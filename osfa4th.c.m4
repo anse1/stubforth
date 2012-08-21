@@ -135,6 +135,24 @@ binop(eq, ==, =)
 binop(gt, >)
 binop(lt, <)
 
+define(unop, `
+primary(`$1', ifelse(`$3',`',`$2',`$3'))
+    ((INT *)sp)[-1] = $2 ((INT *)sp)[-1];
+')
+
+unop(toggle, ~)
+unop(negate, -)
+
+primary(max)
+  sp--;
+  if ((INT)sp[0] > (INT)sp[-1])
+     sp[-1] = sp[0];
+
+primary(min)
+  sp--;
+  if ((INT)sp[0] < (INT)sp[-1])
+     sp[-1] = sp[0];
+
 
 dnl control
 dnl primary(branch,,compile_only)
@@ -164,6 +182,15 @@ primary(load, @)
 primary(cload, c@)
   ((INT *) sp)[-1] = **(char **)sp[-1];
 
+primary(fill)
+{
+  unsigned char c = (INT)*--sp;
+  INT n = (INT)*--sp;
+  p = *--sp;
+  while(n--)
+    ((char *)p)[n] = c;
+}
+
 
 dnl dictionary
 primary(allot)
@@ -177,16 +204,19 @@ primary(here)
 
 
 dnl compiler
-primary(lit)
+primary(lit, compile_only)
   *sp++ = *ip++;
 
 secondary(cold, LIT, (cell)0x55, LIT, (cell) 64, SWAP, EMIT, EMIT, BYE)
-
 
 
 dnl from fig.txt, unclassified
 secondary(cr, LIT, (cell)13, EMIT)
 secondary(bl, LIT, (cell)32, EMIT)
+
+
+dnl convenience
+dnl DUMP
 
 undivert(1)
 
