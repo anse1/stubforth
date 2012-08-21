@@ -7,6 +7,8 @@ cell dictionary_stack[1000];
 
 word *dictionary;
 
+struct vmstate vmstate;
+
 define(dict_head, 0);
 
 define(primary, `
@@ -45,11 +47,20 @@ static word w_$1 = {
   define(translit($1,a-z,A-Z), &w_$1.code)
 ')
 
+static int strcmp(const char *a, const char *b) {
+  while (*a && *b && *a == *b)
+     a++, b++;
+  return (*a == *b) ? 0 : (*a > *b) ? 1 : -1;
+}
+
 int main()
 {
   cell *ip, *sp, *rp, *dp, *w;
   cell *p, t;
 
+  vmstate.base = 10;
+
+abort:
   sp = param_stack;
   rp = return_stack;
   dp = dictionary_stack;
@@ -153,6 +164,9 @@ primary(min)
   if ((INT)sp[0] < (INT)sp[-1])
      sp[-1] = sp[0];
 
+primary(plus1, 1+)
+  ((INT *)sp)[-1]++;
+
 
 dnl control
 dnl primary(branch,,compile_only)
@@ -163,8 +177,25 @@ primary(emit)
   putchar((INT)*--sp);
   fflush(stdout);
 
+primary(hex)
+  vmstate.base = 16;
+
+primary(decimal)
+  vmstate.base = 10;
+
 primary(key)
   *sp++ = (cell)(INT)getchar();
+
+primary(print, .)
+{
+  INT i = (INT) *--sp;
+  char *hex = "01234567890abcdef";
+  int j;
+  for (j=28; j>=0; j-=4) {
+    putchar(hex[0xf & (i>>j)]);
+  }
+  putchar(32);
+}
 
 
 dnl MEM
@@ -193,21 +224,91 @@ primary(fill)
 
 
 dnl dictionary
+
 primary(allot)
+dnl ( n -- ) increase dictionary pointer
   dp += (INT) *--sp;
 
 primary(comma, `,')
   *dp++ = *--sp;
 
 primary(here)
+dnl ( -- a ) push dictionary pointer onto parameter stack
   *sp++ = dp;
+
+primary(word)
+dnl ( -- a ) read a word, return zstring allocated on dictionary stack
+{
+   int c;
+   char *s = (char *)dp;
+   do {
+      c = getchar();
+      putchar(c);
+      fflush(stdout);
+      *s++ = c;
+   } while (IS_WORD(c));
+  s[-1] = 0;
+  *sp++ = dp;
+  dp = (cell *)s;
+}
+
+primary(type)
+dnl ( a -- ) send string at address a
+{
+  char *s = (char *) (*--sp);
+  while (*s)
+    putchar(*s++);
+}
+
+primary(free)
+dnl ( a -- ) set dictionary pointer to a
+  dp = *--sp;
 
 
 dnl compiler
 primary(lit, compile_only)
   *sp++ = *ip++;
 
-secondary(cold, LIT, (cell)0x55, LIT, (cell) 64, SWAP, EMIT, EMIT, BYE)
+primary(find)
+dnl addr -- cfa tf (found) -- ff (not found)
+dnl find string at address a
+{
+   word *p = dictionary;
+   char *s = *--sp;
+   while(p) {
+      if(0 == strcmp(p->name, s)) {
+         *sp++ = &p->code;
+         *sp++ = (cell)1;
+	 goto next;
+      }
+      p = p->link;
+   }
+   *sp++ = 0;
+}
+
+primary(number)
+dnl addr -- n
+dnl convert string at addr to number
+dnl on failure, abort
+{
+  INT n = 0;
+  char *s = sp[-1];
+  int c;
+  while ((c = *s)) {
+   if (c <= 58)
+      c -= 48;
+   else
+      c -= 97;
+   if (c < 0 || c > vmstate.base)
+      goto abort;
+   n *= vmstate.base;
+   n += c;
+   s++;
+  }
+  sp[-1] = (cell)n;
+}
+
+secondary(cold, LIT, (cell) "Hello world\n", TYPE, WORD, NUMBER, PRINT, BYE)
 
 
 dnl from fig.txt, unclassified
