@@ -38,7 +38,7 @@ static word w_$1 = {
   .name = "$1",
   .link = dict_head,
   .code = &&enter,
-  .data = { shift($@) }
+  .data = { shift($@) , EXIT}
 };
 
   define(`dict_head', &w_$1)
@@ -139,8 +139,7 @@ binop(lt, <)
 dnl control
 dnl primary(branch,,compile_only)
 dnl   ip = *--sp;
-dnl   goto next;
-dnl 
+dnl
 dnl I/O
 primary(emit)
   putchar((INT)*--sp);
@@ -181,10 +180,13 @@ dnl compiler
 primary(lit)
   *sp++ = *ip++;
 
+secondary(cold, LIT, (cell)0x55, LIT, (cell) 64, SWAP, EMIT, EMIT, BYE)
 
-secondary(cold, LIT, (cell)0x55, EMIT, BYE, EXIT)
-secondary(cr, LIT, (cell)13, EMIT, EXIT)
-secondary(bl, LIT, (cell)32, EMIT, EXIT)
+
+
+dnl from fig.txt, unclassified
+secondary(cr, LIT, (cell)13, EMIT)
+secondary(bl, LIT, (cell)32, EMIT)
 
 undivert(1)
 
