@@ -18,11 +18,8 @@
 /*   return hash; */
 /* } */
 
-typedef long INT;
-/* assert(sizeof(void *) == sizeof(INT)) */
-
 typedef void *cell;
-
+typedef long INT;
 
 struct word {
   const char *name;
