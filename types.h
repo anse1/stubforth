@@ -18,8 +18,12 @@
 /*   return hash; */
 /* } */
 
-typedef void *cell;
-typedef long INT;
+typedef union {
+  void *a;
+  void *aa;
+  int i;
+  char *s;
+} cell;
 
 struct word {
   const char *name;
