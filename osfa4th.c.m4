@@ -53,6 +53,11 @@ static int strcmp(const char *a, const char *b) {
   return (*a == *b) ? 0 : (*a > *b) ? 1 : -1;
 }
 
+static void my_puts(const char *s) {
+  while (*s)
+    putchar(*s++);
+}
+
 int main()
 {
   cell *ip, *sp, *rp, *dp, *w;
@@ -60,11 +65,12 @@ int main()
 
   vmstate.base = 10;
 
-abort:
+primary(abort)
   sp = param_stack;
   rp = return_stack;
   dp = dictionary_stack;
-
+  my_puts("abort\n");
+  putchar(10);
   goto boot;
 
 enter:
@@ -169,32 +175,48 @@ primary(plus1, 1+)
 
 
 dnl control
-dnl primary(branch,,compile_only)
-dnl   ip = *--sp;
-dnl
+
+dnl --
+primary(branch, , compile_only)
+   ip += (INT)*ip;
+
+dnl f --
+primary(zbranch, 0branch, compile_only)
+   if (*--sp)
+      ip++;
+   else
+      ip += (INT)*ip;
+
 dnl I/O
+
+dnl c --
 primary(emit)
   putchar((INT)*--sp);
   fflush(stdout);
 
+dnl --
 primary(hex)
   vmstate.base = 16;
 
+dnl --
 primary(decimal)
   vmstate.base = 10;
 
+dnl -- c
 primary(key)
   *sp++ = (cell)(INT)getchar();
 
+dnl n --
 primary(print, .)
 {
   INT i = (INT) *--sp;
-  char *hex = "01234567890abcdef";
+  char *hex = "0123456789abcdef";
   int j;
-  for (j=28; j>=0; j-=4) {
+  for (j=4 * sizeof(cell) - 4; j>=0; j-=4) {
     putchar(hex[0xf & (i>>j)]);
   }
   putchar(32);
+  fflush(stdout);
 }
 
 
@@ -243,8 +265,6 @@ dnl ( -- a ) read a word, return zstring allocated on dictionary stack
    char *s = (char *)dp;
    do {
       c = getchar();
-      putchar(c);
-      fflush(stdout);
       *s++ = c;
    } while (IS_WORD(c));
   s[-1] = 0;
@@ -256,8 +276,7 @@ primary(type)
 dnl ( a -- ) send string at address a
 {
   char *s = (char *) (*--sp);
-  while (*s)
-    putchar(*s++);
+  puts(s);
 }
 
 primary(free)
@@ -270,13 +289,14 @@ primary(lit, compile_only)
   *sp++ = *ip++;
 
 primary(find)
-dnl addr -- cfa tf (found) -- ff (not found)
+dnl addr -- cfa tf (found) -- addr ff (not found)
 dnl find string at address a
 {
    word *p = dictionary;
-   char *s = *--sp;
+   char *s = sp[-1];
    while(p) {
       if(0 == strcmp(p->name, s)) {
+          sp--;
          *sp++ = &p->code;
          *sp++ = (cell)1;
 	 goto next;
@@ -298,8 +318,8 @@ dnl on failure, abort
    if (c <= 58)
       c -= 48;
    else
-      c -= 97;
-   if (c < 0 || c > vmstate.base)
+      c -= 87;
+   if (c < 0 || c >= vmstate.base)
       goto abort;
    n *= vmstate.base;
    n += c;
@@ -308,12 +328,19 @@ dnl on failure, abort
   sp[-1] = (cell)n;
 }
 
-secondary(cold, LIT, (cell) "Hello world\n", TYPE, WORD, NUMBER, PRINT, BYE)
-
 
 dnl from fig.txt, unclassified
 secondary(cr, LIT, (cell)13, EMIT)
+secondary(lf, LIT, (cell)10, EMIT)
+secondary(crlf, CR, LF)
 secondary(bl, LIT, (cell)32, EMIT)
+
+secondary(quit, WORD, FIND, ZBRANCH, (cell)4, EXECUTE, BRANCH, (cell)2, NUMBER, BRANCH, (cell)-9)
+
+secondary(test, WORD, TYPE, BRANCH, (cell) -3)
+secondary(testdict, WORD, FIND, PRINT, PRINT, BRANCH, (cell) -5)
+
+secondary(cold, LIT, (cell) "Hello world\n", TYPE, QUIT, BYE)
 
 
 dnl convenience
@@ -321,11 +348,10 @@ dnl DUMP
 
 undivert(1)
 
-dictionary = dict_head;
-
 boot:
-  ip = COLD;
-  *sp++ = COLD;
+  dictionary = dict_head;
+  ip = QUIT;
+  *sp++ = QUIT;
   goto execute;
 
   return 0;
