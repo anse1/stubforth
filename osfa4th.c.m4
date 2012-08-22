@@ -60,7 +60,7 @@ static void my_puts(const char *s) {
 
 int main()
 {
-  cell *ip, *sp, *rp, *dp, *w;
+  cell *ip, *sp, *rp, *w, *dp;
   cell *p, t;
 
   vmstate.base = 10;
@@ -116,6 +116,10 @@ primary(rot)
   sp[-3] = sp[-2];
   sp[-2] = t;
 
+primary(over)
+  *sp = sp[-2];
+  sp++;
+
 
 dnl return stack
 
@@ -138,8 +142,8 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 ')
 
 binop(mul, *)
-binop(plus, +)
-binop(minus, -)
+binop(add, +)
+binop(sub, -)
 binop(div, /)
 binop(or, |)
 binop(xor, ^)
@@ -159,6 +163,7 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 
 unop(toggle, ~)
 unop(negate, -)
+unop(nullp, !, 0=)
 
 primary(max)
   sp--;
@@ -245,18 +250,31 @@ primary(fill)
 }
 
 
-dnl dictionary
+dnl strings
 
-primary(allot)
-dnl ( n -- ) increase dictionary pointer
-  dp += (INT) *--sp;
-
-primary(comma, `,')
-  *dp++ = *--sp;
-
-primary(here)
-dnl ( -- a ) push dictionary pointer onto parameter stack
-  *sp++ = dp;
+primary(number)
+dnl addr -- n
+dnl convert string at addr to number
+dnl on failure, abort
+{
+  INT n = 0;
+  char *s = sp[-1];
+  int c;
+  while ((c = *s)) {
+   if (c <= 58)
+      c -= 48;
+   else
+      c -= 87;
+   if (c < 0 || c >= vmstate.base) {
+      dp = (cell *)s; /* TODO: sanity check */
+      goto abort;
+   }
+   n *= vmstate.base;
+   n += c;
+   s++;
+  }
+  sp[-1] = (cell)n;
+}
 
 primary(word)
 dnl ( -- a ) read a word, return zstring allocated on dictionary stack
@@ -272,6 +290,20 @@ dnl ( -- a ) read a word, return zstring allocated on dictionary stack
   dp = (cell *)s;
 }
 
+
+dnl dictionary
+
+primary(allot)
+dnl ( n -- ) increase dictionary pointer
+  dp += (INT) *--sp;
+
+primary(comma, `,')
+  *dp++ = *--sp;
+
+primary(here)
+dnl ( -- a ) push dictionary pointer onto parameter stack
+  *sp++ = dp;
+
 primary(type)
 dnl ( a -- ) send string at address a
 {
@@ -279,24 +311,21 @@ dnl ( a -- ) send string at address a
   puts(s);
 }
 
-primary(free)
+primary(forget)
 dnl ( a -- ) set dictionary pointer to a
   dp = *--sp;
-
-
-dnl compiler
-primary(lit, compile_only)
-  *sp++ = *ip++;
 
 primary(find)
 dnl addr -- cfa tf (found) -- addr ff (not found)
 dnl find string at address a
+dnl string is deallocated when found
 {
    word *p = dictionary;
    char *s = sp[-1];
    while(p) {
       if(0 == strcmp(p->name, s)) {
-          sp--;
+         dp = (cell *) s; /* TODO: sanity check */
+	 sp--;
          *sp++ = &p->code;
          *sp++ = (cell)1;
 	 goto next;
@@ -306,27 +335,10 @@ dnl find string at address a
    *sp++ = 0;
 }
 
-primary(number)
-dnl addr -- n
-dnl convert string at addr to number
-dnl on failure, abort
-{
-  INT n = 0;
-  char *s = sp[-1];
-  int c;
-  while ((c = *s)) {
-   if (c <= 58)
-      c -= 48;
-   else
-      c -= 87;
-   if (c < 0 || c >= vmstate.base)
-      goto abort;
-   n *= vmstate.base;
-   n += c;
-   s++;
-  }
-  sp[-1] = (cell)n;
-}
+
+dnl compiler
+primary(lit, compile_only)
+  *sp++ = *ip++;
 
 
 dnl from fig.txt, unclassified
@@ -335,12 +347,12 @@ secondary(lf, LIT, (cell)10, EMIT)
 secondary(crlf, CR, LF)
 secondary(bl, LIT, (cell)32, EMIT)
 
-secondary(quit, WORD, FIND, ZBRANCH, (cell)4, EXECUTE, BRANCH, (cell)2, NUMBER, BRANCH, (cell)-9)
+secondary(repl, WORD, FIND, ZBRANCH, (cell)4, EXECUTE, BRANCH, (cell)2, NUMBER, BRANCH, (cell)-9)
 
 secondary(test, WORD, TYPE, BRANCH, (cell) -3)
 secondary(testdict, WORD, FIND, PRINT, PRINT, BRANCH, (cell) -5)
 
-secondary(cold, LIT, (cell) "Hello world\n", TYPE, QUIT, BYE)
+secondary(cold, LIT, (cell) "Hello world\n", TYPE, REPL, BYE)
 
 
 dnl convenience
@@ -350,8 +362,8 @@ undivert(1)
 
 boot:
   dictionary = dict_head;
-  ip = QUIT;
-  *sp++ = QUIT;
+  ip = REPL;
+  *sp++ = REPL;
   goto execute;
 
   return 0;
