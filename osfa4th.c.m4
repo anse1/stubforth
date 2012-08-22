@@ -264,6 +264,7 @@ dnl on failure, abort
    if (c <= 58)
       c -= 48;
    else
+      c |= 1 << 5;
       c -= 87;
    if (c < 0 || c >= vmstate.base) {
       dp = (cell *)s; /* TODO: sanity check */
