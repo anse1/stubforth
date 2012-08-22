@@ -23,7 +23,7 @@ divert(1)
   static word w_$1 = {
     .name = "ifelse(`$2',`',`$1',`$2')",
     .link = dict_head,
-    .code = &&$1
+    .code = { .a = &&$1 }
     ifelse(`$3',`',`',`, .$3=1')
     ifelse(`$4',`',`',`, .$4=1')
     ifelse(`$5',`',`',`, .$5=1')
@@ -34,13 +34,15 @@ divert(0)
   define(translit($1,a-z,A-Z), &w_$1.code)
 ')
 
+define(`init_union', `ifelse(`$1',,,`{ $1 } ifelse(`$2',,,`,') init_union(shift($@))') ')
+
 define(secondary, `
 undivert(1)
 static word w_$1 = {
   .name = "$1",
   .link = dict_head,
-  .code = &&enter,
-  .data = { shift($@) , EXIT}
+  .code.a = &&enter,
+  .data = { init_union(shift($@)) , {EXIT}}
 };
 
   define(`dict_head', &w_$1)
@@ -61,7 +63,7 @@ static void my_puts(const char *s) {
 int main()
 {
   cell *ip, *sp, *rp, *w, *dp;
-  cell *p, t;
+  cell t;
 
   vmstate.base = 10;
 
@@ -74,20 +76,20 @@ primary(abort)
   goto boot;
 
 enter:
-  *rp++ = ip;
+  (rp++)->a = ip;
   ip = w + 1;
 next:
-  w = *ip++;
+  w = (ip++)->a;
   goto **(void **)w;
 
 
 dnl inner interpreter
 primary(execute)
-  w = *--sp;
-  goto **(void **)w;
+  w = (--sp)->a;
+  goto *(w->aa);
 
 primary(exit)
-  ip = *--rp; w = *ip;
+  ip = (--rp)->a; w = ip->a;
 
 primary(bye)
   return 0;
@@ -96,7 +98,7 @@ primary(bye)
 dnl stack manipulation
 
 primary(pick)
-  sp[-1] = sp[-2 - (INT)sp[-1]];
+  sp[-1] = sp[-2 - sp[-1].i];
 
 primary(drop)
   sp--;
@@ -138,7 +140,7 @@ dnl Arithmetic/Logic
 define(binop, `
 primary(`$1', ifelse(`$3',`',`$2',`$3'))
     t = *--sp;
-    ((INT *)sp)[-1] = ((INT *)sp)[-1] $2 (INT)t;
+    sp[-1].i = sp[-1].i $2 t.i;
 ')
 
 binop(mul, *)
@@ -158,7 +160,7 @@ binop(lt, <)
 
 define(unop, `
 primary(`$1', ifelse(`$3',`',`$2',`$3'))
-    ((INT *)sp)[-1] = $2 ((INT *)sp)[-1];
+    sp[-1].i = $2 sp[-1].i;
 ')
 
 unop(toggle, ~)
@@ -167,36 +169,36 @@ unop(nullp, !, 0=)
 
 primary(max)
   sp--;
-  if ((INT)sp[0] > (INT)sp[-1])
+  if (sp[0].i > sp[-1].i)
      sp[-1] = sp[0];
 
 primary(min)
   sp--;
-  if ((INT)sp[0] < (INT)sp[-1])
+  if (sp[0].i < sp[-1].i)
      sp[-1] = sp[0];
 
 primary(plus1, 1+)
-  ((INT *)sp)[-1]++;
+  sp[-1].i++;
 
 
 dnl control
 
 dnl --
 primary(branch, , compile_only)
-   ip += (INT)*ip;
+   ip += ip->i;
 
 dnl f --
 primary(zbranch, 0branch, compile_only)
-   if (*--sp)
+   if ((--sp)->i)
       ip++;
    else
-      ip += (INT)*ip;
+      ip += ip->i;
 
 dnl I/O
 
 dnl c --
 primary(emit)
-  putchar((INT)*--sp);
+  putchar((--sp)->i);
   fflush(stdout);
 
 dnl --
@@ -209,16 +211,16 @@ primary(decimal)
 
 dnl -- c
 primary(key)
-  *sp++ = (cell)(INT)getchar();
+  (sp++)->i = getchar();
 
 dnl n --
 primary(print, .)
 {
-  INT i = (INT) *--sp;
+  t.i = (--sp)->i;
   char *hex = "0123456789abcdef";
   int j;
   for (j=4 * sizeof(cell) - 4; j>=0; j-=4) {
-    putchar(hex[0xf & (i>>j)]);
+    putchar(hex[0xf & (t.i>>j)]);
   }
   putchar(32);
   fflush(stdout);
@@ -227,26 +229,26 @@ primary(print, .)
 
 dnl MEM
 primary(store, !)
-  p = *--sp;
-  *p = *--sp;
+  *(sp[-1].aa) = sp[-2].a;
+  sp -= 2;
 
 primary(cstore, c!)
-  p = *--sp;
-  *(char *)p = (INT)*--sp;
+  *sp[-1].s = sp[-2].i;
+  sp -= 2;
 
 primary(load, @)
-  sp[-1] = **(cell **)sp[-1];
+  sp[-1].a = *sp[-1].aa;
 
 primary(cload, c@)
-  ((INT *) sp)[-1] = **(char **)sp[-1];
+  sp[-1].i = *sp[-1].s;
 
 primary(fill)
 {
-  unsigned char c = (INT)*--sp;
-  INT n = (INT)*--sp;
-  p = *--sp;
+  unsigned char c = (--sp)->i;
+  int n = (--sp)->i;
+  t = *--sp;
   while(n--)
-    ((char *)p)[n] = c;
+    t.s[n] = c;
 }
 
 
@@ -257,24 +259,26 @@ dnl addr -- n
 dnl convert string at addr to number
 dnl on failure, abort
 {
-  INT n = 0;
-  char *s = sp[-1];
+  t.i = 0;
+  char *s = sp[-1].s;
   int c;
   while ((c = *s)) {
    if (c <= 58)
       c -= 48;
    else
+    {
       c |= 1 << 5;
       c -= 87;
+    }
    if (c < 0 || c >= vmstate.base) {
       dp = (cell *)s; /* TODO: sanity check */
       goto abort;
    }
-   n *= vmstate.base;
-   n += c;
+   t.i *= vmstate.base;
+   t.i += c;
    s++;
   }
-  sp[-1] = (cell)n;
+  sp[-1] = t;
 }
 
 primary(word)
@@ -287,7 +291,7 @@ dnl ( -- a ) read a word, return zstring allocated on dictionary stack
       *s++ = c;
    } while (IS_WORD(c));
   s[-1] = 0;
-  *sp++ = dp;
+  (sp++)->s = (char *)dp;
   dp = (cell *)s;
 }
 
@@ -295,26 +299,26 @@ dnl ( -- a ) read a word, return zstring allocated on dictionary stack
 dnl dictionary
 
 primary(allot)
-dnl ( n -- ) increase dictionary pointer
-  dp += (INT) *--sp;
+dnl n -- increase dictionary pointer
+  dp += (--sp)->i;
 
 primary(comma, `,')
   *dp++ = *--sp;
 
 primary(here)
 dnl ( -- a ) push dictionary pointer onto parameter stack
-  *sp++ = dp;
+  (sp++)->a = dp;
 
 primary(type)
-dnl ( a -- ) send string at address a
+dnl ( s -- ) send zstring
 {
-  char *s = (char *) (*--sp);
-  puts(s);
+  char *s = (--sp)->s;
+  my_puts(s);
 }
 
 primary(forget)
 dnl ( a -- ) set dictionary pointer to a
-  dp = *--sp;
+  dp = (--sp)->a;
 
 primary(find)
 dnl addr -- cfa tf (found) -- addr ff (not found)
@@ -322,18 +326,18 @@ dnl find string at address a
 dnl string is deallocated when found
 {
    word *p = dictionary;
-   char *s = sp[-1];
+   char *s = sp[-1].s;
    while(p) {
       if(0 == strcmp(p->name, s)) {
          dp = (cell *) s; /* TODO: sanity check */
 	 sp--;
-         *sp++ = &p->code;
-         *sp++ = (cell)1;
+         (sp++)->a = &p->code;
+         (sp++)->i = 1;
 	 goto next;
       }
       p = p->link;
    }
-   *sp++ = 0;
+   (sp++)->i = 0;
 }
 
 
@@ -343,17 +347,18 @@ primary(lit, compile_only)
 
 
 dnl from fig.txt, unclassified
-secondary(cr, LIT, (cell)13, EMIT)
-secondary(lf, LIT, (cell)10, EMIT)
+secondary(cr, LIT, .i=13, EMIT)
+secondary(lf, LIT, .i=10, EMIT)
 secondary(crlf, CR, LF)
-secondary(bl, LIT, (cell)32, EMIT)
+secondary(bl, LIT, .i=32, EMIT)
 
-secondary(repl, WORD, FIND, ZBRANCH, (cell)4, EXECUTE, BRANCH, (cell)2, NUMBER, BRANCH, (cell)-9)
+secondary(repl, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BRANCH, .i=-9)
 
-secondary(test, WORD, TYPE, BRANCH, (cell) -3)
-secondary(testdict, WORD, FIND, PRINT, PRINT, BRANCH, (cell) -5)
+secondary(test, WORD, TYPE, BRANCH,  .i=-3)
+secondary(testdict, WORD, FIND, PRINT, PRINT, BRANCH, .i=-5)
 
-secondary(cold, LIT, (cell) "Hello world\n", TYPE, REPL, BYE)
+secondary(hi, LIT, .s= "Hello world\n", TYPE)
+secondary(cold, HI, REPL, BYE)
 
 
 dnl convenience
@@ -363,8 +368,8 @@ undivert(1)
 
 boot:
   dictionary = dict_head;
-  ip = REPL;
-  *sp++ = REPL;
+  ip = 0;
+  (sp++)->a = REPL;
   goto execute;
 
   return 0;
