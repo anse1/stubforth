@@ -1,8 +1,8 @@
 #include "platform.h"
 #include "types.h"
 
-cell param_stack[1000];
 cell return_stack[1000];
+cell param_stack[1000];
 cell dictionary_stack[1000];
 
 word *dictionary;
@@ -254,10 +254,23 @@ primary(fill)
 
 dnl strings
 
+primary(word)
+dnl ( -- a ) read a word, return zstring allocated on dictionary stack
+{
+   int c;
+   char *s = (char *)dp;
+   do {
+      c = getchar();
+      *s++ = c;
+   } while (IS_WORD(c));
+  s[-1] = 0;
+  (sp++)->s = (char *)dp;
+  dp = (cell *)s;
+}
+
 primary(number)
-dnl addr -- n
-dnl convert string at addr to number
-dnl on failure, abort
+dnl ( s -- n )
+dnl Convert string to number. On failure, abort.
 {
   t.i = 0;
   char *s = sp[-1].s;
@@ -279,20 +292,6 @@ dnl on failure, abort
    s++;
   }
   sp[-1] = t;
-}
-
-primary(word)
-dnl ( -- a ) read a word, return zstring allocated on dictionary stack
-{
-   int c;
-   char *s = (char *)dp;
-   do {
-      c = getchar();
-      *s++ = c;
-   } while (IS_WORD(c));
-  s[-1] = 0;
-  (sp++)->s = (char *)dp;
-  dp = (cell *)s;
 }
 
 
