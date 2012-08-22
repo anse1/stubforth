@@ -18,12 +18,13 @@
 /*   return hash; */
 /* } */
 
-typedef union {
+union cell {
   void *a;
-  void *aa;
+  void **aa;
   int i;
   char *s;
-} cell;
+};
+typedef union cell cell;
 
 struct word {
   const char *name;
@@ -38,7 +39,7 @@ struct word {
 struct vmstate {
   volatile int break_condition : 1;
   int compiling : 1;
-  int base : 7;
+  int base : 6;
 };
 
 #define IS_WORD(c) (c > ' ')
