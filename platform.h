@@ -12,22 +12,30 @@
 
 int fifostate;
 
-
-static void puts(const char *s)
+static int putchar(int c)
 {
-  while (*s) {
-    while (UTX & UTX_BUSY)
-      ;
-    UTX_TXDATA = *s++;
-  }
+  if (c=='\n')
+    putchar('\r');
+  while (! (UTX & UTX_TX_AVAIL))
+        ;
+  UTX_TXDATA = c;
+
+  return 0;
 }
 
+
+static int puts(const char *s)
+{
+  while (*s) {
+    putchar(*s++);
+  }
+  putchar('\n');
+  return 0;
+}
 
 static int getchar()
 {
   int c;
-
-  puts("getchar()\n");
 
   do {
     fifostate = URX;
@@ -35,34 +43,33 @@ static int getchar()
 
   c = fifostate & URX_RXDATA_MASK;
 
-  UTX_TXDATA = c;
+  putchar(c);
 
   return c;
 }
 
-static int putchar(int c)
-{
-  puts("putchar()\n");
-  while (! (UTX & UTX_TX_AVAIL))
-        ;
-      UTX_TXDATA = c;
-  return 0;
-}
-
 static void initio(void)
 {
-  puts("initio()\n");
+  puts("initio()");
   fifostate = URX;
   puts("sizeof(cell): ");
   putchar(sizeof(cell) + '0');
-  putchar('\n');
   puts("sizeof(int): ");
   putchar(sizeof(int) + '0');
-  putchar('\n');
   puts("sizeof(void *): ");
   putchar(sizeof(void *) + '0');
-  putchar('\n');
 }
 
+
+static int cprint(int i)
+{
+  char *hex = "0123456789abcdef";
+  int j;
+  for (j=8 * sizeof(i) - 4; j>=0; j-=4) {
+    putchar(hex[0xf & (i>>j)]);
+  }
+  putchar('\n');
+  return 0;
+}
 
 #endif
