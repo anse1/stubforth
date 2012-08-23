@@ -13,10 +13,9 @@ struct vmstate vmstate = { .dp = dictionary_stack };
 define(dict_head, 0);
 
 dnl $1 - ANS94 error code
-define(`throw', `
+define(`cthrow', `
 {
   vmstate.errno = $1;
-  goto abort;
 }')
 
 define(primary, `
@@ -350,7 +349,7 @@ dnl Convert string to number. On failure, abort.
       c = c - 'a' + 10;
     }
    if (c < 0 || c >= vmstate.base) {
-      throw(-24, invalid numeric argument);
+      cthrow(-24, invalid numeric argument);
    }
    t.i *= vmstate.base;
    t.i += c;
@@ -483,7 +482,7 @@ secondary(q, ?, LOAD, PRINT)
 secondary(test,, WORD, TYPE, BRANCH,  .i=-3)
 secondary(testdict,, WORD, FIND, PRINT, PRINT, BRANCH, .i=-5)
 
-secondary(hi,, LIT, .s= FORTHNAME "-" REVISION "\n", TYPE)
+secondary(hi,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
 secondary(cold,, HI, QUIT, BYE)
 
 
