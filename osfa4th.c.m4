@@ -7,14 +7,21 @@ cell dictionary_stack[1000];
 
 word *dictionary;
 
-struct vmstate vmstate;
+struct vmstate vmstate = { .dp = dictionary_stack };
 
 define(dict_head, 0);
+
+dnl $1 - ANS94 error code
+define(`throw', `
+{
+  vmstate.errno = $1;
+  goto abort;
+}')
 
 define(primary, `
 dnl Cons a primary word
 dnl $1 - C identifier
-dnl $2 - token string (default: $1)
+dnl $2 - forth word (default: $1)
 dnl $3... - flags
 undivert(1)
 $1:
@@ -23,7 +30,8 @@ divert(1)
   static word w_$1 = {
     .name = "ifelse(`$2',`',`$1',`$2')",
     .link = dict_head,
-    .code = { .a = &&$1 }
+    .code = &&$1
+    dnl optional flags
     ifelse(`$3',`',`',`, .$3=1')
     ifelse(`$4',`',`',`, .$4=1')
     ifelse(`$5',`',`',`, .$5=1')
@@ -36,13 +44,18 @@ divert(0)
 
 define(`init_union', `ifelse(`$1',,,`{ $1 } ifelse(`$2',,,`,') init_union(shift($@))') ')
 
+dnl Cons a secondary word
+dnl $1 - C identifier
+dnl $2 - forth word (default: $1)
+dnl $3... - cell data
+
 define(secondary, `
 undivert(1)
 static word w_$1 = {
-  .name = "$1",
+  .name = "ifelse($2,`',`$1',`$2')",
   .link = dict_head,
-  .code.a = &&enter,
-  .data = { init_union(shift($@)) , {EXIT}}
+  .code = &&enter,
+  .data = { init_union(shift(shift($@))) , {EXIT}}
 };
 
   define(`dict_head', &w_$1)
@@ -60,9 +73,19 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
+static word *find(word *p, const char *key)
+{
+   while(p) {
+      if(! p->smudge && (0 == strcmp(p->name, key)))
+         break;
+      p = p->link;
+   }
+   return p;
+}
+
 int main()
 {
-  cell *ip, *sp, *rp, *w, *dp;
+  cell *ip, *sp, *rp, *w;
   cell t;
 
   vmstate.base = 10;
@@ -70,14 +93,14 @@ int main()
 primary(abort)
   sp = param_stack;
   rp = return_stack;
-  dp = dictionary_stack;
   my_puts("abort\n");
-  putchar(10);
+  putchar('\n');
   goto boot;
 
 enter:
   (rp++)->a = ip;
   ip = w + 1;
+
 next:
   w = (ip++)->a;
   goto **(void **)w;
@@ -93,6 +116,39 @@ primary(exit)
 
 primary(bye)
   return 0;
+
+
+
+dnl non-colon secondary words
+
+docon:
+  *(sp++) = *(w + 1);
+  goto next;
+
+dnl $1 - name
+dnl $2 - value
+
+define(constant, `
+undivert(1)
+static word w_$1 = {
+  .name = "$1",
+  .link = dict_head,
+  .code = &&docon,
+  .data = {{ $2 }}
+};
+
+  define(`dict_head', &w_$1)
+  define(translit($1,a-z,A-Z), &w_$1.code)
+')
+
+constant(cell, .i=sizeof(cell))
+constant(dp, .a=(&vmstate.dp))
+constant(s0, .a=param_stack)
+constant(r0, .a=return_stack)
+
+primary(spat, sp@)
+  sp->a = sp-1;
+  sp++;
 
 
 dnl stack manipulation
@@ -147,10 +203,10 @@ binop(mul, *)
 binop(add, +)
 binop(sub, -)
 binop(div, /)
-binop(or, |)
-binop(xor, ^)
-binop(and, &)
-binop(mod, %)
+binop(or, |, or)
+binop(xor, ^, xor)
+binop(and, &, and)
+binop(mod, %, mod)
 binop(shl, <<)
 binop(shr, >>)
 
@@ -164,7 +220,7 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 ')
 
 unop(toggle, ~)
-unop(negate, -)
+unop(invert, -, invert)
 unop(nullp, !, 0=)
 
 primary(max)
@@ -219,10 +275,10 @@ primary(print, .)
   t.i = (--sp)->i;
   char *hex = "0123456789abcdef";
   int j;
-  for (j=4 * sizeof(cell) - 4; j>=0; j-=4) {
+  for (j=8 * sizeof(t.i) - 4; j>=0; j-=4) {
     putchar(hex[0xf & (t.i>>j)]);
   }
-  putchar(32);
+  putchar(' ');
   fflush(stdout);
 }
 
@@ -237,7 +293,7 @@ primary(cstore, c!)
   sp -= 2;
 
 primary(load, @)
-  sp[-1].a = *sp[-1].aa;
+  sp[-1].a = *(sp[-1].aa);
 
 primary(cload, c@)
   sp[-1].i = *sp[-1].s;
@@ -255,17 +311,18 @@ primary(fill)
 dnl strings
 
 primary(word)
-dnl ( -- a ) read a word, return zstring allocated on dictionary stack
+dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
 {
    int c;
-   char *s = (char *)dp;
+   char *s = (char *)vmstate.dp;
    do {
       c = getchar();
+      if (c < 0) return 0;
       *s++ = c;
    } while (IS_WORD(c));
   s[-1] = 0;
-  (sp++)->s = (char *)dp;
-  dp = (cell *)s;
+  (sp++)->s = (char *)vmstate.dp;
+  vmstate.dp = (cell *)s;
 }
 
 primary(number)
@@ -276,16 +333,16 @@ dnl Convert string to number. On failure, abort.
   char *s = sp[-1].s;
   int c;
   while ((c = *s)) {
-   if (c <= 58)
-      c -= 48;
+   if (c <= '9')
+      c -= '0';
    else
     {
-      c |= 1 << 5;
-      c -= 87;
+      c |= 1 << 5; /* upcase */
+      c = c - 'a' + 10;
     }
    if (c < 0 || c >= vmstate.base) {
-      dp = (cell *)s; /* TODO: sanity check */
-      goto abort;
+      vmstate.dp = (cell *)s; /* TODO: sanity check */
+      throw(-24);
    }
    t.i *= vmstate.base;
    t.i += c;
@@ -299,14 +356,14 @@ dnl dictionary
 
 primary(allot)
 dnl n -- increase dictionary pointer
-  dp += (--sp)->i;
+  vmstate.dp += (--sp)->i;
 
 primary(comma, `,')
-  *dp++ = *--sp;
+  *vmstate.dp++ = *--sp;
 
 primary(here)
 dnl ( -- a ) push dictionary pointer onto parameter stack
-  (sp++)->a = dp;
+  (sp++)->a = vmstate.dp;
 
 primary(type)
 dnl ( s -- ) send zstring
@@ -317,26 +374,22 @@ dnl ( s -- ) send zstring
 
 primary(forget)
 dnl ( a -- ) set dictionary pointer to a
-  dp = (--sp)->a;
+  vmstate.dp = (--sp)->a;
 
 primary(find)
-dnl addr -- cfa tf (found) -- addr ff (not found)
-dnl find string at address a
-dnl string is deallocated when found
+dnl s -- cfa tf (found) -- s ff (not found)
+dnl s is deallocated when found
 {
-   word *p = dictionary;
-   char *s = sp[-1].s;
-   while(p) {
-      if(0 == strcmp(p->name, s)) {
-         dp = (cell *) s; /* TODO: sanity check */
-	 sp--;
-         (sp++)->a = &p->code;
-         (sp++)->i = 1;
-	 goto next;
-      }
-      p = p->link;
+   char *key = sp[-1].s;
+   word *p = find(dictionary, key);
+   if (p)
+   {
+     vmstate.dp = (cell *) key; /* TODO: sanity check */
+     sp--;
+     (sp++)->a = &p->code;
+     (sp++)->i = 1;
    }
-   (sp++)->i = 0;
+     else (sp++)->i = 0;
 }
 
 
@@ -344,20 +397,48 @@ dnl compiler
 primary(lit, compile_only)
   *sp++ = *ip++;
 
+primary(state)
+  (sp++)->i = vmstate.compiling;
+
+dnl ( s --- )
+dnl cons the header of a dictionary entry for s, switch state
+primary(cons)
+{
+  word *new = (word *)vmstate.dp;
+  new->name = (--sp)->s;
+  new->link = dictionary;
+  new->smudge = 0;
+  vmstate.compiling = 1;
+  dictionary = new;
+  new->code = &&enter;
+  vmstate.dp = (cell *) &new->data;
+}
+
 
 dnl from fig.txt, unclassified
-secondary(cr, LIT, .i=13, EMIT)
-secondary(lf, LIT, .i=10, EMIT)
-secondary(crlf, CR, LF)
-secondary(bl, LIT, .i=32, EMIT)
+secondary(cr,, LIT, .i=13, EMIT)
+secondary(lf,, LIT, .i=10, EMIT)
+secondary(crlf,, CR, LF)
+secondary(bl,, LIT, .i=32, EMIT)
 
-secondary(repl, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BRANCH, .i=-9)
+dnl secondary(repl, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BRANCH, .i=-9)
 
-secondary(test, WORD, TYPE, BRANCH,  .i=-3)
-secondary(testdict, WORD, FIND, PRINT, PRINT, BRANCH, .i=-5)
+secondary(tick, ', WORD, FIND, DROP)
+secondary(tobody, >body, CELL, ADD)
 
-secondary(hi, LIT, .s= "Hello world\n", TYPE)
-secondary(cold, HI, REPL, BYE)
+secondary(repl,, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
+
+dnl secondary(quit, WORD, FIND, ZBRANCH, .i=4, STATE, ZBRANCH, .i=4, COMMA, BRANCH, .i=-9, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
+
+secondary(colon, :, WORD, CONS)
+
+secondary(q, ?, LOAD, PRINT)
+
+secondary(test,, WORD, TYPE, BRANCH,  .i=-3)
+secondary(testdict,, WORD, FIND, PRINT, PRINT, BRANCH, .i=-5)
+
+secondary(hi,, LIT, .s= "Hello world\n", TYPE)
+secondary(cold,, HI, REPL, BYE)
 
 
 dnl convenience
