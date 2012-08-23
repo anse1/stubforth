@@ -95,7 +95,6 @@ primary(abort)
   sp = param_stack;
   rp = return_stack;
   my_puts("abort\n");
-  putchar('\n');
   goto boot;
 
 enter:
