@@ -1,1 +1,7 @@
-stub4th.c gitrev.h *.log words.*
+stub4th.c
+gitrev.h
+*.log
+words.*
+*.s
+*.o
+stub4th
