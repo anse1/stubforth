@@ -27,6 +27,7 @@ dnl $2 - forth word (default: $1)
 dnl $3... - flags
 undivert(1)
 $1:
+puts("p$1\n");
 divert(1)
   goto next;
   static word w_$1 = {
@@ -92,6 +93,8 @@ int main()
   cell *ip, *sp, *rp, *w;
   cell t;
 
+  initio();
+
   vmstate.base = 10;
 
 goto cold;
@@ -106,10 +109,12 @@ primary(abort)
   goto quit;
 
 enter:
+  puts("enter\n");
   (rp++)->a = ip;
   ip = w + 1;
 
 next:
+  puts("next\n");
   w = (ip++)->a;
   goto **(void **)w;
 
@@ -280,7 +285,6 @@ dnl I/O
 dnl c --
 primary(emit)
   putchar((--sp)->i);
-  fflush(stdout);
 
 dnl --
 primary(hex)
@@ -304,7 +308,6 @@ primary(print, .)
     putchar(hex[0xf & (t.i>>j)]);
   }
   putchar(' ');
-  fflush(stdout);
 }
 
 
@@ -556,6 +559,7 @@ cold:
   rp = return_stack;
   ip = 0;
   (sp++)->a = COLD;
+  puts("jumping to execute\n");
   goto execute;
 
   return 0;
