@@ -16,6 +16,8 @@ dnl $1 - ANS94 error code
 define(`cthrow', `
 {
   vmstate.errno = $1;
+  vmstate.errstr = "$2";
+  goto abort;
 }')
 
 define(primary, `
@@ -93,7 +95,12 @@ int main()
 goto cold;
 
 primary(abort)
-  my_puts("abort\n");
+  my_puts("abort");
+  if (vmstate.errno)
+    my_puts(": ");
+    my_puts(vmstate.errstr);
+  my_puts("\n");
+  vmstate.errno = 0;
   goto quit;
 
 enter:
@@ -176,6 +183,18 @@ primary(rot)
 primary(over)
   *sp = sp[-2];
   sp++;
+
+primary(qstack, ?stack)
+  if (sp > &param_stack[sizeof(param_stack)])
+    cthrow(-3, stack overflow)
+  if (sp < param_stack)
+    cthrow(-4, stack underflow)
+  if (rp > &return_stack[sizeof(return_stack)])
+    cthrow(-5, stack overflow)
+  if (rp < return_stack)
+    cthrow(-6, return stack underflow)
+  if (vmstate.dp > &dictionary_stack[sizeof(dictionary_stack)])
+    cthrow(-8, dictionary overflow)
 
 
 dnl return stack
@@ -471,7 +490,7 @@ NUMBER,
 STATE, NULLP, ZBRANCH, .i=2, EXIT,
 LIT, LIT, COMMA, COMMA)
 
-secondary(quit,, WORD, INTERPRET, BRANCH, .i=-3)
+secondary(quit,, WORD, INTERPRET, QSTACK, BRANCH, .i=-4)
 
 dnl secondary(quit, WORD, FIND, ZBRANCH, .i=4, STATE, ZBRANCH, .i=4, COMMA, BRANCH, .i=-9, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
 
