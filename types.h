@@ -31,18 +31,23 @@ struct word {
   int execute_only : 1;
   int compile_only : 1;
   int immediate : 1;
+  int smudge : 1;
   struct word *link;
-  cell code;
+  void *code;
   cell data[];
 } __attribute__((packed));
 
 struct vmstate {
   volatile int break_condition : 1;
   int compiling : 1;
-  int base : 6;
-};
+  unsigned int base : 5;
+  int errno : 14;
+  cell *dp;
+} __attribute__((packed));
 
 #define IS_WORD(c) (c > ' ')
+
+#define CFA2WORD(x,w) ((word *) ((char *)x) - ((char *)(&w->code) - (char *)w))
 
 extern struct word *dictionary;
 extern struct vmstate vmstate;
