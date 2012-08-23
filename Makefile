@@ -3,7 +3,7 @@ all: stub4th
 
 config.h: .rev.h
 
-.rev.h: .
+.rev.h: .git
 	echo -n \#define REVISION \"  > $@
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@

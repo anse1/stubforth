@@ -49,7 +49,8 @@ define(`init_union', `ifelse(`$1',,,`{ $1 } ifelse(`$2',,,`,') init_union(shift(
 dnl Cons a secondary word
 dnl $1 - C identifier
 dnl $2 - forth word (default: $1)
-dnl $3... - cell data
+dnl $3 - flags
+dnl $4... - cell data
 
 define(secondary, `
 undivert(1)
@@ -57,7 +58,8 @@ static word w_$1 = {
   .name = "ifelse($2,`',`$1',`$2')",
   .link = dict_head,
   .code = &&enter,
-  .data = { init_union(shift(shift($@))) , {EXIT}}
+   ifelse(`$3',`',`',`$3,')
+  .data = { init_union(shift(shift(shift($@)))) , {EXIT}}
 };
 
   define(`dict_head', &w_$1)
@@ -466,21 +468,21 @@ primary(semi, ;, immediate)
 }
 
 dnl from fig.txt, unclassified
-secondary(cr,, LIT, .i=13, EMIT)
-secondary(lf,, LIT, .i=10, EMIT)
-secondary(crlf,, CR, LF)
-secondary(bl,, LIT, .i=32, EMIT)
+secondary(cr,,, LIT, .i=13, EMIT)
+secondary(lf,,, LIT, .i=10, EMIT)
+secondary(crlf,,, CR, LF)
+secondary(bl,,, LIT, .i=32, EMIT)
 
-dnl secondary(repl, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BRANCH, .i=-9)
+dnl secondary(repl, WORD,, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BRANCH, .i=-9)
 
-secondary(tick, ', WORD, FIND, ZBRANCH, .i=2, EXIT, ABORT)
-secondary(tobody, >body, CELL, ADD)
+secondary(tick, ',, WORD, FIND, ZBRANCH, .i=2, EXIT, ABORT)
+secondary(tobody, >body,, CELL, ADD)
 
-dnl secondary(interpret,, FIND, ZBRANCH, .i=3, EXECUTE, EXIT, NUMBER)
+dnl secondary(interpret,,, FIND, ZBRANCH, .i=3, EXECUTE, EXIT, NUMBER)
 
 dnl (s -- )
 dnl interpret or compile s
-secondary(interpret,,
+secondary(interpret,,,
 FIND,
 ZBRANCH, .i=11,
 IMMEDIATEP, NULLP, STATE, AND, ZBRANCH, .i=3,
@@ -490,19 +492,51 @@ NUMBER,
 STATE, NULLP, ZBRANCH, .i=2, EXIT,
 LIT, LIT, COMMA, COMMA)
 
-secondary(quit,, WORD, INTERPRET, QSTACK, BRANCH, .i=-4)
+secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, .i=-4)
 
-dnl secondary(quit, WORD, FIND, ZBRANCH, .i=4, STATE, ZBRANCH, .i=4, COMMA, BRANCH, .i=-9, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
+dnl secondary(quit, WORD,, FIND, ZBRANCH, .i=4, STATE, ZBRANCH, .i=4, COMMA, BRANCH, .i=-9, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
 
-secondary(colon, :, WORD, CONS)
+secondary(colon, :,, WORD, CONS)
 
-secondary(q, ?, LOAD, PRINT)
+dnl ( -- a )
+secondary(begin,, .immediate=1,
+ DP, LOAD)
+dnl ( a -- )
+secondary(again,, .immediate=1,
+ LIT, BRANCH, COMMA, DP, LOAD, SUB, CELL, DIV, COMMA)
+dnl ( a -- )
+secondary(until,, .immediate=1,
+ LIT, ZBRANCH, COMMA, DP, LOAD, SUB, CELL, DIV, COMMA)
 
-secondary(test,, WORD, TYPE, BRANCH,  .i=-3)
-secondary(testdict,, WORD, FIND, PRINT, PRINT, BRANCH, .i=-5)
+dnl ( -- &zbranch-arg )
+secondary(if,, .immediate=1,
+ LIT, ZBRANCH, COMMA, /* place branch cfa */
+ DP, LOAD,            /* push address of branch arg */
+ DP, COMMA            /* place dummy arg */
+)
 
-secondary(hi,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
-secondary(cold,, HI, QUIT, BYE)
+dnl ( &zbranch-arg -- &branch-arg )
+secondary(else,, .immediate=1,
+ LIT, BRANCH, COMMA, /* place branch cfa */
+ DP, LOAD, /* push address of dummy target */
+ DP, COMMA, /* place dummy target */
+ SWAP, DUP,
+ DP, LOAD, SWAP, SUB, CELL, DIV, /* compute distance */
+ SWAP, STORE /* patch */
+)
+
+dnl ( &branch-arg -- )
+secondary(then,, .immediate=1,
+ DUP,  /* address to patch */
+ DP, LOAD, /* next cell */
+ SWAP, SUB, CELL, DIV,  /* compute distance */
+ SWAP, STORE /* patch */
+)
+
+secondary(q, ?,, LOAD, PRINT)
+
+secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
+secondary(cold,,, HI, QUIT, BYE)
 
 
 dnl convenience

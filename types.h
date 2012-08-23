@@ -42,6 +42,7 @@ struct vmstate {
   int compiling : 1;
   unsigned int base : 5;
   int errno : 14;
+  char *errstr;
   cell *dp;
 } __attribute__((packed));
 
