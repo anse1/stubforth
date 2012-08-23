@@ -1,5 +1,5 @@
 stub4th.c
-gitrev.h
+.rev.h
 *.log
 words.*
 *.s

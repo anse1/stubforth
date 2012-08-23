@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "gitrev.h"
+#include ".rev.h"
 
 #define FORTHNAME "stub4th"
 
