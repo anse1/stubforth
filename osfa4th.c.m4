@@ -350,13 +350,13 @@ dnl Convert string to number. On failure, abort.
       c = c - 'a' + 10;
     }
    if (c < 0 || c >= vmstate.base) {
-      vmstate.dp = (cell *)s; /* TODO: sanity check */
-      throw(-24);
+      throw(-24, invalid numeric argument);
    }
    t.i *= vmstate.base;
    t.i += c;
    s++;
   }
+  vmstate.dp = (cell *)sp[-1].s; /* TODO: sanity check */
   sp[-1] = t;
 }
 
@@ -452,7 +452,7 @@ secondary(bl,, LIT, .i=32, EMIT)
 
 dnl secondary(repl, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BRANCH, .i=-9)
 
-secondary(tick, ', WORD, FIND, DROP)
+secondary(tick, ', WORD, FIND, ZBRANCH, .i=2, EXIT, ABORT)
 secondary(tobody, >body, CELL, ADD)
 
 dnl secondary(interpret,, FIND, ZBRANCH, .i=3, EXECUTE, EXIT, NUMBER)
@@ -467,7 +467,7 @@ COMMA, EXIT,
 EXECUTE, EXIT,
 NUMBER,
 STATE, NULLP, ZBRANCH, .i=2, EXIT,
-LIT, LIT, COMMA, COMMA )
+LIT, LIT, COMMA, COMMA)
 
 secondary(quit,, WORD, INTERPRET, BRANCH, .i=-3)
 
