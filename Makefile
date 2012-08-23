@@ -1,4 +1,7 @@
 
+GCC = gcc
+CFLAGS = -O3 -m32 -g -Wall
+
 all: stub4th
 
 config.h: .rev.h
@@ -9,10 +12,10 @@ config.h: .rev.h
 	echo -n '"' >> $@
 
 stub4th.o:  stub4th.c  *.h Makefile *.m4 config.h
-	gcc -O3 -m32  -g -Wall -o $@ -c $<
+	$(GCC) $(CFLAGS) -o $@ -c $<
 
 stub4th:  stub4th.o
-	gcc -O3 -m32  -g -Wall -o $@ $<
+	$(GCC) $(CFLAGS) -o $@ $<
 
 %.size: %
 	nm -t d --size-sort --print-size $<
