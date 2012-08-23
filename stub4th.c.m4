@@ -91,11 +91,11 @@ int main()
 
   vmstate.base = 10;
 
+goto cold;
+
 primary(abort)
-  sp = param_stack;
-  rp = return_stack;
   my_puts("abort\n");
-  goto boot;
+  goto quit;
 
 enter:
   (rp++)->a = ip;
@@ -112,11 +112,11 @@ primary(execute)
   goto *(w->aa);
 
 primary(exit)
-  ip = (--rp)->a; w = ip->a;
+  ip = (--rp)->a;
+  w = ip->a;
 
 primary(bye)
   return 0;
-
 
 
 dnl non-colon secondary words
@@ -419,6 +419,9 @@ primary(immediatep)
   (sp++)->i = w->immediate;
 }
 
+primary(recurse,, immediate, compile_only)
+  (vmstate.dp++)->a = &dictionary->code;
+
 dnl ( -- )
 dnl set immediate flag most recently defined word
 primary(immediate,,compile_only)
@@ -489,10 +492,18 @@ dnl DUMP
 
 undivert(1)
 
-boot:
-  dictionary = dict_head;
-  ip = 0;
+quit:
+  sp = param_stack;
+  rp = return_stack;
   (sp++)->a = QUIT;
+  goto execute;
+
+cold:
+  dictionary = dict_head;
+  sp = param_stack;
+  rp = return_stack;
+  ip = 0;
+  (sp++)->a = COLD;
   goto execute;
 
   return 0;

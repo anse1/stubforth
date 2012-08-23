@@ -21,5 +21,5 @@ stub4th:  stub4th.o
 	m4 -s $< > $@
 
 check: stub4th
-	echo hi | ./$<
+	echo 42 | ./$<
 	@echo
