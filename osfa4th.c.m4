@@ -37,7 +37,7 @@ divert(1)
     ifelse(`$5',`',`',`, .$5=1')
     ifelse(`$6',`',`',`, .$6=1')
   };
-divert(0)
+divert
   define(`dict_head', &w_$1)
   define(translit($1,a-z,A-Z), &w_$1.code)
 ')
@@ -243,12 +243,17 @@ dnl --
 primary(branch, , compile_only)
    ip += ip->i;
 
-dnl f --
+dnl i --
 primary(zbranch, 0branch, compile_only)
    if ((--sp)->i)
       ip++;
    else
       ip += ip->i;
+
+dnl dnl i --
+dnl primary(zexit, 0exit, compile_only)
+dnl    if (!(--sp)->i)
+dnl      goto exit;
 
 dnl I/O
 
@@ -318,9 +323,13 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    do {
       c = getchar();
       if (c < 0) return 0;
+   } while (!IS_WORD(c));
+   do {
+      if (c < 0) return 0;
       *s++ = c;
+      c = getchar();
    } while (IS_WORD(c));
-  s[-1] = 0;
+  *s++ = 0;
   (sp++)->s = (char *)vmstate.dp;
   vmstate.dp = (cell *)s;
 }
@@ -394,26 +403,46 @@ dnl s is deallocated when found
 
 
 dnl compiler
-primary(lit, compile_only)
+primary(lit,, compile_only)
   *sp++ = *ip++;
 
 primary(state)
   (sp++)->i = vmstate.compiling;
+  dictionary->smudge = 0;
 
-dnl ( s --- )
+dnl ( cfa -- cfa i )
+dnl check immediate flag of word around cfa
+primary(immediatep)
+{
+  word bogus;
+  word *w = (word *) ((sp[-1].s) - ((char *)&bogus.code - (char *)&bogus));
+  (sp++)->i = w->immediate;
+}
+
+dnl ( -- )
+dnl set immediate flag most recently defined word
+primary(immediate,,compile_only)
+  dictionary->immediate = 1;
+
+dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
 primary(cons)
 {
   word *new = (word *)vmstate.dp;
   new->name = (--sp)->s;
   new->link = dictionary;
-  new->smudge = 0;
+  new->smudge = 1;
   vmstate.compiling = 1;
   dictionary = new;
   new->code = &&enter;
   vmstate.dp = (cell *) &new->data;
 }
 
+primary(semi, ;, immediate)
+{
+  vmstate.compiling = 0;
+  (vmstate.dp++)->a = EXIT;
+}
 
 dnl from fig.txt, unclassified
 secondary(cr,, LIT, .i=13, EMIT)
@@ -426,7 +455,21 @@ dnl secondary(repl, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BR
 secondary(tick, ', WORD, FIND, DROP)
 secondary(tobody, >body, CELL, ADD)
 
-secondary(repl,, WORD, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
+dnl secondary(interpret,, FIND, ZBRANCH, .i=3, EXECUTE, EXIT, NUMBER)
+
+dnl (s -- )
+dnl interpret or compile s
+secondary(interpret,,
+FIND,
+ZBRANCH, .i=11,
+IMMEDIATEP, NULLP, STATE, AND, ZBRANCH, .i=3,
+COMMA, EXIT,
+EXECUTE, EXIT,
+NUMBER,
+STATE, NULLP, ZBRANCH, .i=2, EXIT,
+LIT, LIT, COMMA, COMMA )
+
+secondary(quit,, WORD, INTERPRET, BRANCH, .i=-3)
 
 dnl secondary(quit, WORD, FIND, ZBRANCH, .i=4, STATE, ZBRANCH, .i=4, COMMA, BRANCH, .i=-9, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
 
@@ -438,7 +481,7 @@ secondary(test,, WORD, TYPE, BRANCH,  .i=-3)
 secondary(testdict,, WORD, FIND, PRINT, PRINT, BRANCH, .i=-5)
 
 secondary(hi,, LIT, .s= "Hello world\n", TYPE)
-secondary(cold,, HI, REPL, BYE)
+secondary(cold,, HI, QUIT, BYE)
 
 
 dnl convenience
@@ -449,7 +492,7 @@ undivert(1)
 boot:
   dictionary = dict_head;
   ip = 0;
-  (sp++)->a = REPL;
+  (sp++)->a = QUIT;
   goto execute;
 
   return 0;
