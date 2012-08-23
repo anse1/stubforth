@@ -1,5 +1,6 @@
 #include "platform.h"
 #include "types.h"
+#include "config.h"
 
 cell return_stack[1000];
 cell param_stack[1000];
@@ -480,7 +481,7 @@ secondary(q, ?, LOAD, PRINT)
 secondary(test,, WORD, TYPE, BRANCH,  .i=-3)
 secondary(testdict,, WORD, FIND, PRINT, PRINT, BRANCH, .i=-5)
 
-secondary(hi,, LIT, .s= "Hello world\n", TYPE)
+secondary(hi,, LIT, .s= "osfa4th-" GIT_REVISION "\n", TYPE)
 secondary(cold,, HI, QUIT, BYE)
 
 
