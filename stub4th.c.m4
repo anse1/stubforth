@@ -102,6 +102,8 @@ int main()
 
   vmstate.base = 10;
 
+  initio();
+
 goto cold;
 
 primary(abort)
@@ -200,7 +202,7 @@ primary(qstack, ?stack)
   if (sp < param_stack)
     cthrow(-4, stack underflow)
   if (rp > &return_stack[sizeof(return_stack)])
-    cthrow(-5, stack overflow)
+    cthrow(-5, return stack overflow)
   if (rp < return_stack)
     cthrow(-6, return stack underflow)
   if (vmstate.dp > &dictionary_stack[sizeof(dictionary_stack)])
