@@ -21,7 +21,7 @@ define(`cthrow', `
 }')
 
 define(`chkalign', `
-  if ((int)vmstate.dp & (__alignof__(cell)-1))
+  if ((int)($1) & (__alignof__(cell)-1))
     cthrow(-23,address alignment)
 ')
 
