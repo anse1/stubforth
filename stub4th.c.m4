@@ -491,8 +491,6 @@ dnl secondary(repl, WORD,, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, B
 secondary(tick, ',, WORD, FIND, ZBRANCH, .i=2, EXIT, ABORT)
 secondary(tobody, >body,, CELL, ADD)
 
-dnl secondary(interpret,,, FIND, ZBRANCH, .i=3, EXECUTE, EXIT, NUMBER)
-
 dnl (s -- )
 dnl interpret or compile s
 secondary(interpret,,,
@@ -506,8 +504,6 @@ STATE, NULLP, ZBRANCH, .i=2, EXIT,
 LIT, LIT, COMMA, COMMA)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, .i=-4)
-
-dnl secondary(quit, WORD,, FIND, ZBRANCH, .i=4, STATE, ZBRANCH, .i=4, COMMA, BRANCH, .i=-9, EXECUTE, BRANCH, .i=-6, NUMBER, BRANCH, .i=-9)
 
 secondary(colon, :,, WORD, CONS)
 
