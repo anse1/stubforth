@@ -277,11 +277,6 @@ primary(zbranch, 0branch, compile_only)
    else
       ip += ip->i;
 
-dnl dnl i --
-dnl primary(zexit, 0exit, compile_only)
-dnl    if (!(--sp)->i)
-dnl      goto exit;
-
 dnl I/O
 
 dnl c --
@@ -549,7 +544,6 @@ secondary(cold,,, HI, QUIT, BYE)
 
 
 dnl convenience
-dnl DUMP
 
 undivert(1)
 
