@@ -99,6 +99,8 @@ int main()
 
   vmstate.base = 10;
 
+  initio();
+
 goto cold;
 
 primary(abort)
