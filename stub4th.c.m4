@@ -4,7 +4,7 @@
 
 cell return_stack[1000];
 cell param_stack[1000];
-cell dictionary_stack[1000];
+cell dictionary_stack[0x30000/sizeof(cell)];
 
 word *dictionary;
 
