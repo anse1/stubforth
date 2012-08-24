@@ -32,7 +32,6 @@ dnl $2 - forth word (default: $1)
 dnl $3... - flags
 undivert(1)
 $1:
-dnl puts("p$1\n");
 divert(1)
   goto next;
   static word w_$1 = {
