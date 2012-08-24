@@ -12,10 +12,10 @@ set lines [split [read stdin] \n]
 foreach l $lines {
 
     # Exploit the 12 byte RX FIFO of the Dragonball.
-    foreach {a b c d e f g h i j k l}  [split $l ""] {
-	send -- "$a$b$c$d$e$f$g$h$i$j$k$l"
-	expect -- "$a$b$c$d$e$f$g$h$i$j$k$l"
+    foreach {a b c d e }  [split $l ""] {
+	send -- "$a$b$c$d$e"
+	expect -- "$a$b$c$d$e"
     }
-    send "\r"
-    expect "\r"
+    send "\n"
+    expect "\n"
 }
