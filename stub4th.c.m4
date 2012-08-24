@@ -285,7 +285,6 @@ dnl I/O
 dnl c --
 primary(emit)
   putchar((--sp)->i);
-  fflush(stdout);
 
 dnl --
 primary(hex)
@@ -309,7 +308,6 @@ primary(print, .)
     putchar(hex[0xf & (t.i>>j)]);
   }
   putchar(' ');
-  fflush(stdout);
 }
 
 primary(comment, `(', immediate)
