@@ -362,6 +362,14 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
   vmstate.dp = (cell *)s;
 }
 
+dnl ( addr -- a-addr )
+primary(aligned)
+{
+  char *s = sp[-1].a;
+  while ((int)s & (__alignof__(cell)-1)) s++;
+  sp[-1].a = s;
+}
+
 primary(number)
 dnl ( s -- n )
 dnl Convert string to number. On failure, abort.
