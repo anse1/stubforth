@@ -1,6 +1,6 @@
 decimal
-lxmax @ 160 16 lshift or lxmax !
-lymax @ 240 16 lshift or lymax !
+lxmax @ 160 16 << or lxmax !
+lymax @ 240 16 << or lymax !
 160 16 / lvpw c!
 8 lpicf c!
 hex 80 lckcon c!
@@ -10,16 +10,19 @@ dup c@ 2 pick xor swap c! drop ;
 : set ( c a -- )
 dup c@ 2 pick or swap c! drop ;
 : clear ( c a -- )
-dup c@ 2 pick invert and swap c! drop ;
-1 6 lshift dup pfdir set pfdata set
+dup c@ 2 pick ~ and swap c! drop ;
+1 6 << dup pfdir set pfdata set
+
+0 lrra c!
 
 : dac
-3 4 lshift dup dup pfdir set pfdata set pfdata clear
-1 5 lshift
+3 4 << dup dup pfdir set
+pfdata set pfdata clear
+1 5 <<
 begin
 dup pfdata set
 dup pfdata clear
 swap 1 - swap 1 pick
-0 < until
-;
-0 lrra c!
+0 < until ;
+
+10 dac
