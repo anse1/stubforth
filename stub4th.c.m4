@@ -504,35 +504,35 @@ secondary(colon, :,, WORD, CONS)
 
 dnl ( -- a )
 secondary(begin,, .immediate=1,
- DP, LOAD)
+ HERE)
 dnl ( a -- )
 secondary(again,, .immediate=1,
- LIT, BRANCH, COMMA, DP, LOAD, SUB, CELL, DIV, COMMA)
+ LIT, BRANCH, COMMA, HERE, SUB, CELL, DIV, COMMA)
 dnl ( a -- )
 secondary(until,, .immediate=1,
- LIT, ZBRANCH, COMMA, DP, LOAD, SUB, CELL, DIV, COMMA)
+ LIT, ZBRANCH, COMMA, HERE, SUB, CELL, DIV, COMMA)
 
 dnl ( -- &zbranch-arg )
 secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, /* place branch cfa */
- DP, LOAD,            /* push address of branch arg */
+ HERE,            /* push address of branch arg */
  DP, COMMA            /* place dummy arg */
 )
 
 dnl ( &zbranch-arg -- &branch-arg )
 secondary(else,, .immediate=1,
  LIT, BRANCH, COMMA, /* place branch cfa */
- DP, LOAD, /* push address of dummy target */
+ HERE, /* push address of dummy target */
  DP, COMMA, /* place dummy target */
  SWAP, DUP,
- DP, LOAD, SWAP, SUB, CELL, DIV, /* compute distance */
+ HERE, SWAP, SUB, CELL, DIV, /* compute distance */
  SWAP, STORE /* patch */
 )
 
 dnl ( &branch-arg -- )
 secondary(then,, .immediate=1,
  DUP,  /* address to patch */
- DP, LOAD, /* next cell */
+ HERE, /* next cell */
  SWAP, SUB, CELL, DIV,  /* compute distance */
  SWAP, STORE /* patch */
 )

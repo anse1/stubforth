@@ -5,3 +5,7 @@ words.*
 *.s
 *.o
 stub4th
+*.bin
+*.srec
+*.brec
+*.elf
