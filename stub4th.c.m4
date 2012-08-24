@@ -20,6 +20,11 @@ define(`cthrow', `
   goto abort;
 }')
 
+define(`chkalign', `
+  if ((int)vmstate.dp & (__alignof__(cell)-1))
+    cthrow(-23,address alignment)
+')
+
 define(primary, `
 dnl Cons a primary word
 dnl $1 - C identifier
@@ -313,15 +318,17 @@ primary(print, .)
 
 dnl MEM
 primary(store, !)
+  chkalign(sp[-1].aa)
   *(sp[-1].aa) = sp[-2].a;
   sp -= 2;
+
+primary(load, @)
+  chkalign(sp[-1].aa)
+  sp[-1].a = *(sp[-1].aa);
 
 primary(cstore, c!)
   *sp[-1].s = sp[-2].i;
   sp -= 2;
-
-primary(load, @)
-  sp[-1].a = *(sp[-1].aa);
 
 primary(cload, c@)
   sp[-1].i = *sp[-1].s;
@@ -354,6 +361,9 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    } while (IS_WORD(c));
   *s++ = 0;
   (sp++)->s = (char *)vmstate.dp;
+
+  /* fix alignment */
+  while ((int)s & (__alignof__(cell)-1)) s++;
   vmstate.dp = (cell *)s;
 }
 
@@ -550,6 +560,7 @@ undivert(1)
 quit:
   sp = param_stack;
   rp = return_stack;
+  vmstate.compiling = 0;
   (sp++)->a = QUIT;
   goto execute;
 
