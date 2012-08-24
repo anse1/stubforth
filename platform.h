@@ -23,16 +23,6 @@ static int putchar(int c)
   return 0;
 }
 
-
-static int puts(const char *s)
-{
-  while (*s) {
-    putchar(*s++);
-  }
-  putchar('\n');
-  return 0;
-}
-
 static int getchar()
 {
   int c;
@@ -50,14 +40,8 @@ static int getchar()
 
 static void initio(void)
 {
-  puts("initio()");
+  UTX_TXDATA = ' ';
   fifostate = URX;
-  puts("sizeof(cell): ");
-  putchar(sizeof(cell) + '0');
-  puts("sizeof(int): ");
-  putchar(sizeof(int) + '0');
-  puts("sizeof(void *): ");
-  putchar(sizeof(void *) + '0');
 }
 
 
