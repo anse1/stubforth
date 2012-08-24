@@ -248,7 +248,7 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 ')
 
 unop(toggle, ~)
-unop(invert, -, invert)
+unop(invert, -, minus)
 unop(nullp, !, 0=)
 
 primary(max)
@@ -312,6 +312,9 @@ primary(print, .)
   }
   putchar(' ');
 }
+
+primary(comment, `(', immediate)
+  while(getchar() != ')');
 
 
 dnl MEM
