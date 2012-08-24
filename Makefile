@@ -80,5 +80,5 @@ init:
 .PHONY : %.prog clean %.size init
 
 stub4th.elf : stub4th.o start.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
-	$(LD)  --section-start=.text=0x000100  $+ -o $@
+	$(LD)  --section-start=.vectors=0 --section-start=.text=0x000100  $+ -o $@
 
