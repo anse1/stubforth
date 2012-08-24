@@ -94,7 +94,7 @@ static word *find(word *p, const char *key)
 
 int main()
 {
-  cell *ip, *sp, *rp, *w;
+  cell *sp, *rp, *w;
   cell t;
 
   vmstate.base = 10;
@@ -117,13 +117,13 @@ enter:
   ip = w + 1;
 
 next:
-  if(vmstate.break_condition) {
-    vmstate.break_condition = 0;
-    cthrow(-28,user interrupt)
- }
-
   w = (ip++)->a;
   goto **(void **)w;
+
+primary(brk)
+{
+  cthrow(-28,user interrupt)
+}
 
 
 dnl inner interpreter
@@ -586,6 +586,8 @@ cold:
   sp = param_stack;
   rp = return_stack;
   ip = 0;
+  exception_cell[0].aa = BRK;
+  exception_cell[1].aa = BRK;
   (sp++)->a = COLD;
   goto execute;
 
