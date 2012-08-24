@@ -9,4 +9,8 @@
 /* flags.break_condition can be set in an ISR to interrupt the
    interpreter. */
 
+static void initio()
+{
+}
+
 #endif
