@@ -117,6 +117,11 @@ enter:
   ip = w + 1;
 
 next:
+  if(vmstate.break_condition) {
+    vmstate.break_condition = 0;
+    cthrow(-28,user interrupt)
+ }
+
   w = (ip++)->a;
   goto **(void **)w;
 
@@ -467,6 +472,20 @@ primary(cons)
   dictionary = new;
   new->code = &&enter;
   vmstate.dp = (cell *) &new->data;
+}
+
+primary(srload, sr@)
+{
+  short sr;
+  asm("move.w %%sr , %0" : "=r" (sr) );
+  (sp++)->i = sr;
+}
+
+primary(srstore, sr!)
+{
+  short sr;
+  sr = (--sp)->i;
+  asm("move.w  %0, %%sr" : /* no outputs */ : "r" (sr));
 }
 
 primary(semi, ;, immediate)
