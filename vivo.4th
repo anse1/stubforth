@@ -1,4 +1,6 @@
 hex
+: lshift << ;
+: rshift >> ;
 : flash 800000 ;
 : c? c@ . ;
 : fcmd flash c! ;
