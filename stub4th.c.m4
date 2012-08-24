@@ -32,7 +32,7 @@ dnl $2 - forth word (default: $1)
 dnl $3... - flags
 undivert(1)
 $1:
-puts("p$1\n");
+dnl puts("p$1\n");
 divert(1)
   goto next;
   static word w_$1 = {
@@ -114,12 +114,10 @@ primary(abort)
   goto quit;
 
 enter:
-  puts("enter\n");
   (rp++)->a = ip;
   ip = w + 1;
 
 next:
-  puts("next\n");
   w = (ip++)->a;
   goto **(void **)w;
 
@@ -570,7 +568,6 @@ cold:
   rp = return_stack;
   ip = 0;
   (sp++)->a = COLD;
-  puts("jumping to execute\n");
   goto execute;
 
   return 0;
