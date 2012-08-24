@@ -63,3 +63,14 @@ begin
 : fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;
 : tuck swap over ;
 : gcd dup if tuck mod recurse else drop then ;
+
+: 2dup 1 pick 1 pick ;
+
+: dump ( addr n -- )
+over + swap
+( endaddr addr )
+begin
+dup c@ emit
+1 + 2dup <
+until
+lf;
