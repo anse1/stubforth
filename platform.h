@@ -57,5 +57,6 @@ static int cprint(int i)
   }
   putchar('\n');
   return 0;
+}
 
 #endif
