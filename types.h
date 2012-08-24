@@ -35,16 +35,16 @@ struct word {
   struct word *link;
   void *code;
   cell data[];
-} __attribute__((packed));
+};
 
 struct vmstate {
+  cell *dp;
   volatile int break_condition : 1;
   int compiling : 1;
   unsigned int base : 5;
   int errno : 14;
   char *errstr;
-  cell *dp;
-} __attribute__((packed));
+};
 
 #define IS_WORD(c) (c > ' ')
 
