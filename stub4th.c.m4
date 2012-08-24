@@ -98,9 +98,9 @@ int main()
   cell *ip, *sp, *rp, *w;
   cell t;
 
-  initio();
-
   vmstate.base = 10;
+
+  initio();
 
 goto cold;
 
