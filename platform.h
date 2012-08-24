@@ -33,6 +33,9 @@ static int getchar()
 
   c = fifostate & URX_RXDATA_MASK;
 
+  if (c == '\r')
+    c = '\n';
+
   putchar(c);
 
   return c;
