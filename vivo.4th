@@ -73,4 +73,4 @@ begin
 dup c@ emit
 1 + 2dup <
 until
-lf;
+lf ;
