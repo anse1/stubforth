@@ -65,6 +65,9 @@ init:
 %.srec : %.elf
 	$(OBJCOPY) $< -O srec $@
 
+%.bin : %.elf
+	$(OBJCOPY) $< -O binary $@
+
 %.prog : %.brec
 	cat $< > $(TTY)
 
