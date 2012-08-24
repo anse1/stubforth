@@ -8,3 +8,4 @@ stub4th
 *.bin
 *.srec
 *.brec
+*.elf
