@@ -96,3 +96,9 @@ hex
 : stpwch FFFB12 ;
 : dayr FFFB1A ;
 : dayalarm FFFB1C ;
+: icemcr fffffd0c ;
+: icemsr fffffd0e ;
+: icemcmr fffffd0a ;
+: icemccr fffffd08 ;
+: icemamr fffffd04 ;
+: icemacr fffffd00 ;
