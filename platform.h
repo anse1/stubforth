@@ -2,14 +2,43 @@
 #define PLATFORM_H
 
 #include "types.h"
+#define DF my_puts("->");my_puts(__func__);  my_puts("()\n");
+#define RF my_puts("<-");my_puts(__func__); my_puts("()\n") ;
+
+#define DASM(x)  do { int p; my_puts(x ": ") ; asm("move.w " x  ", %0" : "=r"(p));   cprint(p); } while (0)
+
+define(dumpregs,
+`
+
+  my_puts("ISR: ");
+  cprint(ISR);
+  my_puts("IPR: ");
+  cprint(IPR);
+  my_puts("SCR: ");
+  cprint(SCR);
+  my_puts("IVR: ");
+  cprint(IVR);
+  my_puts("ICEMSR: ");
+  cprint(ICEMSR);
+
+  my_puts("SR: ");
+  {
+    unsigned short sr;
+    asm("move.w %%sr , %0" : "=r" (sr) );
+    cprint(sr);
+  }
+')
 
 /* The platform needs to provide getchar() and putchar() */
 
-
 #include "MC68EZ328.h"
 
-register cell *ip asm ("a5");
+dnl register cell *ip asm ("a5");
+volatile cell *ip;
+
 cell exception_cell[2];
+
+static void my_puts(const char *);
 
 static int putchar(int c)
 {
@@ -33,40 +62,67 @@ static int cprint(int i)
   return 0;
 }
 
+
 __attribute__((interrupt_handler))
-void ivect_default ()
+void ivect_bus_err ()
 {
-  void *p;
+  DF
 
-  char *s;
-    while(1) {
-      asm("move.w (%%fp), %0" : "=r"(p));
-      cprint(p);
-      UTX_TXDATA = ' ';
-      asm("move.l 2(%%fp), %0" : "=r"(p));
-      cprint(p);
-      UTX_TXDATA = ' ';
-      asm("move.l 4(%%fp), %0" : "=r"(p));
-      cprint(p);
-      UTX_TXDATA = ' ';
-      asm("move.l 6(%%fp), %0" : "=r"(p));
-      cprint(p);
-      UTX_TXDATA = ' ';
-      cprint(ISR);
-      UTX_TXDATA = ' ';
-      cprint(IPR);
-      UTX_TXDATA = '\r';
-      UTX_TXDATA = '\n';
+  long l;
+  short s;
 
-    s = "default interrupt handler\r\n";
-    while (*s) {
-      while (UTX & UTX_BUSY)
-	;
-      UTX_TXDATA = *s++;
-    }
-    }
-  return;
+ my_puts("function: ") ;
+ asm("move.w 4(%%fp), %0" : "=r"(s));
+ cprint(s);
+
+ my_puts("address: ") ;
+ asm("move.l 6(%%fp), %0" : "=r"(l));
+ cprint(l);
+
+ my_puts("instruction & status: ") ;
+ asm("move.l 10(%%fp), %0" : "=r"(l));
+ cprint(l);
+
+ my_puts("PC: ") ;
+ asm("move.l 14(%%fp), %0" : "=r"(l));
+ cprint(l);
+
+dumpregs
+
+  RF
+  while(1);
 }
+
+
+define(defaulth, `
+__attribute__((interrupt_handler))
+void ivect_$1 ()
+{
+  DF
+  DASM("4(%%fp)");
+  DASM("6(%%fp)");
+  DASM("8(%%fp)");
+   DASM("10(%%fp)");
+   DASM("12(%%fp)");
+   DASM("14(%%fp)");
+   DASM("16(%%fp)");
+   dumpregs
+}
+')
+
+
+defaulth(addr_err)
+defaulth(illinstr)
+defaulth(zero_div)
+defaulth(default)
+defaulth(privilege)
+defaulth(spurious)
+defaulth(uninitialized)
+defaulth(emu1111)
+defaulth(emu1010)
+defaulth(trace)
+defaulth(trap)
+defaulth(chk)
 
 volatile static struct {
   short beg;
@@ -76,44 +132,61 @@ volatile static struct {
 
 
 __attribute__((interrupt_handler))
-void ivect_28 ()
+void ivect_level4 ()
 {
   char c;
   int fifostate;
-
-/*   if (! (ISR & ISR_UART) ) */
-/*     return; */
+dnl   DF;
+dnl 
+dnl   my_puts("ISR: ");
+dnl   cprint(ISR);
+dnl   my_puts("IPR: ");
+dnl   cprint(IPR);
+dnl 
+dnl   DASM("4(%%fp)");
+dnl   DASM("6(%%fp)");
+dnl   DASM("8(%%fp)");
+dnl 
+  if (! (ISR & ISR_UART) ) {
+dnl    RF
+    return;
+  }
 
   while ((fifostate = URX) & URX_DATA_READY) {
-
+dnl    putchar('c');
     if (fifostate & URX_BREAK) {
-      if (exception_cell[1].a)
+      putchar('B');
+      putchar('R');
+      if (exception_cell[1].a) {
+        putchar('K');
 	ip = exception_cell;
+      }
     }
     c = fifostate & URX_RXDATA_MASK;
     ring.buf[ring.end] = c;
     ring.end = (ring.end + 1) % sizeof(ring.buf);
   }
-
+dnl  putchar('\n');
+dnl  RF
   return;
 }
 
 void *vectors[] __attribute__((section(".vectors")))
     =  {
-  [2] = ivect_default,
-  [3] = ivect_default,
-  [4] = ivect_default,
-  [5] = ivect_default,
-  [6] = ivect_default,
-  [7] = ivect_default,
-  [8] = ivect_default,
-  [9] = ivect_default,
-  [10] = ivect_default,
-  [11] = ivect_default,
+   [2] = ivect_bus_err,
+   [3] = ivect_addr_err,
+   [4] = ivect_illinstr,
+   [5] = ivect_zero_div,
+   [6] = ivect_chk,
+   [7] = ivect_trap,
+   [8] = ivect_privilege,
+   [9] = ivect_trace,
+  [10] = ivect_emu1010,
+  [11] = ivect_emu1111,
   [12] = ivect_default,
   [13] = ivect_default,
   [14] = ivect_default,
-  [15] = ivect_default,
+  [15] = ivect_uninitialized,
   [16] = ivect_default,
   [17] = ivect_default,
   [18] = ivect_default,
@@ -122,21 +195,20 @@ void *vectors[] __attribute__((section(".vectors")))
   [21] = ivect_default,
   [22] = ivect_default,
   [23] = ivect_default,
-  [24] = ivect_default,
+  [24] = ivect_spurious,
   [25] = ivect_default,
   [26] = ivect_default,
   [27] = ivect_default,
-  [28] = ivect_28,
+  [28] = ivect_level4,
   [29] = ivect_default,
   [30] = ivect_default,
   [31] = ivect_default,
 };
 
-
 static int getchar()
 {
   int c;
-
+/*   DF */
   while (ring.end == ring.beg)
     ;
   c = ring.buf[ring.beg];
@@ -146,19 +218,25 @@ static int getchar()
     c = '\n';
 
   putchar(c);
-
+/*   RF */
   return c;
 }
 
 static void initio(void)
 {
   int bogus;
-  UTX_TXDATA = ' ';
+  DF
   bogus = URX;
   IMR &= ~IMR_MUART;
   USTCNT |= USTCNT_RXRE;
 
+  dumpregs
+
+  my_puts("enabling interrupts...\n");
+  asm(" nop ");
   asm(" move.w  0x2000, %sr ");
+  my_puts("...done\n");
+  RF
 }
 
 

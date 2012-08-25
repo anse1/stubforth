@@ -1,10 +1,10 @@
-#include "platform.h"
+include(platform.h)
 #include "types.h"
 #include "config.h"
 
 cell return_stack[1000];
 cell param_stack[1000];
-cell dictionary_stack[0x30000/sizeof(cell)];
+cell dictionary_stack[10000];
 
 word *dictionary;
 
@@ -364,6 +364,7 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
 
   /* fix alignment */
   while ((int)s & (__alignof__(cell)-1)) s++;
+  chkalign(s);
   vmstate.dp = (cell *)s;
 }
 
@@ -397,6 +398,7 @@ dnl Convert string to number. On failure, abort.
    t.i += c;
    s++;
   }
+  chkalign(sp[-1].s);
   vmstate.dp = (cell *)sp[-1].s; /* TODO: sanity check */
   sp[-1] = t;
 }
@@ -434,6 +436,7 @@ dnl s is deallocated when found
    word *p = find(dictionary, key);
    if (p)
    {
+     chkalign(key);
      vmstate.dp = (cell *) key; /* TODO: sanity check */
      sp--;
      (sp++)->a = &p->code;
