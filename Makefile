@@ -1,7 +1,7 @@
 TARGET = m68k-elf
 GCC = $(TARGET)-gcc
 CC= $(GCC) $(CFLAGS)
-CFLAGS =  -Wall -m68000 -O0 -Wcast-align
+CFLAGS =  -Wall -m68000 -O2 -Wcast-align
 LD = $(TARGET)-ld
 OBJCOPY = $(TARGET)-objcopy
 
@@ -36,7 +36,7 @@ check: stub4th
 
 clean:
 	rm -f .rev.h *.o *.s stub4th.c
-	rm -f *.o *.s *.elf *.srec *.brec
+	rm -f *.o *.s *.elf *.srec *.brec *.bin
 
 
 init:
@@ -80,5 +80,6 @@ init:
 .PHONY : %.prog clean %.size init
 
 stub4th.elf : stub4th.o start.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
-	$(LD)  --section-start=.vectors=0 --section-start=.text=0x000200  $+ -o $@
+#	$(LD)  --section-start=.vectors=0 --section-start=.text=0x000200  $+ -o $@
+	$(LD) -T vivo.ld $+ -o $@
 
