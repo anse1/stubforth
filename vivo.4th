@@ -74,3 +74,5 @@ dup c@ emit
 1 + 2dup <
 until
 lf ;
+
+: sleep 80 pctlr c! ;
