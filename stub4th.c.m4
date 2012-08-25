@@ -499,6 +499,9 @@ primary(srstore, sr!)
   asm("move.w  %0, %%sr" : /* no outputs */ : "r" (sr));
 }
 
+primary(stop)
+asm("stop #0x2000");
+
 primary(semi, ;, immediate)
 {
   vmstate.compiling = 0;
