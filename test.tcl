@@ -1,6 +1,7 @@
 #!/usr/bin/expect
 
-spawn ./stub4th
+set tty [lindex $argv 0]
+spawn -open [set port [open $tty "r+"]]
 
 sleep 0.1
 set timeout 0
