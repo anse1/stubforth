@@ -96,7 +96,7 @@ void ivect_bus_err ()
 
  dumpregs();
 
-  while(1);
+ asm("reset");
 }
 
 
@@ -114,7 +114,7 @@ void ivect_$1 ()
    DASM("16(%%fp)");
 
    dumpregs();
-   while(1) ;
+   asm("reset");
 }
 ')
 
@@ -278,7 +278,11 @@ void initio(void)
   IMR &= ~IMR_MUART;
   USTCNT |= USTCNT_RXRE;
 
+  dumpregs();
+  my_puts("enabling interrupts...");
   sei();
+  my_puts("done.\n");
+  dumpregs();
 }
 
 
