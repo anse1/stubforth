@@ -257,7 +257,7 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 ')
 
 unop(toggle, ~)
-unop(invert, -, minus)
+unop(minus, -, minus)
 unop(nullp, !, 0=)
 
 primary(max)
