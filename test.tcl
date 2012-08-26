@@ -74,7 +74,7 @@ test "decimal 11111 12341 gcd ." {29 $}
 send "hex\n"
 
 send ": tloop begin 1 - dup 8 < if exit then again ;\n"
-test "100 t ." {7 $}
+test "100 tloop ." {7 $}
 
 send ": tuntil begin 1 - dup 197 < until ;\n"
 test " 999 tuntil ." {196 $}
