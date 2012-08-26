@@ -30,8 +30,8 @@ stub4th:  stub4th.o
 %.c: %.c.m4 Makefile
 	m4 -s $< > $@
 
-check: stub4th
-	expect test.tcl
+check: stub4th.elf
+	./test.tcl $(TTY)
 
 clean:
 	rm -f .rev.h *.o *.s stub4th.c
