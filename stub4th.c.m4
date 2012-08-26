@@ -545,6 +545,19 @@ dnl ( a -- )
 secondary(until,, .immediate=1,
  LIT, ZBRANCH, COMMA, HERE, SUB, CELL, DIV, COMMA)
 
+dnl ( -- a )
+secondary(while,, .immediate=1,
+ LIT, ZBRANCH, COMMA, HERE, DP, COMMA /* jump after repeat */)
+
+dnl ( a a -- )
+secondary(repeat,, .immediate=1,
+ SWAP,
+ /* deal with unconditional jump first */ 
+ LIT, BRANCH, COMMA, HERE, SUB, CELL, DIV, COMMA,
+ /* patch the while jump */
+ DUP, HERE, SWAP, SUB, CELL, DIV, SWAP, STORE)
+
+
 dnl ( -- &zbranch-arg )
 secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, /* place branch cfa */
