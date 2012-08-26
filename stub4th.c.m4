@@ -114,7 +114,7 @@ static word *find(word *p, const char *key)
 
 
 dnl The entire VM must be contained in main since we make use of GCC's
-dnl Labels as Values Extension
+dnl Labels as Values extension
 
 int main()
 {
