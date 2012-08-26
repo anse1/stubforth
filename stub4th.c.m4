@@ -320,9 +320,16 @@ primary(print, .)
   t.i = (--sp)->i;
   char *hex = "0123456789abcdef";
   int j;
+  int skip = 1;
   for (j=8 * sizeof(t.i) - 4; j>=0; j-=4) {
-    putchar(hex[0xf & (t.i>>j)]);
+    char c = hex[0xf & (t.i>>j)];
+    if (c == '0' && skip)
+      continue;
+    skip = 0;
+    putchar(c);
   }
+  if (skip)
+    putchar('0');
   putchar(' ');
 }
 
