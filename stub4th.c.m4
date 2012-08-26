@@ -10,6 +10,10 @@ word *dictionary;
 
 struct vmstate vmstate = { .dp = dictionary_stack };
 
+
+
+dnl m4 magic
+
 define(dict_head, 0);
 
 dnl $1 - ANS94 error code
@@ -72,6 +76,21 @@ static word w_$1 = {
   define(translit($1,a-z,A-Z), &w_$1.code)
 ')
 
+define(constant, `
+undivert(1)
+static word w_$1 = {
+  .name = "$1",
+  .link = dict_head,
+  .code = &&docon,
+  .data = {{ $2 }}
+};
+
+  define(`dict_head', &w_$1)
+  define(translit($1,a-z,A-Z), &w_$1.code)
+')
+
+
+dnl C helpers
 static int strcmp(const char *a, const char *b) {
   while (*a && *b && *a == *b)
      a++, b++;
@@ -92,6 +111,10 @@ static word *find(word *p, const char *key)
    }
    return p;
 }
+
+
+dnl The entire VM must be contained in main since we make use of GCC's
+dnl Labels as Values Extension
 
 int main()
 {
@@ -148,19 +171,6 @@ dovar:
 dnl $1 - name
 dnl $2 - value
 
-define(constant, `
-undivert(1)
-static word w_$1 = {
-  .name = "$1",
-  .link = dict_head,
-  .code = &&docon,
-  .data = {{ $2 }}
-};
-
-  define(`dict_head', &w_$1)
-  define(translit($1,a-z,A-Z), &w_$1.code)
-')
-
 constant(cell, .i=sizeof(cell))
 constant(dp, .a=(&vmstate.dp))
 constant(s0, .a=param_stack)
@@ -176,7 +186,7 @@ primary(rpload, rp@)
   sp++;
 
 
-dnl primary stack manipulation
+dnl stack manipulation
 
 primary(pick)
   sp[-1] = sp[-2 - sp[-1].i];
@@ -274,7 +284,7 @@ primary(plus1, 1+)
   sp[-1].i++;
 
 
-dnl control
+dnl control primitives
 
 dnl --
 primary(branch, , compile_only)
@@ -392,7 +402,8 @@ primary(aligned)
 
 primary(number)
 dnl ( s -- n )
-dnl Convert string to number. On failure, abort.
+dnl Convert string to number according to base variable.
+dnl On failure, abort.
 {
   t.i = 0;
   char *s = sp[-1].s;
@@ -479,12 +490,12 @@ primary(recurse,, immediate, compile_only)
 
 dnl ( -- )
 dnl toggle immediate flag of most recently defined word
-primary(immediate,,compile_only)
+primary(immediate,,)
   dictionary->immediate ^= 1;
 
 dnl ( -- )
 dnl toggle smudge flag of most recently defined word
-primary(smudge,,compile_only)
+primary(smudge,,)
   dictionary->smudge ^= 1;
 
 dnl ( s -- )
@@ -552,7 +563,7 @@ secondary(while,, .immediate=1,
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
  SWAP,
- /* deal with unconditional jump first */ 
+ /* deal with unconditional jump first */
  LIT, BRANCH, COMMA, COMMA,
  /* patch the while jump */
  HERE, SWAP, STORE)
