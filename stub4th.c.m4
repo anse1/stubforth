@@ -113,6 +113,8 @@ primary(abort)
   vmstate.errno = 0;
   goto quit;
 
+
+dnl inner interpreter
 enter:
   (rp++)->a = ip;
   ip = w + 1;
@@ -121,8 +123,6 @@ next:
   w = (ip++)->a;
   goto **(void **)w;
 
-
-dnl inner interpreter
 primary(execute)
   w = (--sp)->a;
   goto *(w->aa);
@@ -176,7 +176,7 @@ primary(rpload, rp@)
   sp++;
 
 
-dnl stack manipulation
+dnl primary stack manipulation
 
 primary(pick)
   sp[-1] = sp[-2 - sp[-1].i];
@@ -286,6 +286,7 @@ primary(zbranch, 0branch, compile_only)
       ip++;
    else
       ip = ip->a;
+
 dnl I/O
 
 dnl c --
@@ -299,6 +300,9 @@ primary(hex)
 dnl --
 primary(decimal)
   vmstate.base = 10;
+
+dnl -- &c
+constant(base, .s=&vmstate.base)
 
 dnl -- c
 primary(key)
@@ -512,10 +516,10 @@ secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
 
 
 dnl from fig.txt, unclassified
-secondary(cr,,, LIT, .i=13, EMIT)
+dnl secondary(cr,,, LIT, .i=13, EMIT)
 secondary(lf,,, LIT, .i=10, EMIT)
-secondary(crlf,,, CR, LF)
-secondary(bl,,, LIT, .i=32, EMIT)
+dnl secondary(crlf,,, CR, LF)
+dnl secondary(bl,,, LIT, .i=32, EMIT)
 
 secondary(tick, ',, WORD, FIND, ZBRANCH, self[5], EXIT, ABORT)
 secondary(tobody, >body,, CELL, ADD)
@@ -535,14 +539,11 @@ LIT, LIT, COMMA, COMMA)
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
 dnl ( -- a )
-secondary(begin,, .immediate=1,
- HERE)
+secondary(begin,, .immediate=1, HERE)
 dnl ( a -- )
-secondary(again,, .immediate=1,
- LIT, BRANCH, COMMA, COMMA)
+secondary(again,, .immediate=1, LIT, BRANCH, COMMA, COMMA)
 dnl ( a -- )
-secondary(until,, .immediate=1,
- LIT, ZBRANCH, COMMA, COMMA)
+secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
 secondary(while,, .immediate=1,
@@ -581,6 +582,9 @@ secondary(cold,,, HI, QUIT, BYE)
 
 dnl convenience
 
+
+
+
 undivert(1)
 
 quit:

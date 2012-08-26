@@ -23,7 +23,7 @@ struct vmstate {
   cell *dp;
   volatile int break_condition : 1;
   int compiling : 1;
-  unsigned int base : 5;
+  char base;
   int errno : 14;
   char *errstr;
 };

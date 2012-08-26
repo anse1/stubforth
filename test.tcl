@@ -94,3 +94,4 @@ test "word fubar type" {fubar$}
 send "0 variable scratch 10 allot\n"
 test "scratch 10 55 fill scratch 8 + c@ 11 + ." {66 $}
 
+test "8 base c! 777 ." {1ff $}
