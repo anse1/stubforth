@@ -11,7 +11,7 @@ send "decimal \n"
 expect plzflushkthx
 expect *
 
-set timeout 1
+set timeout 3
 
 proc test {tx rx} {
     send "$tx\n"
@@ -52,9 +52,13 @@ test "1 2 3 4 5 6 7 8 9 << >> << swap / ." {99 $}
 
 test "1234 2345 max 9999 min 11 + ." {2356 $}
 
-test "55 emit 1234 2345 dup = 30 + emit = 30 + emit " {U10$}
-test "55 emit 1234 2345 swap dup < 30 + emit < 30 + emit " {U01$}
-test "55 emit 8 2345 dup dup and 0= 30 + emit and 0= 30 + emit " {U01$}
+test "55 emit" {U$}
+test "1234 2345 dup = 30 + emit" {1$}
+test "= 30 + emit" {0$}
+test "1234 2345 swap dup < 30 + emit" {0$}
+test "< 30 + emit" {1$}
+test "8 2345 dup dup and 0= 30 + emit" {0$}
+test "and 0= 30 + emit" {1$}
 
 send "decimal : foo 85 emit ;\n"
 test "foo" {U$}
