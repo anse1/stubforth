@@ -161,9 +161,14 @@ constant(cell, .i=sizeof(cell))
 constant(dp, .a=(&vmstate.dp))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
+constant(d0, .a=dictionary_stack)
 
-primary(spat, sp@)
+primary(spload, sp@)
   sp->a = sp-1;
+  sp++;
+
+primary(rpload, rp@)
+  sp->a = rp-1;
   sp++;
 
 
@@ -450,8 +455,8 @@ dnl ( cfa -- cfa i )
 dnl check immediate flag of word around cfa
 primary(immediatep)
 {
-  word bogus;
-  word *w = (word *) ((sp[-1].s) - ((char *)&bogus.code - (char *)&bogus));
+  word w;
+  CFA2WORD(w,  sp[-1].s)
   (sp++)->i = w->immediate;
 }
 
