@@ -69,7 +69,7 @@ test "20 fib ." 0*1a6d
 send ": tuck swap over ;\n"
 send ": gcd dup if tuck mod recurse else drop then ;\n"
 
-test "decimal 11111 12341 gcd . " {29 $}
+test "decimal 11111 12341 gcd ." {29 $}
 
 send "hex\n"
 
