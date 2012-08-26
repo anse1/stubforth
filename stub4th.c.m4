@@ -142,7 +142,7 @@ docon:
   goto next;
 
 dovar:
-  *(sp++) = (w + 1);
+  (sp++)->a = (w + 1);
   goto next;
 
 dnl $1 - name
@@ -498,10 +498,10 @@ primary(resume, ], immediate)
 secondary(semi, ;, .immediate=1,
   LIT, EXIT, COMMA, SMUDGE, SUSPEND)
 
-secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
-
-secondary(``constant'',,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
-secondary(``variable'',,, WORD, CONS, LIT, &&dovar, COMMA, COMMA, SMUDGE, SUSPEND)
+secondary(create,,, WORD, CONS, COMMA)
+secondary(colon, :,, LIT, &&enter, CREATE)
+secondary(``constant'',,, LIT, &&docon, CREATE, COMMA, SMUDGE, SUSPEND)
+secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
 
 
 dnl from fig.txt, unclassified
