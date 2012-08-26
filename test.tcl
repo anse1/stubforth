@@ -89,4 +89,4 @@ test "2ff 1 + constant foo foo ." {300 $}
 test "word fubar type" {fubar$}
 
 send "0 variable scratch 10 allot\n"
-test "scratch 10 55 fill scratch 8 + c@ ." {55 $}
+test "scratch 10 55 fill scratch 8 + c@ 11 + ." {66 $}
