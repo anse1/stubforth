@@ -16,7 +16,7 @@ dnl $1 - ANS94 error code
 define(`cthrow', `
 {
   vmstate.errno = $1;
-  vmstate.errstr = "$2";
+  vmstate.errstr = ifelse(`$2',`',0,"$2");
   goto abort;
 }')
 
