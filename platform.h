@@ -2,12 +2,8 @@
 #define PLATFORM_H
 
 #include "types.h"
-#define DF my_puts("->");my_puts(__func__);  my_puts("()\n");
-#define RF my_puts("<-");my_puts(__func__); my_puts("()\n") ;
 
 #define DASM(x)  do { int p; my_puts(x ": ") ; asm("move.w " x  ", %0" : "=r"(p));   cprint(p); } while (0)
-
-
 
 /* The platform needs to provide getchar() and putchar() */
 
@@ -20,12 +16,6 @@ cell exception_cell[2];
 
 static void my_puts(const char *);
 
-__attribute__((noinline))
-void sei()
-{
-  asm(" move.w  0x2000, %sr ");
-}
-
 static int putchar(int c)
 {
   if (c=='\n')
@@ -35,6 +25,12 @@ static int putchar(int c)
   UTX_TXDATA = c;
 
   return 0;
+}
+
+__attribute__((noinline))
+void sei()
+{
+  asm(" move.w  0x2000, %sr ");
 }
 
 static int cprint(int i)
@@ -73,7 +69,11 @@ void dumpregs()
 __attribute__((interrupt_handler))
 void ivect_bus_err ()
 {
-  DF
+  putchar('\n');
+  my_puts(" x_x ");
+  my_puts("bus_err");
+  my_puts(" x_x ");
+  putchar('\n');
 
   long l;
   short s;
@@ -95,8 +95,7 @@ void ivect_bus_err ()
  cprint(l);
 
  dumpregs();
-
- asm("reset");
+ while(1);
 }
 
 
@@ -104,17 +103,24 @@ define(defaulth, `
 __attribute__((interrupt_handler))
 void ivect_$1 ()
 {
-  DF
+  my_puts("\n");
+  my_puts(" x_x ");
+  my_puts("$1");
+  my_puts(" x_x ");
+  my_puts("\n");
+
   DASM("4(%%fp)");
   DASM("6(%%fp)");
   DASM("8(%%fp)");
-   DASM("10(%%fp)");
-   DASM("12(%%fp)");
-   DASM("14(%%fp)");
-   DASM("16(%%fp)");
+  DASM("10(%%fp)");
+  DASM("12(%%fp)");
+  DASM("14(%%fp)");
+  DASM("16(%%fp)");
 
-   dumpregs();
-   asm("reset");
+  dumpregs();
+
+  while(1);
+
 }
 ')
 
@@ -125,13 +131,10 @@ defaulth(zero_div)
 defaulth(default)
 defaulth(privilege)
 defaulth(spurious)
-defaulth(uninitialized)
-defaulth(emu1111)
-defaulth(emu1010)
+defaulth(emu)
 defaulth(trace)
 defaulth(trap)
 defaulth(chk)
-defaulth(high)
 
 volatile static struct {
   short beg;
@@ -147,7 +150,6 @@ void ivect_level4 ()
   int fifostate;
 dnl  asm(" moveml %d0-%d6/%a0-%a6, %sp@- ");
 
-dnl   DF;
 dnl 
 dnl   my_puts("ISR: ");
 dnl   cprint(ISR);
@@ -159,7 +161,6 @@ dnl   DASM("6(%%fp)");
 dnl   DASM("8(%%fp)");
 dnl 
   if (! (ISR & ISR_UART) ) {
-dnl    RF
     return;
   }
 
@@ -168,17 +169,16 @@ dnl   putchar('c');
     if (fifostate & URX_BREAK) {
       putchar('B');
       putchar('R');
-      if (exception_cell[1].a) {
-        putchar('K');
-	ip = exception_cell;
-      }
+       if (exception_cell[1].a) {
+         putchar('K');
+ 	 ip = exception_cell;
+       }
     }
     c = fifostate & URX_RXDATA_MASK;
     ring.buf[ring.end] = c;
     ring.end = (ring.end + 1) % sizeof(ring.buf);
   }
 dnl  putchar('\n');
-dnl  RF
 dnl  asm(" moveml %sp@+, %d0-%d6/%a0-%a6 ");
   return;
 }
@@ -193,12 +193,12 @@ void *vectors[] __attribute__((section(".vectors")))
    [7] = ivect_trap,
    [8] = ivect_privilege,
    [9] = ivect_trace,
-  [10] = ivect_emu1010,
-  [11] = ivect_emu1111,
+  [10] = ivect_emu,
+  [11] = ivect_emu,
   [12] = ivect_default,
   [13] = ivect_default,
   [14] = ivect_default,
-  [15] = ivect_uninitialized,
+  [15] = ivect_default,
   [16] = ivect_default,
   [17] = ivect_default,
   [18] = ivect_default,
@@ -215,44 +215,11 @@ void *vectors[] __attribute__((section(".vectors")))
   [29] = ivect_default,
   [30] = ivect_default,
   [31] = ivect_default,
-  [32] = ivect_high,
-  [33] = ivect_high,
-  [34] = ivect_high,
-  [35] = ivect_high,
-  [36] = ivect_high,
-  [37] = ivect_high,
-  [38] = ivect_high,
-  [39] = ivect_high,
-  [40] = ivect_high,
-  [41] = ivect_high,
-  [42] = ivect_high,
-  [43] = ivect_high,
-  [44] = ivect_high,
-  [45] = ivect_high,
-  [46] = ivect_high,
-  [47] = ivect_high,
-  [48] = ivect_high,
-  [49] = ivect_high,
-  [50] = ivect_high,
-  [51] = ivect_high,
-  [52] = ivect_high,
-  [53] = ivect_high,
-  [54] = ivect_high,
-  [55] = ivect_high,
-  [56] = ivect_high,
-  [57] = ivect_high,
-  [58] = ivect_high,
-  [59] = ivect_high,
-  [60] = ivect_high,
-  [61] = ivect_high,
-  [62] = ivect_high,
-  [63] = ivect_high
 };
 
 static int getchar()
 {
   int c;
-/*   DF */
   while (ring.end == ring.beg) {
 
 dnl     PCTLR = 0x80;
@@ -266,7 +233,6 @@ dnl  asm("stop #0x2000");
     c = '\n';
 
   putchar(c);
-/*   RF */
   return c;
 }
 
@@ -277,14 +243,11 @@ void initio(void)
   bogus = URX;
   IMR &= ~IMR_MUART;
   USTCNT |= USTCNT_RXRE;
-
+  putchar('\n');
   dumpregs();
   my_puts("enabling interrupts...");
   sei();
-  my_puts("done.\n");
-  dumpregs();
+  my_puts(" done.\n");
 }
 
-
 #endif
-
