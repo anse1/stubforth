@@ -9,14 +9,13 @@ ENTRY(_start)
 SECTIONS 
 {
     . = 0;
-   .vectors : { *(.vectors) } = 0
-   . = 0x200;
-   .text : SUBALIGN(4) { *(.text) } 
-   .rodata : SUBALIGN(4) { *(.rodata) }
-   .data : SUBALIGN(4) { *(.data) }
+    .vectors : { *(.vectors) } = 0
+    . = 0x4000;
+    .rodata :  { *(.rodata) }
+    .data :  { *(.data) }
+    .text :  { *(.text) } 
     __bss_start = .;
-    .bss : SUBALIGN(4) { *(.bss) }
+    .bss :  { *(.bss) }
     _end = .;
-
 }
 
