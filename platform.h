@@ -221,9 +221,8 @@ static int getchar()
 {
   int c;
   while (ring.end == ring.beg) {
-
 dnl     PCTLR = 0x80;
-dnl  asm("stop #0x2000");
+  asm("stop #0x2000");
 
 }
   c = ring.buf[ring.beg];
