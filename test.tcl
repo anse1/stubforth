@@ -50,7 +50,7 @@ test "1 2 3 4 5 6 7 8 9 swap mod + * xor or swap - hex ." {32 $}
 
 test "1 2 3 4 5 6 7 8 9 << >> << swap / ." {99 $}
 
-test "1234 2345 max 9999 min  ." {2345 $}
+test "1234 2345 max 9999 min 11 + ." {2356 $}
 
 test "55 emit 1234 2345 dup = 30 + emit = 30 + emit " {U10$}
 test "55 emit 1234 2345 swap dup < 30 + emit < 30 + emit " {U01$}
@@ -70,9 +70,12 @@ test "20 fib ." 0*1a6d
 send ": tuck swap over ;\n"
 send ": gcd dup if tuck mod recurse else drop then ;\n"
 
-test "decimal 11111 12341 gcd . " {29 $}
+test "decimal 11111 12341 gcd ." {29 $}
 
 send "hex\n"
+
+send ": tloop begin 1 - dup 8 < if exit then again ;\n"
+test "100 tloop ." {7 $}
 
 send ": tuntil begin 1 - dup 197 < until ;\n"
 test " 999 tuntil ." {196 $}
@@ -90,4 +93,5 @@ test "2ff 1 + constant foo foo ." {300 $}
 test "word fubar type" {fubar$}
 
 send "0 variable scratch 10 allot\n"
-test "scratch 10 55 fill scratch 8 + c@ ." {55 $}
+test "scratch 10 55 fill scratch 8 + c@ 11 + ." {66 $}
+

@@ -28,7 +28,6 @@ typedef union cell cell;
 
 struct word {
   const char *name;
-  int execute_only : 1;
   int compile_only : 1;
   int immediate : 1;
   int smudge : 1;
