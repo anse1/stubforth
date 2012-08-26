@@ -118,6 +118,11 @@ enter:
   ip = w + 1;
 
 next:
+  if(vmstate.break_condition) {
+    vmstate.break_condition = 0;
+    cthrow(-28,user interrupt)
+ }
+
   w = (ip++)->a;
   goto **(void **)w;
 
@@ -146,6 +151,10 @@ docon:
   *(sp++) = *(w + 1);
   goto next;
 
+dovar:
+  (sp++)->a = (w + 1);
+  goto next;
+
 dnl $1 - name
 dnl $2 - value
 
@@ -166,9 +175,14 @@ constant(cell, .i=sizeof(cell))
 constant(dp, .a=(&vmstate.dp))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
+constant(d0, .a=dictionary_stack)
 
-primary(spat, sp@)
+primary(spload, sp@)
   sp->a = sp-1;
+  sp++;
+
+primary(rpload, rp@)
+  sp->a = rp-1;
   sp++;
 
 
@@ -253,7 +267,7 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 ')
 
 unop(toggle, ~)
-unop(invert, -, minus)
+unop(minus, -, minus)
 unop(nullp, !, 0=)
 
 primary(max)
@@ -452,14 +466,13 @@ primary(lit,, compile_only)
 
 primary(state)
   (sp++)->i = vmstate.compiling;
-  dictionary->smudge = 0;
 
 dnl ( cfa -- cfa i )
 dnl check immediate flag of word around cfa
 primary(immediatep)
 {
-  word bogus;
-  word *w = (word *) ((sp[-1].s) - ((char *)&bogus.code - (char *)&bogus));
+  word *w;
+  CFA2WORD(w,  sp[-1].s);
   (sp++)->i = w->immediate;
 }
 
@@ -467,9 +480,14 @@ primary(recurse,, immediate, compile_only)
   (vmstate.dp++)->a = &dictionary->code;
 
 dnl ( -- )
-dnl set immediate flag most recently defined word
+dnl toggle immediate flag of most recently defined word
 primary(immediate,,compile_only)
-  dictionary->immediate = 1;
+  dictionary->immediate ^= 1;
+
+dnl ( -- )
+dnl toggle smudge flag of most recently defined word
+primary(smudge,,compile_only)
+  dictionary->smudge ^= 1;
 
 dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
@@ -481,8 +499,7 @@ primary(cons)
   new->smudge = 1;
   vmstate.compiling = 1;
   dictionary = new;
-  new->code = &&enter;
-  vmstate.dp = (cell *) &new->data;
+  vmstate.dp = (cell *) &new->code;
 }
 
 primary(srload, sr@)
@@ -502,11 +519,20 @@ primary(srstore, sr!)
 primary(stop)
 asm("stop #0x2000");
 
-primary(semi, ;, immediate)
-{
+primary(suspend, [, immediate)
   vmstate.compiling = 0;
-  (vmstate.dp++)->a = EXIT;
-}
+
+primary(resume, ], immediate)
+  vmstate.compiling = 1;
+
+secondary(semi, ;, .immediate=1,
+  LIT, EXIT, COMMA, SMUDGE, SUSPEND)
+
+secondary(create,,, WORD, CONS, COMMA)
+secondary(colon, :,, LIT, &&enter, CREATE)
+secondary(``constant'',,, LIT, &&docon, CREATE, COMMA, SMUDGE, SUSPEND)
+secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
+
 
 dnl from fig.txt, unclassified
 secondary(cr,,, LIT, .i=13, EMIT)
@@ -530,8 +556,6 @@ STATE, NULLP, ZBRANCH, self[19], EXIT,
 LIT, LIT, COMMA, COMMA)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
-
-secondary(colon, :,, WORD, CONS)
 
 dnl ( -- a )
 secondary(begin,, .immediate=1,

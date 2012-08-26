@@ -21,7 +21,7 @@
 union cell {
   void *a;
   void **aa;
-  int i;
+  long i;
   char *s;
 };
 typedef union cell cell;
@@ -48,7 +48,9 @@ struct vmstate {
 
 #define IS_WORD(c) (c > ' ')
 
-#define CFA2WORD(x,w) ((word *) ((char *)x) - ((char *)(&w->code) - (char *)w))
+#define CFA2WORD(w,cfa)							\
+  do { word bogus;							\
+    w = (word *) ((cfa) - ((char *)&bogus.code - (char *)&bogus)) ;} while (0)
 
 extern struct word *dictionary;
 extern struct vmstate vmstate;
