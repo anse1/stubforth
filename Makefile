@@ -1,7 +1,7 @@
 TARGET = m68k-elf
 GCC = $(TARGET)-gcc
 CC= $(GCC) $(CFLAGS)
-CFLAGS =  -Wall -m68000 -O2 -Wcast-align
+CFLAGS =  -Wall -m68000 -O2
 LD = $(TARGET)-ld
 OBJCOPY = $(TARGET)-objcopy
 
@@ -27,7 +27,7 @@ stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h
 stub4th:  stub4th.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
-%.c: %.c.m4 Makefile
+%.c: %.c.m4 Makefile platform.h
 	m4 -s $< > $@
 
 check: stub4th.elf
@@ -42,21 +42,20 @@ init:
 #	stty -F $(TTY) -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
 	stty -F $(TTY) 9600
 	echo U > $(TTY) # baud rate calibration
-	sleep 0.1
+	sleep 0.6
 	cat init.Brec  > $(TTY)
-	sleep 0.1
+	sleep 0.06
 	echo FFFFF200022410 > $(TTY) # pllcr: sysclk ½ -> full speed
 	stty -F $(TTY) 19200
-	sleep 0.1
+	sleep 0.06
 	echo FFFFF902020138 > $(TTY) # ubaud
 	stty -F $(TTY) 57600
+	sleep 0.06
 # 	echo FFFFF902020038 > $(TTY) # ubaud
 # 	stty -F $(TTY) 115200
 # 	echo FFFFF902020026 > $(TTY) # ubaud
 # 	stty -F $(TTY) 38400
-	sleep 0.1
 	perl -e '($$s,$$m,$$h)=localtime(time); printf("FFFFFB0004%02X%02X00%02X\n",$$h,$$m,$$s)' > $(TTY)
-	sleep 0.1
 
 %.brec : %.srec
 	srec_cat $< -Output $@ -B-Record
@@ -73,8 +72,10 @@ init:
 %.prog : %.4th
 	./infuse.tcl $(TTY) < $<
 
-%.size : %.elf
+%.size : %.elf %.bin
 	m68k-elf-nm -t d --size-sort --print-size $<
+	m68k-elf-strip $<
+	ls -l $+
 
 .PHONY : %.prog clean %.size init
 
