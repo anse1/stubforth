@@ -49,7 +49,7 @@ test "1 2 3 4 5 6 7 8 9 swap mod + * xor or swap - hex ." {32 $}
 
 test "1 2 3 4 5 6 7 8 9 << >> << swap / ." {99 $}
 
-test "1234 2345 max 9999 min  ." {2345 $}
+test "1234 2345 max 9999 min 11 + ." {2356 $}
 
 test "55 emit 1234 2345 dup = 30 + emit = 30 + emit " {U10$}
 test "55 emit 1234 2345 swap dup < 30 + emit < 30 + emit " {U01$}
