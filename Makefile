@@ -31,8 +31,7 @@ stub4th:  stub4th.o
 	m4 -s $< > $@
 
 check: stub4th
-	echo 42 | ./$<
-	@echo
+	expect test.tcl
 
 clean:
 	rm -f .rev.h *.o *.s stub4th.c

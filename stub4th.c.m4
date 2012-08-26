@@ -59,6 +59,7 @@ dnl $4... - cell data
 
 define(secondary, `
 undivert(1)
+define(`self', `&w_$1.data')
 static word w_$1 = {
   .name = "ifelse($2,`',`$1',`$2')",
   .link = dict_head,
@@ -66,7 +67,7 @@ static word w_$1 = {
    ifelse(`$3',`',`',`$3,')
   .data = { init_union(shift(shift(shift($@)))) , {EXIT}}
 };
-
+  undefine(`self')
   define(`dict_head', &w_$1)
   define(translit($1,a-z,A-Z), &w_$1.code)
 ')
@@ -145,6 +146,10 @@ docon:
   *(sp++) = *(w + 1);
   goto next;
 
+dovar:
+  (sp++)->a = (w + 1);
+  goto next;
+
 dnl $1 - name
 dnl $2 - value
 
@@ -165,9 +170,14 @@ constant(cell, .i=sizeof(cell))
 constant(dp, .a=(&vmstate.dp))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
+constant(d0, .a=dictionary_stack)
 
-primary(spat, sp@)
+primary(spload, sp@)
   sp->a = sp-1;
+  sp++;
+
+primary(rpload, rp@)
+  sp->a = rp-1;
   sp++;
 
 
@@ -252,7 +262,7 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 ')
 
 unop(toggle, ~)
-unop(invert, -, minus)
+unop(minus, -, minus)
 unop(nullp, !, 0=)
 
 primary(max)
@@ -273,15 +283,14 @@ dnl control
 
 dnl --
 primary(branch, , compile_only)
-   ip += ip->i;
+   ip = ip->a;
 
 dnl i --
 primary(zbranch, 0branch, compile_only)
    if ((--sp)->i)
       ip++;
    else
-      ip += ip->i;
-
+      ip = ip->a;
 dnl I/O
 
 dnl c --
@@ -449,14 +458,13 @@ primary(lit,, compile_only)
 
 primary(state)
   (sp++)->i = vmstate.compiling;
-  dictionary->smudge = 0;
 
 dnl ( cfa -- cfa i )
 dnl check immediate flag of word around cfa
 primary(immediatep)
 {
-  word bogus;
-  word *w = (word *) ((sp[-1].s) - ((char *)&bogus.code - (char *)&bogus));
+  word *w;
+  CFA2WORD(w,  sp[-1].s);
   (sp++)->i = w->immediate;
 }
 
@@ -464,9 +472,14 @@ primary(recurse,, immediate, compile_only)
   (vmstate.dp++)->a = &dictionary->code;
 
 dnl ( -- )
-dnl set immediate flag most recently defined word
+dnl toggle immediate flag of most recently defined word
 primary(immediate,,compile_only)
-  dictionary->immediate = 1;
+  dictionary->immediate ^= 1;
+
+dnl ( -- )
+dnl toggle smudge flag of most recently defined word
+primary(smudge,,compile_only)
+  dictionary->smudge ^= 1;
 
 dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
@@ -478,8 +491,7 @@ primary(cons)
   new->smudge = 1;
   vmstate.compiling = 1;
   dictionary = new;
-  new->code = &&enter;
-  vmstate.dp = (cell *) &new->data;
+  vmstate.dp = (cell *) &new->code;
 }
 
 primary(srload, sr@)
@@ -496,11 +508,20 @@ primary(srstore, sr!)
   asm("move.w  %0, %%sr" : /* no outputs */ : "r" (sr));
 }
 
-primary(semi, ;, immediate)
-{
+primary(suspend, [, immediate)
   vmstate.compiling = 0;
-  (vmstate.dp++)->a = EXIT;
-}
+
+primary(resume, ], immediate)
+  vmstate.compiling = 1;
+
+secondary(semi, ;, .immediate=1,
+  LIT, EXIT, COMMA, SMUDGE, SUSPEND)
+
+secondary(create,,, WORD, CONS, COMMA)
+secondary(colon, :,, LIT, &&enter, CREATE)
+secondary(``constant'',,, LIT, &&docon, CREATE, COMMA, SMUDGE, SUSPEND)
+secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
+
 
 dnl from fig.txt, unclassified
 secondary(cr,,, LIT, .i=13, EMIT)
@@ -508,60 +529,60 @@ secondary(lf,,, LIT, .i=10, EMIT)
 secondary(crlf,,, CR, LF)
 secondary(bl,,, LIT, .i=32, EMIT)
 
-dnl secondary(repl, WORD,, FIND, ZBRANCH, .i=4, EXECUTE, BRANCH, .i=2, NUMBER, BRANCH, .i=-9)
-
-secondary(tick, ',, WORD, FIND, ZBRANCH, .i=2, EXIT, ABORT)
+secondary(tick, ',, WORD, FIND, ZBRANCH, self[5], EXIT, ABORT)
 secondary(tobody, >body,, CELL, ADD)
 
 dnl (s -- )
 dnl interpret or compile s
 secondary(interpret,,,
 FIND,
-ZBRANCH, .i=11,
-IMMEDIATEP, NULLP, STATE, AND, ZBRANCH, .i=3,
+ZBRANCH, self[13],
+IMMEDIATEP, NULLP, STATE, AND, ZBRANCH, self[11],
 COMMA, EXIT,
 EXECUTE, EXIT,
 NUMBER,
-STATE, NULLP, ZBRANCH, .i=2, EXIT,
+STATE, NULLP, ZBRANCH, self[19], EXIT,
 LIT, LIT, COMMA, COMMA)
 
-secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, .i=-4)
-
-secondary(colon, :,, WORD, CONS)
+secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
 dnl ( -- a )
 secondary(begin,, .immediate=1,
  HERE)
 dnl ( a -- )
 secondary(again,, .immediate=1,
- LIT, BRANCH, COMMA, HERE, SUB, CELL, DIV, COMMA)
+ LIT, BRANCH, COMMA, COMMA)
 dnl ( a -- )
 secondary(until,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, SUB, CELL, DIV, COMMA)
+ LIT, ZBRANCH, COMMA, COMMA)
 
-dnl ( -- &zbranch-arg )
+dnl ( -- a )
+secondary(while,, .immediate=1,
+ LIT, ZBRANCH, COMMA, HERE, DP, COMMA /* jump after repeat */)
+
+dnl ( a a -- )
+secondary(repeat,, .immediate=1,
+ SWAP,
+ /* deal with unconditional jump first */ 
+ LIT, BRANCH, COMMA, COMMA,
+ /* patch the while jump */
+ HERE, SWAP, STORE)
+
+
+dnl ( -- a )
 secondary(if,, .immediate=1,
- LIT, ZBRANCH, COMMA, /* place branch cfa */
- HERE,            /* push address of branch arg */
- DP, COMMA            /* place dummy arg */
+ LIT, ZBRANCH, COMMA, HERE, DP, COMMA
 )
 
-dnl ( &zbranch-arg -- &branch-arg )
+dnl ( a -- a )
 secondary(else,, .immediate=1,
- LIT, BRANCH, COMMA, /* place branch cfa */
- HERE, /* push address of dummy target */
- DP, COMMA, /* place dummy target */
- SWAP, DUP,
- HERE, SWAP, SUB, CELL, DIV, /* compute distance */
- SWAP, STORE /* patch */
+ LIT, BRANCH, COMMA, HERE, DP, COMMA,
+ SWAP, HERE, SWAP, STORE
 )
 
-dnl ( &branch-arg -- )
+dnl ( a -- )
 secondary(then,, .immediate=1,
- DUP,  /* address to patch */
- HERE, /* next cell */
- SWAP, SUB, CELL, DIV,  /* compute distance */
- SWAP, STORE /* patch */
+ HERE, SWAP, STORE
 )
 
 secondary(q, ?,, LOAD, PRINT)
