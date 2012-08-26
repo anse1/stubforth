@@ -165,7 +165,6 @@ dnl
   }
 
   while ((fifostate = URX) & URX_DATA_READY) {
-dnl   putchar('c');
     if (fifostate & URX_BREAK) {
       putchar('B');
       putchar('R');
