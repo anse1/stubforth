@@ -76,3 +76,7 @@ until
 lf ;
 
 : sleep 80 pctlr c! ;
+
+: depth sp@ s0 - cell + cell / ;
+: .s 23 emit depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
+
