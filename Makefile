@@ -42,7 +42,7 @@ init:
 #	stty -F $(TTY) -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
 	stty -F $(TTY) 9600
 	echo U > $(TTY) # baud rate calibration
-	sleep 0.6
+	sleep 0.06
 	cat init.Brec  > $(TTY)
 	sleep 0.06
 	echo FFFFF200022410 > $(TTY) # pllcr: sysclk ½ -> full speed
