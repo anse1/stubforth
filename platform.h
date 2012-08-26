@@ -66,14 +66,14 @@ void dumpregs()
 }
 
 
+define(excepth, `
 __attribute__((interrupt_handler))
-void ivect_bus_err ()
+void ivect_$1 ()
 {
-  putchar('\n');
+  my_puts("\n x_x ");
+  my_puts("$1");
   my_puts(" x_x ");
-  my_puts("bus_err");
-  my_puts(" x_x ");
-  putchar('\n');
+  my_puts("\n");
 
   long l;
   short s;
@@ -96,8 +96,10 @@ void ivect_bus_err ()
 
  dumpregs();
  while(1);
-}
+} ')
 
+excepth(bus_err)
+excepth(addr_err)
 
 define(defaulth, `
 __attribute__((interrupt_handler))
@@ -124,8 +126,6 @@ void ivect_$1 ()
 }
 ')
 
-
-defaulth(addr_err)
 defaulth(illinstr)
 defaulth(zero_div)
 defaulth(default)
