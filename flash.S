@@ -1,54 +1,71 @@
+
+.section .vectors,"ax",@progbits
+.long 0x40000
+.long _start + 0x800000
+
 .section .text,"ax",@progbits
 .global  _start
 _start:
-
-	moveb #0,      0xFFFFFB0A /* watchdog */
+ 	movew #0x2410, 0xFFFFF200 /* pllcr: full speed */
 	movew #0x2700, %sr /* orig */
-	moveb #0x1C,  	0xfffff000 /* orig, SCR */
+	moveb #0x14,  0xfffff000 /* orig, SCR */
+	moveb #0,      0xFFFFFB0B /* watchdog */
+        moveb #8, 0xFFFFFD0D /* disable hardmap */
 	moveb #0xF5,   0xFFFFF42B /* pfsel */
-;; 	moveb #-11,   0xfffff40b /* pbsel */
+	moveb #0x0,   0xfffff40b /* pbsel, probably too conservative */
         movew #8, 0xfffffd0c /* orig, ICEMCR */
         movew #7, 0xfffffd0e /* orig, ICEMSR */
-
-	moveb #0x7B,   0xFFFFF42B /* pbpuen */
-
-	/* enable UART early so we can debug */
+ 	moveb #0x18,   0xFFFFF300 /* ivr */
+	movel #0x007FFFFF, 0xFFFFF304 /* imr */
+	/* enable UART */
 
 	movew #0x00bf, 0xfffff420 /* PEDIR + PEDATA */
 	movew #0xff0f, 0xfffff422 /* PEPUEN + PESEL */
-	movew #0x2410, 0xFFFFF200 /* pllcr: full speed */
 	movew #0xe100, 0xFFFFF900 /* ustcnt: enable tx, rx */
 	movew #0x0138, 0xFFFFF902 /* ubaud: 57600 */
-	moveb #'F',   0xFFFFF907
-	moveb #0x18,   0xFFFFF300 /* ivr */
+	moveb #'f',   0xFFFFF907
 
 	jmp 1f + 0x800000
 1:	
-
-	moveb #'G',   0xFFFFF907
+	moveb #'F',   0xFFFFF907
 	
 	movew #0x0400, 0xFFFFF100 /* csgba: flash 8M-10M */
-	movew #0x0089, 0xFFFFF110 /* csa */
+	movew #0x0189, 0xFFFFF110 /* csa */
 	movew #0x0087, 0xFFFFF114 /* csc */
 	movew #0x0000, 0xFFFFF104 /* csgbc: sram 0-256k */
 	movew #0x0000, 0xFFFFF116 /* csd */
+ 	moveb #0x18,   0xFFFFF300 /* ivr */
+ 	moveb #0x1C,  	0xfffff000 /* orig, SCR */
 
-	moveb #'H',   0xFFFFF907
+/*	moveb #0x7B,   0xFFFFF42B /* pbpuen */
+
+	moveb #'M',   0xFFFFF907
 	
-	/* copy flash to sram till __bss_start */
+	lea 0x40000,%sp
+
+	moveb #'c',   0xFFFFF907
+
+	jsr uwait
+
+	/* copy flash to SRAM from 0 till __bss_start */
 	lea 0, %a0
-	lea __bss_start, %a1
-	lea 0x800000, %a2
+	movel #__bss_start, %d0
+	lea 0x800000, %a1
 1:	
-	movb %a2@+, %a0@+
-	cmpl %a0, %a1
-	bgt 1b
+	moveb (%a1)+, (%a0)+
+	moveb #'.', 0xFFFFF907
+	cmpl %d0, %a0
+	jcs 1b
 
-	moveb #'D', 0xFFFFF907
+	jsr uwait
 
-	jmp 1f - 0x800000
+	moveb #'C', 0xFFFFF907
+
+        /* jump into the copy */
+	jmp 1f:l
 1:	
-	moveb #'S', 0xFFFFF907
+	nop
+	moveb #'s', 0xFFFFF907
 	
 	/* bss init. */
 	lea __bss_start, %a0
@@ -58,10 +75,23 @@ _start:
 	cmpl %a0, %a1
 	bgt 1b
 
-	moveb #'M', 0xFFFFF907
+	moveb #'S', 0xFFFFF907
+
+	jsr uwait
+
+	moveb #'\r', 0xFFFFF907
+	moveb #'\n', 0xFFFFF907
+
 
 .global _cinit
 _cinit:	
-	lea _stack_base,%sp
 	jsr main
+	stop #0x2700
+
+uwait:
+1:	
+      	movew 0xfffff906, %d1
+      	btst #13,%d1
+	beqs 1b
+	rts
 
