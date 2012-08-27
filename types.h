@@ -21,6 +21,7 @@ struct word {
 
 struct vmstate {
   cell *dp;
+  struct word *dictionary;
   volatile int break_condition : 1;
   int compiling : 1;
   char base;
@@ -34,7 +35,6 @@ struct vmstate {
   do { word bogus;							\
     w = (word *) ((cfa) - ((char *)&bogus.code - (char *)&bogus)) ;} while (0)
 
-extern struct word *dictionary;
 extern struct vmstate vmstate;
 
 typedef struct word word;
