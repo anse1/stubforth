@@ -17,8 +17,8 @@ proc test {tx rx} {
     send "$tx\n"
 
     expect \
-	timeout { exit 1 } \
-	-re abort: { exit 2 } \
+	timeout { error timeout } \
+	-re abort: { error abort } \
 	-re $rx
     send_user " \[OK\]\n"
 }
@@ -28,13 +28,13 @@ test "hi\n" {stub4th [0-9a-f]+}
 send_user "the following should abort...\n"
 send "should-abort\n"
 expect {
-    timeout { exit 1 }
+    timeout { error }
     -re abort:.*
 }
 
 send ".\n"
 expect {
-    timeout { exit 1 }
+    timeout { error }
     -re abort:.*
 }
 
