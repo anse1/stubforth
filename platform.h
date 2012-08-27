@@ -9,11 +9,6 @@
 
 #include "MC68EZ328.h"
 
-register cell *ip asm ("a5");
-dnl volatile cell *ip;
-
-cell exception_cell[2];
-
 static void my_puts(const char *);
 
 static int putchar(int c)
@@ -161,17 +156,14 @@ dnl   DASM("6(%%fp)");
 dnl   DASM("8(%%fp)");
 dnl 
   if (! (ISR & ISR_UART) ) {
+     my_puts(" huh? \n");
     return;
   }
 
   while ((fifostate = URX) & URX_DATA_READY) {
     if (fifostate & URX_BREAK) {
-      putchar('B');
-      putchar('R');
-       if (exception_cell[1].a) {
-         putchar('K');
- 	 ip = exception_cell;
-       }
+      my_puts(" <BREAK> \n");
+      asm("jmp _cinit");
     }
     c = fifostate & URX_RXDATA_MASK;
     ring.buf[ring.end] = c;
@@ -237,12 +229,10 @@ dnl     PCTLR = 0x80;
 __attribute__((noinline))
 void initio(void)
 {
-  int bogus;
+  volatile int bogus;
   bogus = URX;
   IMR &= ~IMR_MUART;
   USTCNT |= USTCNT_RXRE;
-  putchar('\n');
-  dumpregs();
   my_puts("enabling interrupts...");
   sei();
   my_puts(" done.\n");
