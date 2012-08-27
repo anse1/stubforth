@@ -13,8 +13,10 @@ static void my_puts(const char *);
 
 static int putchar(int c)
 {
-  if (c=='\n')
-    putchar('\r');
+  if (!vmstate.raw)
+    if (c=='\n')
+      putchar('\r');
+
   while (! (UTX & UTX_TX_AVAIL))
         ;
   UTX_TXDATA = c;
@@ -170,8 +172,13 @@ void ivect_level4 ()
   return;
 }
 
+extern void *_start;
+extern void *_stack_base;
+
 void *vectors[] __attribute__((section(".vectors")))
     =  {
+   [0] = &_stack_base,
+   [1] = &_start,
    [2] = ivect_bus_err,
    [3] = ivect_addr_err,
    [4] = ivect_illinstr,
@@ -208,15 +215,19 @@ static int getchar()
 {
   int c;
   while (ring.end == ring.beg) {
-    asm("stop #0x2000");
+    /* Calling STOP will reduce power consumption when idle, but there
+       is a race condition when an interrupt arrives between the check
+       and the STOP. */
+   /*  asm("stop #0x2000"); */
   }
   c = ring.buf[ring.beg];
   ring.beg = (ring.beg + 1) % sizeof(ring.buf);
 
-  if (c == '\r')
-    c = '\n';
-
-  putchar(c);
+  if (! vmstate.raw)
+    if (c == '\r')
+      c = '\n';
+  if (! vmstate.quiet)
+    putchar(c);
   return c;
 }
 
