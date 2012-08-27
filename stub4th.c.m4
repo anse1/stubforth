@@ -116,7 +116,7 @@ dnl Labels as Values extension
 
 int main()
 {
-  cell *sp, *rp, *w;
+  cell *sp, *rp, *w, *ip;
   cell t;
 
   vmstate.base = 10;
