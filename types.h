@@ -21,6 +21,7 @@ struct word {
 
 struct vmstate {
   cell *dp;
+  struct word *dictionary;
   volatile int break_condition : 1;
   int compiling : 1;
   char base;
