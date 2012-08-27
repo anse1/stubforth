@@ -139,28 +139,10 @@ struct {
   char buf[128];
 } ring;
 
-
-__attribute__((interrupt_handler))
-void ivect_level4 ()
+static void uart_interrupt()
 {
   char c;
   int fifostate;
-dnl  asm(" moveml %d0-%d6/%a0-%a6, %sp@- ");
-
-dnl 
-dnl   my_puts("ISR: ");
-dnl   cprint(ISR);
-dnl   my_puts("IPR: ");
-dnl   cprint(IPR);
-dnl 
-dnl   DASM("4(%%fp)");
-dnl   DASM("6(%%fp)");
-dnl   DASM("8(%%fp)");
-dnl 
-  if (! (ISR & ISR_UART) ) {
-     my_puts(" huh? \n");
-    return;
-  }
 
   while ((fifostate = URX) & URX_DATA_READY) {
     if (fifostate & URX_BREAK) {
@@ -171,8 +153,20 @@ dnl
     ring.buf[ring.end] = c;
     ring.end = (ring.end + 1) % sizeof(ring.buf);
   }
-dnl  putchar('\n');
-dnl  asm(" moveml %sp@+, %d0-%d6/%a0-%a6 ");
+}
+
+__attribute__((interrupt_handler))
+void ivect_level4 ()
+{
+
+  if (! (ISR & ISR_UART) ) {
+     my_puts(__func__);
+     my_puts(": huh?\n");
+     dumpregs();
+    return;
+  }
+
+  uart_interrupt();
   return;
 }
 
@@ -215,7 +209,7 @@ static int getchar()
   int c;
   while (ring.end == ring.beg) {
     asm("stop #0x2000");
-}
+  }
   c = ring.buf[ring.beg];
   ring.beg = (ring.beg + 1) % sizeof(ring.buf);
 
