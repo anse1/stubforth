@@ -1,11 +1,6 @@
 .section .text,"ax",@progbits
 .global  _start
 _start:	
-	lea 0x40000,%sp
-
-	/* Save bootloader state. */
-	moveml %d0-%d6/%a0, %sp@-
-
 	/* C runtime init. */
 	lea __bss_start, %a0
 	lea _end, %a1
@@ -13,9 +8,8 @@ _start:
 	clrl %a0@+
 	cmpl %a0, %a1
 	bgt 1b
-
+.global _cinit
+_cinit:	
+	lea _stack_base,%sp
 	jsr main
 
-	/* Resume bootstrapping. */
-	moveml %sp@+, %d0-%d6/%a0
-	jmp 0xffffff44 
