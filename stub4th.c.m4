@@ -10,6 +10,10 @@ word *dictionary;
 
 struct vmstate vmstate = { .dp = dictionary_stack };
 
+
+
+dnl m4 magic
+
 define(dict_head, 0);
 
 dnl $1 - ANS94 error code
@@ -72,6 +76,21 @@ static word w_$1 = {
   define(translit($1,a-z,A-Z), &w_$1.code)
 ')
 
+define(constant, `
+undivert(1)
+static word w_$1 = {
+  .name = "$1",
+  .link = dict_head,
+  .code = &&docon,
+  .data = {{ $2 }}
+};
+
+  define(`dict_head', &w_$1)
+  define(translit($1,a-z,A-Z), &w_$1.code)
+')
+
+
+dnl C helpers
 static int strcmp(const char *a, const char *b) {
   while (*a && *b && *a == *b)
      a++, b++;
@@ -93,6 +112,10 @@ static word *find(word *p, const char *key)
    return p;
 }
 
+
+dnl The entire VM must be contained in main since we make use of GCC's
+dnl Labels as Values extension
+
 int main()
 {
   cell *sp, *rp, *w;
@@ -113,6 +136,8 @@ primary(abort)
   vmstate.errno = 0;
   goto quit;
 
+
+dnl inner interpreter
 enter:
   (rp++)->a = ip;
   ip = w + 1;
@@ -126,13 +151,6 @@ next:
   w = (ip++)->a;
   goto **(void **)w;
 
-primary(brk)
-{
-  cthrow(-28,user interrupt)
-}
-
-
-dnl inner interpreter
 primary(execute)
   w = (--sp)->a;
   goto *(w->aa);
@@ -157,19 +175,6 @@ dovar:
 
 dnl $1 - name
 dnl $2 - value
-
-define(constant, `
-undivert(1)
-static word w_$1 = {
-  .name = "$1",
-  .link = dict_head,
-  .code = &&docon,
-  .data = {{ $2 }}
-};
-
-  define(`dict_head', &w_$1)
-  define(translit($1,a-z,A-Z), &w_$1.code)
-')
 
 constant(cell, .i=sizeof(cell))
 constant(dp, .a=(&vmstate.dp))
@@ -284,7 +289,7 @@ primary(plus1, 1+)
   sp[-1].i++;
 
 
-dnl control
+dnl control primitives
 
 dnl --
 primary(branch, , compile_only)
@@ -296,6 +301,7 @@ primary(zbranch, 0branch, compile_only)
       ip++;
    else
       ip = ip->a;
+
 dnl I/O
 
 dnl c --
@@ -309,6 +315,9 @@ primary(hex)
 dnl --
 primary(decimal)
   vmstate.base = 10;
+
+dnl -- &c
+constant(base, .s=&vmstate.base)
 
 dnl -- c
 primary(key)
@@ -399,7 +408,8 @@ primary(aligned)
 
 primary(number)
 dnl ( s -- n )
-dnl Convert string to number. On failure, abort.
+dnl Convert string to number according to base variable.
+dnl On failure, abort.
 {
   t.i = 0;
   char *s = sp[-1].s;
@@ -488,12 +498,12 @@ primary(recurse,, immediate, compile_only)
 
 dnl ( -- )
 dnl toggle immediate flag of most recently defined word
-primary(immediate,,compile_only)
+primary(immediate,,)
   dictionary->immediate ^= 1;
 
 dnl ( -- )
 dnl toggle smudge flag of most recently defined word
-primary(smudge,,compile_only)
+primary(smudge,,)
   dictionary->smudge ^= 1;
 
 dnl ( s -- )
@@ -542,10 +552,10 @@ secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
 
 
 dnl from fig.txt, unclassified
-secondary(cr,,, LIT, .i=13, EMIT)
+dnl secondary(cr,,, LIT, .i=13, EMIT)
 secondary(lf,,, LIT, .i=10, EMIT)
-secondary(crlf,,, CR, LF)
-secondary(bl,,, LIT, .i=32, EMIT)
+dnl secondary(crlf,,, CR, LF)
+dnl secondary(bl,,, LIT, .i=32, EMIT)
 
 secondary(tick, ',, WORD, FIND, ZBRANCH, self[5], EXIT, ABORT)
 secondary(tobody, >body,, CELL, ADD)
@@ -565,14 +575,11 @@ LIT, LIT, COMMA, COMMA)
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
 dnl ( -- a )
-secondary(begin,, .immediate=1,
- HERE)
+secondary(begin,, .immediate=1, HERE)
 dnl ( a -- )
-secondary(again,, .immediate=1,
- LIT, BRANCH, COMMA, COMMA)
+secondary(again,, .immediate=1, LIT, BRANCH, COMMA, COMMA)
 dnl ( a -- )
-secondary(until,, .immediate=1,
- LIT, ZBRANCH, COMMA, COMMA)
+secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
 secondary(while,, .immediate=1,
@@ -581,7 +588,7 @@ secondary(while,, .immediate=1,
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
  SWAP,
- /* deal with unconditional jump first */ 
+ /* deal with unconditional jump first */
  LIT, BRANCH, COMMA, COMMA,
  /* patch the while jump */
  HERE, SWAP, STORE)
@@ -611,6 +618,9 @@ secondary(cold,,, HI, QUIT, BYE)
 
 dnl convenience
 
+
+
+
 undivert(1)
 
 quit:

@@ -1,23 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#define PARAM_SIZE 10000
-#define RETURN_SIZE 10000
-#define NAME_SIZE 4
-
-#define HASH_PRIME 8209
-#define HASH(s) hash(s, HASH_PRIME)
-/* __attribute__((pure,always_inline)) */
-
-/* static unsigned int hash(const char *s, unsigned int prime) */
-/* { */
-/*   unsigned int hash = 0; */
-/*   while (*s) */
-
-/*     hash = hash * prime + *s++; */
-/*   return hash; */
-/* } */
-
 union cell {
   void *a;
   void **aa;
@@ -40,7 +23,7 @@ struct vmstate {
   cell *dp;
   volatile int break_condition : 1;
   int compiling : 1;
-  unsigned int base : 5;
+  char base;
   int errno : 14;
   char *errstr;
 };
