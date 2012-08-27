@@ -2,20 +2,19 @@
 
 # Wait for echos so we don't overflow the buffers.
 
-set timeout -1
 
 set tty [lindex $argv 0]
 spawn -open [set port [open $tty "r+"]]
 
+send "hi\n"
+expect -re "stub4th .*"
+
 set lines [split [read stdin] \n]
 
+set timeout -1
 foreach l $lines {
 
-    # Exploit the 12 byte RX FIFO of the Dragonball.
-    foreach {a b c d e }  [split $l ""] {
-	send -- "$a$b$c$d$e"
-	expect -- "$a$b$c$d$e"
-    }
+    send -- $l
     send "\n"
-    expect "\n"
+    expect -- $l
 }
