@@ -588,9 +588,9 @@ secondary(q, ?,, LOAD, PRINT)
 
 secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
 
-primary(cold)
 secondary(boot,,, HI, QUIT)
 
+primary(cold)
 goto real_cold;
 
 
