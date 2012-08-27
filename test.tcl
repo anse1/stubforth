@@ -11,7 +11,7 @@ send "decimal \n"
 expect plzflushkthx
 expect *
 
-set timeout 3
+set timeout 4
 
 proc test {tx rx} {
     send "$tx\n"
