@@ -618,6 +618,18 @@ secondary(boot,,, HI, QUIT)
 primary(cold)
 goto real_cold;
 
+primary(raw)
+ vmstate.raw = 1;
+
+primary(cooked)
+ vmstate.raw = 0;
+
+primary(echo)
+ vmstate.quiet = 0;
+
+primary(quiet)
+ vmstate.quiet = 1;
+
 
 dnl convenience
 
@@ -630,6 +642,8 @@ quit:
   sp = param_stack;
   rp = return_stack;
   vmstate.compiling = 0;
+  vmstate.raw = 0;
+  vmstate.quiet = 0;
 
   if (vmstate.dp)
   {

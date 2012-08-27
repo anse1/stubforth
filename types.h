@@ -22,11 +22,13 @@ struct word {
 struct vmstate {
   cell *dp;
   struct word *dictionary;
+  char *errstr;
   volatile int break_condition : 1;
   int compiling : 1;
-  char base;
+  int raw : 1;
+  int quiet : 1;
   int errno : 14;
-  char *errstr;
+  char base;
 };
 
 #define IS_WORD(c) (c > ' ')
