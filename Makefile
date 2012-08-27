@@ -80,6 +80,27 @@ init:
 .PHONY : %.prog clean %.size init
 
 stub4th.elf : stub4th.o start.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
-#	$(LD)  --section-start=.vectors=0 --section-start=.text=0x000200  $+ -o $@
 	$(LD) -T vivo.ld $+ -o $@
 
+flash.elf : flash.o stub4th.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+	$(LD) -T vivo.ld $+ -o $@
+
+dummy.elf : flash.o dummy.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+	$(LD) -T vivo.ld $+ -o $@
+
+flashload: flashload.c
+	gcc -g -Wall flashload.c -o flashload
+
+flash.prog : flash.bin flashload
+	echo F > $(TTY)
+	stty -F $(TTY) raw
+	./flashload $< < $(TTY) > $(TTY)
+
+dummy.prog : dummy.bin flashload
+	echo F > $(TTY)
+	stty -F $(TTY) raw
+	./flashload $< < $(TTY) > $(TTY)
+
+flash:
+	make init stub4th.prog dragon.prog vivo.prog
+	make flash.prog
