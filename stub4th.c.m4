@@ -6,9 +6,7 @@ cell return_stack[1000];
 cell param_stack[1000];
 cell dictionary_stack[1000];
 
-word *dictionary;
-
-struct vmstate vmstate = { .dp = dictionary_stack };
+struct vmstate vmstate;
 
 
 
@@ -125,7 +123,7 @@ int main()
 
   initio();
 
-goto cold;
+goto quit;
 
 primary(abort)
   my_puts("abort");
@@ -417,6 +415,7 @@ dnl On failure, abort.
       c = c - 'a' + 10;
     }
    if (c < 0 || c >= vmstate.base) {
+      vmstate.dp = (cell *)sp[-1].s; /* TODO: sanity check */
       cthrow(-24, invalid numeric argument);
    }
    t.i *= vmstate.base;
@@ -457,7 +456,7 @@ dnl s -- cfa tf (found) -- s ff (not found)
 dnl s is deallocated when found
 {
    char *key = sp[-1].s;
-   word *p = find(dictionary, key);
+   word *p = find(vmstate.dictionary, key);
    if (p)
    {
      vmstate.dp = (cell *) key; /* TODO: sanity check */
@@ -486,17 +485,17 @@ primary(immediatep)
 }
 
 primary(recurse,, immediate, compile_only)
-  (vmstate.dp++)->a = &dictionary->code;
+  (vmstate.dp++)->a = &vmstate.dictionary->code;
 
 dnl ( -- )
 dnl toggle immediate flag of most recently defined word
 primary(immediate,,)
-  dictionary->immediate ^= 1;
+  vmstate.dictionary->immediate ^= 1;
 
 dnl ( -- )
 dnl toggle smudge flag of most recently defined word
 primary(smudge,,)
-  dictionary->smudge ^= 1;
+  vmstate.dictionary->smudge ^= 1;
 
 dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
@@ -504,10 +503,10 @@ primary(cons)
 {
   word *new = (word *)vmstate.dp;
   new->name = (--sp)->s;
-  new->link = dictionary;
+  new->link = vmstate.dictionary;
   new->smudge = 1;
   vmstate.compiling = 1;
-  dictionary = new;
+  vmstate.dictionary = new;
   vmstate.dp = (cell *) &new->code;
 }
 
@@ -588,7 +587,11 @@ secondary(then,, .immediate=1,
 secondary(q, ?,, LOAD, PRINT)
 
 secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
-secondary(cold,,, HI, QUIT, BYE)
+
+primary(cold)
+secondary(boot,,, HI, QUIT)
+
+goto real_cold;
 
 
 dnl convenience
@@ -602,16 +605,22 @@ quit:
   sp = param_stack;
   rp = return_stack;
   vmstate.compiling = 0;
-  (sp++)->a = QUIT;
-  goto execute;
 
-cold:
-  dictionary = dict_head;
-  sp = param_stack;
-  rp = return_stack;
-  ip = 0;
-  (sp++)->a = COLD;
-  goto execute;
-
-  return 0;
+  if (vmstate.dp)
+  {
+    ip = 0;
+    (sp++)->a = QUIT;
+    goto execute;
+  }
+  else
+  {
+real_cold:
+    vmstate.dp = dictionary_stack;
+    vmstate.dictionary = dict_head;
+    sp = param_stack;
+    rp = return_stack;
+    ip = 0;
+    (sp++)->a = BOOT;
+    goto execute;
+  }
 }
