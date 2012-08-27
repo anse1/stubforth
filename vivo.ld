@@ -9,7 +9,7 @@ ENTRY(_start)
 SECTIONS 
 {
     . = 0;
-    .vectors : { *(.vectors) } = 0
+    .vectors : { *(.vectors) }
     . = 0x4000;
     .rodata :  { *(.rodata) }
     .data :  { *(.data) }
@@ -17,5 +17,5 @@ SECTIONS
     __bss_start = .;
     .bss :  { *(.bss) }
     _end = .;
+    _stack_base = 0x40000 - 4;
 }
-
