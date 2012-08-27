@@ -25,7 +25,9 @@ static int putchar(int c)
 __attribute__((noinline))
 void sei()
 {
-  asm(" move.w  0x2000, %sr ");
+  my_puts("enabling interrupts...");
+  asm(" move.w #0x2000, %sr ");
+  my_puts(" done.\n");
 }
 
 static int cprint(int i)
@@ -90,7 +92,7 @@ void ivect_$1 ()
  cprint(l);
 
  dumpregs();
- while(1);
+  asm("jmp _cinit");
 } ')
 
 excepth(bus_err)
@@ -116,7 +118,7 @@ void ivect_$1 ()
 
   dumpregs();
 
-  while(1);
+  asm("jmp _cinit");
 
 }
 ')
@@ -131,9 +133,9 @@ defaulth(trace)
 defaulth(trap)
 defaulth(chk)
 
-volatile static struct {
+struct {
   short beg;
-  short end;
+  volatile short end;
   char buf[128];
 } ring;
 
@@ -212,9 +214,7 @@ static int getchar()
 {
   int c;
   while (ring.end == ring.beg) {
-dnl     PCTLR = 0x80;
-  asm("stop #0x2000");
-
+    asm("stop #0x2000");
 }
   c = ring.buf[ring.beg];
   ring.beg = (ring.beg + 1) % sizeof(ring.buf);
@@ -233,9 +233,7 @@ void initio(void)
   bogus = URX;
   IMR &= ~IMR_MUART;
   USTCNT |= USTCNT_RXRE;
-  my_puts("enabling interrupts...");
   sei();
-  my_puts(" done.\n");
 }
 
 #endif
