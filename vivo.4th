@@ -31,6 +31,8 @@ begin
  fsr 80 and until ;
 
 : strap ( a -- )
+raw
+quiet
 begin
  dup key dup emit swap
  fwrite
@@ -80,3 +82,6 @@ lf ;
 : depth sp@ s0 - cell + cell / ;
 : .s 23 emit depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
 
+: F flash dup dup funlock ferase strap ;
+hex 
+: D flash 400 raw dump ;
