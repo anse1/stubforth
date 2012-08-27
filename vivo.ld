@@ -10,7 +10,7 @@ SECTIONS
 {
     . = 0;
     .vectors : { *(.vectors) }
-    . = 0x4000;
+    . = 0x100;
     .rodata :  { *(.rodata) }
     .data :  { *(.data) }
     .text :  { *(.text) } 
