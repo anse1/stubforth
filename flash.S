@@ -1,8 +1,10 @@
 
+/*
 .section .vectors,"ax",@progbits
 .long 0x40000
 .long _start + 0x800000
-
+*/
+	
 .section .text,"ax",@progbits
 .global  _start
 _start:
