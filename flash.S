@@ -20,10 +20,6 @@ _start:
 	movew #0x0138, 0xFFFFF902 /* ubaud: 57600 */
 	moveb #'f',   0xFFFFF907
 
-/*
-	jmp 1f + _flash
-1:
-*/
 	moveb #'F',   0xFFFFF907
 	
 	movew #0x0400, 0xFFFFF100 /* csgba: flash 8M-10M */
@@ -38,8 +34,6 @@ _start:
 
 	moveb #'M',   0xFFFFF907
 
-	/* huh? Why hasn't %sp have been loaded from vecotrs[0]? */
-	lea _stack_base, %sp
 	jsr uwait
 
 	moveb #'c',   0xFFFFF907

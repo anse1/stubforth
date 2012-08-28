@@ -38,9 +38,9 @@ raw
 quiet
 begin
  dup key dup emit swap
+ fwait
  fwrite
  1 +
- fwait
  0 until ;
 
 : fchiperase ( -- )
