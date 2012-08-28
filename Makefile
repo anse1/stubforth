@@ -104,7 +104,7 @@ dummy.prog : dummy.bin flashload
 
 boot:
 	make init
-	stub4th.prog
+	make stub4th.prog
 	make user
 
 user:
