@@ -385,7 +385,7 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
   (sp++)->s = (char *)vmstate.dp;
 
   /* fix alignment */
-  while ((int)s & (__alignof__(cell)-1)) s++;
+  while ((typeof(t.i))s & (__alignof__(cell)-1)) s++;
   vmstate.dp = (cell *)s;
 }
 
@@ -393,7 +393,7 @@ dnl ( addr -- a-addr )
 primary(aligned)
 {
   char *s = sp[-1].a;
-  while ((int)s & (__alignof__(cell)-1)) s++;
+  while ((typeof(t.i))s & (__alignof__(cell)-1)) s++;
   sp[-1].a = s;
 }
 
@@ -478,7 +478,7 @@ dnl ( cfa -- cfa i )
 dnl check immediate flag of word around cfa
 primary(immediatep)
 {
-  word *w = CFA2WORD(sp[-1].s);
+  word *w = CFA2WORD(sp[-1].a);
   (sp++)->i = w->immediate;
 }
 
