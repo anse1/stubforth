@@ -1,10 +1,3 @@
-
-/*
-.section .vectors,"ax",@progbits
-.long 0x40000
-.long _start + 0x800000
-*/
-	
 .section .text,"ax",@progbits
 .global  _start
 _start:
@@ -43,7 +36,7 @@ _start:
 
 	moveb #'M',   0xFFFFF907
 	
-	lea 0x40000,%sp
+	lea _stack_base,%sp
 
 	moveb #'c',   0xFFFFF907
 
@@ -86,7 +79,8 @@ _start:
 
 
 .global _cinit
-_cinit:	
+_cinit:
+	lea _stack_base,%sp
 	jsr main
 	stop #0x2700
 
