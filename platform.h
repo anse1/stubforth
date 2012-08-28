@@ -53,8 +53,6 @@ void dumpregs()
   cprint(SCR);
   my_puts("IVR: ");
   cprint(IVR);
-  my_puts("ICEMSR: ");
-  cprint(ICEMSR);
 
   my_puts("SR: ");
   {
