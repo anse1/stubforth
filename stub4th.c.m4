@@ -391,7 +391,6 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
 
   /* fix alignment */
   while ((int)s & (__alignof__(cell)-1)) s++;
-  chkalign(s);
   vmstate.dp = (cell *)s;
 }
 
@@ -427,7 +426,6 @@ dnl On failure, abort.
    t.i += c;
    s++;
   }
-  chkalign(sp[-1].s);
   vmstate.dp = (cell *)sp[-1].s; /* TODO: sanity check */
   sp[-1] = t;
 }
@@ -465,7 +463,6 @@ dnl s is deallocated when found
    word *p = find(vmstate.dictionary, key);
    if (p)
    {
-     chkalign(key);
      vmstate.dp = (cell *) key; /* TODO: sanity check */
      sp--;
      (sp++)->a = &p->code;
