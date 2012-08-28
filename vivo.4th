@@ -1,6 +1,7 @@
 hex
-: lshift << ;
-: rshift >> ;
+
+\ flash chip control
+
 : flash 800000 ;
 : c? c@ . ;
 : fcmd flash c! ;
@@ -19,9 +20,9 @@ if
  1 xor
  swap FF00 or
 else
- swap 8 lshift FF or
+ swap 8 << FF or
 then
-10 lshift FFFF or
+10 << FFFF or
 swap
 10 fcmd
 ! ;
@@ -62,10 +63,18 @@ begin
  >
   until ;
 
+: STRAP flash dup dup funlock ferase strap ;
+hex 
+
+\ power control
+
+: sleep 80 pctlr c! ;
+
+\ non-platform-specific TODO: move somewhere else
+
 : fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;
 : tuck swap over ;
 : gcd dup if tuck mod recurse else drop then ;
-
 : 2dup 1 pick 1 pick ;
 
 : dump ( addr n -- )
@@ -76,12 +85,7 @@ dup c@ emit
 1 + 2dup <
 until
 lf ;
-
-: sleep 80 pctlr c! ;
-
 : depth sp@ s0 - cell + cell / ;
 : .s 23 emit depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
 
-: STRAP flash dup dup funlock ferase strap ;
-hex 
 : DUMP flash 400 raw dump ;
