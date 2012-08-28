@@ -1,7 +1,7 @@
 TARGET = m68k-elf
 GCC = $(TARGET)-gcc
 CC= $(GCC) $(CFLAGS)
-CFLAGS =  -Wall -m68000 -O2
+CFLAGS =  -Wall -m68000 -O2 -Wcast-align
 LD = $(TARGET)-ld
 OBJCOPY = $(TARGET)-objcopy
 
