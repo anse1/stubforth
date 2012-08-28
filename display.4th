@@ -7,13 +7,6 @@ lymax @ 240 16 << or lymax !
 
 0 pcsel c!
 
-: flip ( c a -- ) 
-  dup c@ 2 pick xor swap c! drop ;
-: set ( c a -- )
-  dup c@ 2 pick or swap c! drop ;
-: clear ( c a -- )
-  dup c@ 2 pick ~ and swap c! drop ;
-
 hex
 
 : lcdon

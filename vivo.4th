@@ -1,5 +1,32 @@
 hex
 
+\ non-platform-specific TODO: move somewhere else
+
+: fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;
+: tuck swap over ;
+: gcd dup if tuck mod recurse else drop then ;
+: 2dup 1 pick 1 pick ;
+
+: dump ( addr n -- )
+over + swap
+( endaddr addr )
+begin
+dup c@ emit
+1 + 2dup <
+until
+lf ;
+: depth sp@ s0 - cell + cell / ;
+: .s 23 emit depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
+
+\ bit flipping
+
+: flip ( c a -- ) 
+  dup c@ 2 pick xor swap c! drop ;
+: set ( c a -- )
+  dup c@ 2 pick or swap c! drop ;
+: clear ( c a -- )
+  dup c@ 2 pick ~ and swap c! drop ;
+
 \ flash chip control
 
 : flash 800000 ;
@@ -71,23 +98,6 @@ hex
 
 : sleep 80 pctlr c! ;
 
-\ non-platform-specific TODO: move somewhere else
-
-: fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;
-: tuck swap over ;
-: gcd dup if tuck mod recurse else drop then ;
-: 2dup 1 pick 1 pick ;
-
-: dump ( addr n -- )
-over + swap
-( endaddr addr )
-begin
-dup c@ emit
-1 + 2dup <
-until
-lf ;
-: depth sp@ s0 - cell + cell / ;
-: .s 23 emit depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
 
 : DUMP flash 400 raw dump ;
 
@@ -104,3 +114,5 @@ lf ;
 delay
 0 pwmc 1+ c! ;
 
+: max3221off 1 pbsel set 1 pbdir set 1 pbdata clear ;
+: max3221on 1 pbsel set 1 pbdir set 1 pbdata set ;
