@@ -31,7 +31,7 @@ swap
 begin
  fsr 80 and until ;
 
-: strap ( a -- )
+: fstrap ( a -- )
 raw
 quiet
 begin
@@ -41,7 +41,7 @@ begin
  fwait
  0 until ;
 
-: chiperase ( -- )
+: fchiperase ( -- )
 flash
 begin
  dup .
@@ -63,7 +63,6 @@ begin
  >
   until ;
 
-: STRAP flash dup dup funlock ferase strap ;
 hex 
 
 \ power control
