@@ -90,3 +90,17 @@ lf ;
 : .s 23 emit depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
 
 : DUMP flash 400 raw dump ;
+
+: delay ( n --, pause for approx n milliseconds)
+ [ decimal ]
+  27 * begin 1 - dup while repeat drop ;
+
+: honk ( n -- )
+[ hex ]
+80 pwmc c!
+3c pwmc 1+ c!
+4 pwms 1+ c!
+8 pwmp c!
+delay
+0 pwmc 1+ c! ;
+
