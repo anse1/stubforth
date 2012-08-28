@@ -31,6 +31,8 @@ swap
 begin
  fsr 80 and until ;
 
+\ Write raw input bytes to flash, starting at the specified address.
+\ Use out-of-band BREAK to stop flashing.
 : fstrap ( a -- )
 raw
 quiet
