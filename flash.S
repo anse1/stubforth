@@ -36,10 +36,6 @@ _start:
 
 	moveb #'M',   0xFFFFF907
 	
-	lea _stack_base,%sp
-
-	moveb #'c',   0xFFFFF907
-
 	jsr uwait
 
 	/* copy flash to SRAM from 0 till __bss_start */
