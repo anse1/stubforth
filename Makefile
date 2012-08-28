@@ -101,6 +101,5 @@ dummy.prog : dummy.bin flashload
 	stty -F $(TTY) raw
 	./flashload $< < $(TTY) > $(TTY)
 
-flash:
+boot:
 	make init stub4th.prog dragon.prog vivo.prog
-	make flash.prog
