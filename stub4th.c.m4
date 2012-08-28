@@ -335,8 +335,11 @@ primary(print, .)
   putchar(' ');
 }
 
-primary(comment, `(', immediate)
+primary(blockcomment, `(', immediate)
   while(getchar() != ')');
+
+primary(linecomment, `\\', immediate)
+  while(getchar() != '\n');
 
 
 dnl MEM
