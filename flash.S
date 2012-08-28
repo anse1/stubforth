@@ -20,8 +20,10 @@ _start:
 	movew #0x0138, 0xFFFFF902 /* ubaud: 57600 */
 	moveb #'f',   0xFFFFF907
 
-	jmp 1f + 0x800000
-1:	
+/*
+	jmp 1f + _flash
+1:
+*/
 	moveb #'F',   0xFFFFF907
 	
 	movew #0x0400, 0xFFFFF100 /* csgba: flash 8M-10M */
@@ -35,13 +37,16 @@ _start:
 /*	moveb #0x7B,   0xFFFFF42B /* pbpuen */
 
 	moveb #'M',   0xFFFFF907
-	
+
+	/* huh? Why hasn't %sp have been loaded from vecotrs[0]? */
+	lea _stack_base, %sp
 	jsr uwait
 
+	moveb #'c',   0xFFFFF907
 	/* copy flash to SRAM from 0 till __bss_start */
 	lea 0, %a0
 	movel #__bss_start, %d0
-	lea 0x800000, %a1
+	lea _flash, %a1
 1:	
 	moveb (%a1)+, (%a0)+
 	moveb #'.', 0xFFFFF907
