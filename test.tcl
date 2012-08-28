@@ -22,6 +22,9 @@ proc test {tx rx} {
     send_user " \[OK\]\n"
 }
 
+set true {ffff $}
+set false {\s0 $}
+
 test "hi\n" {stub4th [0-9a-f]+}
 
 send_user "the following should abort...\n"
@@ -95,3 +98,6 @@ send "0 variable scratch 10 allot\n"
 test "scratch 10 55 fill scratch 8 + c@ 11 + ." {66 $}
 
 test "8 base c! 777 ." {1ff $}
+
+test "word \[ find drop immediatep ." $true
+test "word : find drop immediatep ." $false

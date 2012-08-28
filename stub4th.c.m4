@@ -478,8 +478,7 @@ dnl ( cfa -- cfa i )
 dnl check immediate flag of word around cfa
 primary(immediatep)
 {
-  word *w;
-  CFA2WORD(w,  sp[-1].s);
+  word *w = CFA2WORD(sp[-1].s);
   (sp++)->i = w->immediate;
 }
 

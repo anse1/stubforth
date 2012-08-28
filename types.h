@@ -33,9 +33,9 @@ struct vmstate {
 
 #define IS_WORD(c) (c > ' ')
 
-#define CFA2WORD(w,cfa)							\
-  do { word bogus;							\
-    w = (word *) ((cfa) - ((char *)&bogus.code - (char *)&bogus)) ;} while (0)
+#define offsetof(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
+
+#define CFA2WORD(cfa)  cfa - offsetof(word, code)
 
 extern struct vmstate vmstate;
 
