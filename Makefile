@@ -36,6 +36,7 @@ check: stub4th.elf
 clean:
 	rm -f .rev.h *.o *.s stub4th.c
 	rm -f *.o *.s *.elf *.srec *.brec *.bin
+	rm -f flashload
 
 
 init:
