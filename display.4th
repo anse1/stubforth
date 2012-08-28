@@ -28,8 +28,6 @@ swap 1 - swap 1 pick
 10 dac
 
 : fb lssa @ ;
-20000 lssa !
 : test fb 1300 1 fill ;
 : cls fb 1300 0 fill ;
 
-test
