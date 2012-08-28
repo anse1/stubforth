@@ -14,6 +14,9 @@ config.h: .rev.h
 stub4th.o:  stub4th.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
 
+stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h
+	$(GCC) $(CFLAGS) -o $@ -S $<
+
 stub4th:  stub4th.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
