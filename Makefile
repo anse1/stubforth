@@ -93,13 +93,13 @@ flashload: flashload.c
 	gcc -g -Wall flashload.c -o flashload
 
 flash.prog : flash.bin flashload
-	echo FLASH > $(TTY)
 	stty -F $(TTY) raw
+	echo flash dup dup funlock ferase fstrap > $(TTY)
 	./flashload $< < $(TTY) > $(TTY)
 
 dummy.prog : dummy.bin flashload
-	echo FLASH > $(TTY)
 	stty -F $(TTY) raw
+	echo flash dup dup funlock ferase fstrap > $(TTY)
 	./flashload $< < $(TTY) > $(TTY)
 
 boot:
