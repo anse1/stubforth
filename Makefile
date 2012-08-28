@@ -92,14 +92,21 @@ flashload: flashload.c
 	gcc -g -Wall flashload.c -o flashload
 
 flash.prog : flash.bin flashload
-	echo F > $(TTY)
+	echo FLASH > $(TTY)
 	stty -F $(TTY) raw
 	./flashload $< < $(TTY) > $(TTY)
 
 dummy.prog : dummy.bin flashload
-	echo F > $(TTY)
+	echo FLASH > $(TTY)
 	stty -F $(TTY) raw
 	./flashload $< < $(TTY) > $(TTY)
 
 boot:
-	make init stub4th.prog dragon.prog vivo.prog
+	make init
+	stub4th.prog
+	make user
+
+user:
+	make dragon.prog
+	make vivo.prog
+	make display.prog
