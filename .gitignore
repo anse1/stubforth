@@ -9,3 +9,4 @@ stub4th
 *.srec
 *.brec
 *.elf
+flashload
