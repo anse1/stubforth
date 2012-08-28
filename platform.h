@@ -172,23 +172,23 @@ void ivect_level4 ()
   return;
 }
 
-extern void *_start;
-extern void *_stack_base;
-
+/* Achtung: This table is offset by 2 wrt the manual because the
+   linker script already put the reset PC and SP values in this
+   section. */
 void *vectors[] __attribute__((section(".vectors")))
     =  {
-   [0] = &_stack_base,
-   [1] = &_start,
-   [2] = ivect_bus_err,
-   [3] = ivect_addr_err,
-   [4] = ivect_illinstr,
-   [5] = ivect_zero_div,
-   [6] = ivect_chk,
-   [7] = ivect_trap,
-   [8] = ivect_privilege,
-   [9] = ivect_trace,
-  [10] = ivect_emu,
-  [11] = ivect_emu,
+   [0] = ivect_bus_err,
+   [1] = ivect_addr_err,
+   [2] = ivect_illinstr,
+   [3] = ivect_zero_div,
+   [4] = ivect_chk,
+   [5] = ivect_trap,
+   [6] = ivect_privilege,
+   [7] = ivect_trace,
+   [8] = ivect_emu,
+   [9] = ivect_emu,
+  [10] = ivect_default,
+  [11] = ivect_default,
   [12] = ivect_default,
   [13] = ivect_default,
   [14] = ivect_default,
@@ -199,16 +199,14 @@ void *vectors[] __attribute__((section(".vectors")))
   [19] = ivect_default,
   [20] = ivect_default,
   [21] = ivect_default,
-  [22] = ivect_default,
+  [22] = ivect_spurious,
   [23] = ivect_default,
-  [24] = ivect_spurious,
+  [24] = ivect_default,
   [25] = ivect_default,
-  [26] = ivect_default,
+  [26] = ivect_level4,
   [27] = ivect_default,
-  [28] = ivect_level4,
+  [28] = ivect_default,
   [29] = ivect_default,
-  [30] = ivect_default,
-  [31] = ivect_default,
 };
 
 static int getchar()
