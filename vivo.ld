@@ -8,14 +8,24 @@ ENTRY(_start)
 
 SECTIONS 
 {
+    _flash = 0x800000;
+    _flash_end = 0xa00000;
+    _ram = 0;
+    _ram_end = 0x40000;
+    _stack_base = _ram_end;
+
     . = 0;
-    .vectors : { *(.vectors) }
-    . = 0x100;
+    
+    .vectors : {
+        LONG (_stack_base);
+	LONG (_start + _flash);
+	*(.vectors)
+    }
+    . = 0x80;
     .rodata :  { *(.rodata) }
     .data :  { *(.data) }
     .text :  { *(.text) } 
     __bss_start = .;
     .bss :  { *(.bss) }
     _end = .;
-    _stack_base = 0x40000 - 4;
 }
