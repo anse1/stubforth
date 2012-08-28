@@ -286,6 +286,9 @@ primary(min)
 primary(plus1, 1+)
   sp[-1].i++;
 
+primary(minus1, 1-)
+  sp[-1].i--;
+
 
 dnl control primitives
 
