@@ -22,11 +22,6 @@ define(`cthrow', `
   goto abort;
 }')
 
-define(`chkalign', `
-  if ((int)($1) & (__alignof__(cell)-1))
-    cthrow(-23,address alignment)
-')
-
 define(primary, `
 dnl Cons a primary word
 dnl $1 - C identifier
@@ -352,12 +347,10 @@ primary(linecomment, `\\', immediate)
 
 dnl MEM
 primary(store, !)
-  chkalign(sp[-1].aa)
   *(sp[-1].aa) = sp[-2].a;
   sp -= 2;
 
 primary(load, @)
-  chkalign(sp[-1].aa)
   sp[-1].a = *(sp[-1].aa);
 
 primary(cstore, c!)
