@@ -111,6 +111,19 @@ boot:
 	make user
 
 user:
+	make user.prog
 	make dragon.prog
 	make vivo.prog
 	make display.prog
+
+USER = user.4th dragon.4th vivo.4th display.4th
+
+boot.4th: $(USER) Makefile
+	cat $(USER) > boot.4th
+
+boot.fprog: boot.4th flashload
+	echo 0 fbblock dup dup funlock ferase fstrap > $(TTY)
+	./flashload < $(TTY) > $(TTY) $<
+
+TAGS: .
+	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th --regex-forth='/: *([^ ]+)/\1/' *.4th *.c.m4 platform.h *.m4
