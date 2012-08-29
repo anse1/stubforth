@@ -119,7 +119,8 @@ user:
 USER = user.4th dragon.4th vivo.4th display.4th
 
 boot.4th: $(USER) Makefile
-	cat $(USER) > boot.4th
+	cat $(USER) > $@
+	echo 50 honk >> $@
 
 boot.fprog: boot.4th flashload
 	echo 0 fbblock dup dup funlock ferase fstrap > $(TTY)
