@@ -25,8 +25,9 @@ proc test {tx rx} {
 
 set true {ffff $}
 set false {\s0 $}
+set name {stub4th [0-9a-f]+}
 
-test "hi\n" {stub4th [0-9a-f]+}
+test "hi\n" $name
 
 send_user "the following should abort...\n"
 send "should-abort\n"
@@ -63,8 +64,8 @@ test "< 30 + emit" {1$}
 test "8 2345 dup dup and 0= 30 + emit" {0$}
 test "and 0= 30 + emit" {1$}
 
-send "decimal : foo 85 emit ;\n"
-test "foo" {U$}
+send "decimal : testsuite-marker 85 emit ;\n"
+test "testsuite-marker" {U$}
 
 send "decimal : ifelsethen 85 emit if 64 emit else 65 emit then 85 emit ;\n"
 
@@ -106,6 +107,9 @@ test "8 base c! 777 ." {1ff $}
 
 test "word \[ find drop immediatep ." $true
 test "word : find drop immediatep ." $false
+
+test "' hi execute" $name
+test ": foo ' hi execute ; foo" $name
 
 send "bye\n"
 interact
