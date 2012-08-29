@@ -544,7 +544,7 @@ primary(toword, >word)
 dnl (word *) --- (word **)
 primary(tolink, >link)
 {
-  sp[-1].a = ((word *)sp[-1].a)->link;
+  sp[-1].a = &((word *)sp[-1].a)->link;
 }
 
 dnl (char *) ---
