@@ -18,16 +18,16 @@ config.h: .rev.h
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@
 
-stub4th.o:  stub4th.c  *.h Makefile *.m4 config.h
+stub4th.o:  stub4th.c  *.h Makefile *.m4 config.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
 
-stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h
+stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
 stub4th:  stub4th.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
-%.c: %.c.m4 Makefile platform.h
+%.c: %.c.m4 Makefile
 	m4 -s $< > $@
 
 %.h: %.h.m4
