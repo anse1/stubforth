@@ -10,3 +10,4 @@ stub4th
 *.brec
 *.elf
 flashload
+core*

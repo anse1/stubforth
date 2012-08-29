@@ -106,3 +106,6 @@ test "8 base c! 777 ." {1ff $}
 
 test "word \[ find drop immediatep ." $true
 test "word : find drop immediatep ." $false
+
+send "bye\n"
+interact
