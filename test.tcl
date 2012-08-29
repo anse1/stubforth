@@ -24,8 +24,9 @@ proc test {tx rx} {
 
 set true {ffff $}
 set false {\s0 $}
+set name {stub4th [0-9a-f]+}
 
-test "hi\n" {stub4th [0-9a-f]+}
+test "hi\n" $name
 
 send_user "the following should abort...\n"
 send "should-abort\n"
@@ -101,6 +102,9 @@ test "8 base c! 777 ." {1ff $}
 
 test "word \[ find drop immediatep ." $true
 test "word : find drop immediatep ." $false
+
+test "' hi execute" $name
+test ": foo ' hi execute ; foo" $name
 
 send "bye\n"
 interact
