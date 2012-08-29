@@ -1,5 +1,7 @@
 \ non-platform-specific forth code
 
+hex
+
 : fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;
 : tuck swap over ;
 : gcd dup if tuck mod recurse else drop then ;
