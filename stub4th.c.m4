@@ -642,7 +642,7 @@ real_cold:
     sp = param_stack;
     rp = return_stack;
     ip = 0;
-    (sp++)->a = BOOT;
+    (sp++)->a = &find(vmstate.dictionary, "boot")->code;
     goto execute;
   }
 }
