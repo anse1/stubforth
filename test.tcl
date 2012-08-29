@@ -59,8 +59,8 @@ test "55 emit 1234 2345 dup = 30 + emit = 30 + emit " {U10$}
 test "55 emit 1234 2345 swap dup < 30 + emit < 30 + emit " {U01$}
 test "55 emit 8 2345 dup dup and 0= 30 + emit and 0= 30 + emit " {U01$}
 
-send "decimal : foo 85 emit ;\n"
-test "foo" {U$}
+send "decimal : testsuite-marker 85 emit ;\n"
+test "testsuite-marker" {U$}
 
 send "decimal : ifelsethen 85 emit if 64 emit else 65 emit then 85 emit ;\n"
 
