@@ -501,6 +501,8 @@ primary(cons)
   new->name = (--sp)->s;
   new->link = vmstate.dictionary;
   new->smudge = 1;
+  new->immediate = 0;
+  new->compile_only = 0;
   vmstate.compiling = 1;
   vmstate.dictionary = new;
   vmstate.dp = (cell *) &new->code;
@@ -527,7 +529,8 @@ secondary(lf,,, LIT, .i=10, EMIT)
 dnl secondary(crlf,,, CR, LF)
 dnl secondary(bl,,, LIT, .i=32, EMIT)
 
-secondary(tick, ',, WORD, FIND, ZBRANCH, self[5], EXIT, ABORT)
+secondary(tick, ', .immediate=1,
+    WORD, FIND, ZBRANCH, self[5], EXIT, ABORT)
 secondary(tobody, >body,, CELL, ADD)
 
 
