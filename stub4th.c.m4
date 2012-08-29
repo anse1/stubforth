@@ -616,7 +616,8 @@ primary(quiet)
 
 dnl convenience
 
-
+
+sinclude(platform.m4)
 
 
 undivert(1)
