@@ -1,6 +1,6 @@
 
 GCC = gcc
-CFLAGS = -O3  -g -Wall -Wcast-align
+CFLAGS = -O0  -g -Wall -Wcast-align
 
 all: stub4th
 
