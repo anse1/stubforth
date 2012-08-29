@@ -30,6 +30,9 @@ stub4th:  stub4th.o
 %.c: %.c.m4 Makefile platform.h
 	m4 -s $< > $@
 
+%.h: %.h.m4
+	m4 -s $< > $@
+
 check: stub4th.elf
 	./test.tcl $(TTY)
 
