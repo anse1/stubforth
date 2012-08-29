@@ -530,9 +530,11 @@ dnl secondary(crlf,,, CR, LF)
 dnl secondary(bl,,, LIT, .i=32, EMIT)
 
 secondary(tick, ', .immediate=1,
-    WORD, FIND, ZBRANCH, self[5], EXIT, ABORT)
-secondary(tobody, >body,, CELL, ADD)
+    WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
+    STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
+)
 
+secondary(tobody, >body,, CELL, ADD)
 
 dnl (void **) --- (word *)
 primary(toword, >word)
