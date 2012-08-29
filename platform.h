@@ -207,9 +207,20 @@ void *vectors[] __attribute__((section(".vectors")))
   [29] = ivect_default,
 };
 
+char *redirect;
+
 static int getchar()
 {
   int c;
+
+  if (redirect) {
+    c = *redirect++;
+    if (!c || c == -1)
+      redirect = 0;
+    else
+      return c;
+  }
+
   while (ring.end == ring.beg) {
     /* Calling STOP will reduce power consumption when idle, but there
        is a race condition when an interrupt arrives between the check

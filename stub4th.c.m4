@@ -528,6 +528,9 @@ primary(srstore, sr!)
 primary(stop)
 asm("stop #0x2000");
 
+primary(redirect)
+  redirect = (--sp)->s;
+
 primary(suspend, [, immediate)
   vmstate.compiling = 0;
 
