@@ -122,9 +122,10 @@ goto quit;
 
 primary(abort)
   my_puts("abort");
-  if (vmstate.errno)
+  if (vmstate.errno) {
     my_puts(": ");
     my_puts(vmstate.errstr);
+  }
   my_puts("\n");
   vmstate.errno = 0;
   goto quit;
@@ -169,6 +170,7 @@ constant(dp, .a=(&vmstate.dp))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
 constant(d0, .a=dictionary_stack)
+constant(context, .a=&vmstate.dictionary)
 
 primary(spload, sp@)
   sp->a = sp-1;
@@ -446,10 +448,6 @@ dnl ( s -- ) send zstring
   my_puts(s);
 }
 
-primary(forget)
-dnl ( a -- ) set dictionary pointer to a
-  vmstate.dp = (--sp)->a;
-
 primary(find)
 dnl s -- cfa tf (found) -- s ff (not found)
 dnl s is deallocated when found
@@ -532,7 +530,19 @@ dnl secondary(bl,,, LIT, .i=32, EMIT)
 secondary(tick, ',, WORD, FIND, ZBRANCH, self[5], EXIT, ABORT)
 secondary(tobody, >body,, CELL, ADD)
 
-dnl (s -- )
+
+dnl (void **) --- (word *)
+primary(toword, >word)
+{
+  sp[-1].a = CFA2WORD(sp[-1].a);
+}
+dnl (word *) --- (word **)
+primary(tolink, >link)
+{
+  sp[-1].a = ((word *)sp[-1].a)->link;
+}
+
+dnl (char *) ---
 dnl interpret or compile s
 secondary(interpret,,,
 FIND,
