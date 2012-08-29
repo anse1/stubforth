@@ -78,6 +78,27 @@ begin
  1 +
  0 until ;
 
+\ Return address of block number
+: fblock ( n -- addr )
+flash
+begin
+1 pick while
+10000 +
+swap 1- swap
+repeat
+;
+
+\ Return address of boot block number
+: fbblock ( n -- addr )
+flash 1F0000 +
+begin
+1 pick while
+2000 +
+swap 1- swap
+repeat
+swap drop
+;
+
 : fchiperase ( -- )
 flash
 begin
