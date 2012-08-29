@@ -7,6 +7,14 @@ hex
 : gcd dup if tuck mod recurse else drop then ;
 : 2dup 1 pick 1 pick ;
 
+: forget ( read a word to forget, adjusts dp )
+ word find 0= if abort then
+>word
+dup
+>link @ context !
+dp !
+;
+
 : dump ( addr n -- )
 over + swap
 ( endaddr addr )
