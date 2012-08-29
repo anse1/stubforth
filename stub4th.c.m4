@@ -1,4 +1,4 @@
-include(platform.h)
+#include "platform.h"
 #include "types.h"
 #include "config.h"
 
@@ -7,7 +7,6 @@ cell param_stack[1000];
 cell dictionary_stack[10000];
 
 struct vmstate vmstate;
-
 
 
 dnl m4 magic
