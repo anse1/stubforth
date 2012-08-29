@@ -111,7 +111,7 @@ dnl Labels as Values extension
 
 int main()
 {
-  cell *sp, *rp, *w, *ip;
+  cell *ip, *sp, *rp, *w;
   cell t;
 
   vmstate.base = 10;
@@ -137,11 +137,6 @@ enter:
   ip = w + 1;
 
 next:
-  if(vmstate.break_condition) {
-    vmstate.break_condition = 0;
-    cthrow(-28,user interrupt)
- }
-
   w = (ip++)->a;
   goto **(void **)w;
 
@@ -510,26 +505,6 @@ primary(cons)
   vmstate.dictionary = new;
   vmstate.dp = (cell *) &new->code;
 }
-
-primary(srload, sr@)
-{
-  short sr;
-  asm("move.w %%sr , %0" : "=r" (sr) );
-  (sp++)->i = sr;
-}
-
-primary(srstore, sr!)
-{
-  short sr;
-  sr = (--sp)->i;
-  asm("move.w  %0, %%sr" : /* no outputs */ : "r" (sr));
-}
-
-primary(stop)
-asm("stop #0x2000");
-
-primary(redirect)
-  redirect = (--sp)->s;
 
 primary(suspend, [, immediate)
   vmstate.compiling = 0;
