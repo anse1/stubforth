@@ -36,3 +36,35 @@ lf ;
   dup c@ 2 pick or swap c! drop ;
 : clear ( c a -- )
   dup c@ 2 pick ~ and swap c! drop ;
+
+
+" 0123456789abcdef" constant hexchars
+hex
+
+: ehex \ n --  emit a byte in hexadecimal
+  dup 4 >> f and hexchars + c@ emit
+  f and hexchars + c@ emit ;
+
+: bl 20 emit ;
+
+: dumpaddr ( addr n -- )
+over cell begin 1-
+2dup 8 * >> ff and ehex
+dup 0= until
+drop drop ." : " ;
+
+
+: dump8 ( addr n )
+8 begin
+2dup 0= 0= swap 0= 0= and while
+2 pick c@ ehex bl
+rot 1+ rot 1- rot 1-
+repeat drop ;
+
+: dump ( addr n -- )
+begin dup while
+dumpaddr dump8
+dup 0= if exit then
+."  " dump8 ." 
+" repeat ." 
+" ;
