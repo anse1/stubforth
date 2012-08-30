@@ -7,13 +7,13 @@ hex
 : gcd dup if tuck mod recurse else drop then ;
 : 2dup 1 pick 1 pick ;
 
-: depth sp@ s0 - cell + cell / ;
-: .s 23 emit depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
-
 : c, here c! here 1+ dp ! ;
 : " here begin key dup 22 = 0= while c, repeat drop 0 c, here aligned dp ! ;
 : ," ' branch , here 0 , " swap here swap ! ' lit , , ; immediate
 : ." ' ," execute ' type , ; immediate
+
+: depth sp@ s0 - cell + cell / ;
+: .s ." #" depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
 
 : forget ( read a word to forget, adjusts dp )
  word find 0= if abort then
@@ -36,3 +36,35 @@ lf ;
   dup c@ 2 pick or swap c! drop ;
 : clear ( c a -- )
   dup c@ 2 pick ~ and swap c! drop ;
+
+
+" 0123456789abcdef" constant hexchars
+hex
+
+: ehex \ n --  emit a byte in hexadecimal
+  dup 4 >> f and hexchars + c@ emit
+  f and hexchars + c@ emit ;
+
+: bl 20 emit ;
+
+: dumpaddr ( addr n -- )
+over cell begin 1-
+2dup 8 * >> ff and ehex
+dup 0= until
+drop drop ." : " ;
+
+
+: dump8 ( addr n )
+8 begin
+2dup 0= 0= swap 0= 0= and while
+2 pick c@ ehex bl
+rot 1+ rot 1- rot 1-
+repeat drop ;
+
+: dump ( addr n -- )
+begin dup while
+dumpaddr dump8
+dup 0= if exit then
+."  " dump8 ." 
+" repeat ." 
+" ;
