@@ -41,7 +41,7 @@ lf ;
 " 0123456789abcdef" constant hexchars
 hex
 
-: ehex \ n --  emit a byte in hexadecimal
+: ehex
   dup 4 >> f and hexchars + c@ emit
   f and hexchars + c@ emit ;
 
