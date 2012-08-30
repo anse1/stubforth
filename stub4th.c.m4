@@ -1,3 +1,4 @@
+changecom(/*,*/)
 #include "platform.h"
 #include "types.h"
 #include "config.h"

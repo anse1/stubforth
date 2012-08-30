@@ -23,7 +23,7 @@ stub4th:  stub4th.o
 %.size: %
 	nm -t d --size-sort --print-size $<
 
-%.c: %.c.m4 Makefile
+%.c: %.c.m4 Makefile platform.m4
 	m4 -s $< > $@
 
 check: stub4th
