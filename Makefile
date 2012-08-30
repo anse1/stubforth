@@ -27,7 +27,10 @@ stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h platform.h
 stub4th:  stub4th.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
-%.c: %.c.m4 Makefile
+%.size: %
+	nm -t d --size-sort --print-size $<
+
+%.c: %.c.m4 Makefile platform.m4
 	m4 -s $< > $@
 
 %.h: %.h.m4
