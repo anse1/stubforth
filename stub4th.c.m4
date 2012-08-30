@@ -84,7 +84,7 @@ static word w_$1 = {
 
 dnl C helpers
 static int strcmp(const char *a, const char *b) {
-  while (*a && *b && *a == *b)
+  while (*a && *a == *b)
      a++, b++;
   return (*a == *b) ? 0 : (*a > *b) ? 1 : -1;
 }
