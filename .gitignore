@@ -1,3 +1,5 @@
+cachegrind.*
+gmon.out
 platform.h
 stub4th.c
 .rev.h
