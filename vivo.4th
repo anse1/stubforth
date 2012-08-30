@@ -101,6 +101,7 @@ hex
 
 : honk ( n -- )
 [ hex ]
+1 7 << pbsel clear
 80 pwmc c!
 3c pwmc 1+ c!
 4 pwms 1+ c!
@@ -110,3 +111,16 @@ delay
 
 : max3221off 1 pbsel set 1 pbdir set 1 pbdata clear ;
 : max3221on 1 pbsel set 1 pbdir set 1 pbdata set ;
+
+1 6 << constant s3
+1 14 << constant mirq5
+1 12 << constant mirq3
+1 7 << constant nlcdon
+
+: s3irq  s3 pdsel clear imr @ mirq3 ~ and imr ! ;
+: penirq  2 pfsel clear imr @ mirq5 ~ and imr ! ;
+: suspend 1 3 << pllcr 1+ set max3221off stop max3221on ;
+
+s3irq
+penirq
+
