@@ -34,4 +34,8 @@ clean:
 	rm -f .rev.h *.o *.s stub4th.c
 
 TAGS: .
-	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th --regex-forth='/: *([^ ]+)/\1/' *.4th *.c.m4 platform.h *.m4
+	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
+	--regex-forth='/: *([^ ]+)/\1/' \
+	--regex-forth='/(primary|secondary|constant)\([^,]+, ([^,\)]+)/\2/' \
+	--regex-forth='/(primary|secondary|constant)\(([a-z0-9_]+)/\2/' \
+	 *.4th *.c.m4 platform.h *.m4
