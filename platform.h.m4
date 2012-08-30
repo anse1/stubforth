@@ -138,7 +138,7 @@ defaulth(chk)
 struct {
   short beg;
   volatile short end;
-  char buf[128];
+  char buf[1024];
 } ring;
 
 static void uart_interrupt()
