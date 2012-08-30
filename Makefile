@@ -31,3 +31,6 @@ check: stub4th
 
 clean:
 	rm -f .rev.h *.o *.s stub4th.c
+
+TAGS: .
+	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th --regex-forth='/: *([^ ]+)/\1/' *.4th *.c.m4 platform.h *.m4
