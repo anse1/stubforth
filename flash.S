@@ -7,7 +7,7 @@ _start:
 	moveb #0,      0xFFFFFB0B /* watchdog */
         moveb #8, 0xFFFFFD0D /* disable hardmap */
 	moveb #0xF5,   0xFFFFF42B /* pfsel */
-	moveb #0x0,   0xfffff40b /* pbsel, probably too conservative */
+	moveb #0xfb,   0xfffff40b /* pbsel */
         movew #8, 0xfffffd0c /* orig, ICEMCR */
         movew #7, 0xfffffd0e /* orig, ICEMSR */
  	moveb #0x18,   0xFFFFF300 /* ivr */
