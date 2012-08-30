@@ -1,6 +1,6 @@
 
 GCC = gcc
-CFLAGS = -O0  -g -Wall -Wcast-align
+CFLAGS = -O2  -g -Wall -Wcast-align
 
 all: stub4th
 
@@ -30,6 +30,7 @@ check: stub4th
 	expect test.tcl
 
 clean:
+	rm -f *grind.out.*
 	rm -f .rev.h *.o *.s stub4th.c
 
 TAGS: .
