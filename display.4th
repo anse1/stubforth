@@ -1,7 +1,9 @@
 decimal
-lxmax @ 160 16 << or lxmax !
-lymax @ 240 16 << or lymax !
-160 16 / lvpw c!
+160 constant xdim
+240 constant ydim
+lxmax @ xdim 16 << or lxmax !
+lymax @ ydim 16 << or lymax !
+xdim 16 / lvpw c!
 8 lpicf c!
 0 lrra c!
 
@@ -34,12 +36,8 @@ swap 1 - swap 1 pick
 10 dac
 
 : fb lssa @ ;
-: test fb 1300 1 fill ;
-: cls fb 1300 0 fill ;
+: cls fb [ decimal ] 4800 0 fill ;
 
-decimal
-160 constant xdim
-240 constant ydim
 hex
 
 : pxaddr ( x y -- c a )
@@ -62,7 +60,7 @@ pxaddr c@ and ;
 
 hex
 8fff variable max_abs
-10 variable max_iter
+18 variable max_iter
 10 variable shift
 
 : csq ( r i -- r i )
