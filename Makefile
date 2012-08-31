@@ -30,7 +30,7 @@ check: stub4th
 	expect test.tcl
 
 clean:
-	rm -f *grind.out.*
+	rm -f *grind.out.* stub4th
 	rm -f .rev.h *.o *.s stub4th.c
 
 TAGS: .
