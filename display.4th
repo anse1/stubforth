@@ -59,7 +59,7 @@ pxaddr c@ and ;
 : sq dup * ;
 
 hex
-8fff variable max_abs
+6000 variable max_abs
 18 variable max_iter
 10 variable shift
 
