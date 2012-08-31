@@ -228,7 +228,7 @@ static int getchar()
        and the STOP. */
    /*  asm("stop #0x2000"); */
   }
-  c = ring.buf[ring.beg];
+  c = (unsigned char) ring.buf[ring.beg];
   ring.beg = (ring.beg + 1) % sizeof(ring.buf);
 
   if (! vmstate.raw)
