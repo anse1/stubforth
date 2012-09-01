@@ -40,7 +40,7 @@ check: stub4th.elf
 	./test.tcl $(TTY)
 
 clean:
-	rm -f *grind.out.*
+	rm -f *grind.out.* stub4th
 	rm -f .rev.h *.o *.s stub4th.c
 	rm -f *.o *.s *.elf *.srec *.brec *.bin
 	rm -f flashload

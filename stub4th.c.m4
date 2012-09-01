@@ -17,8 +17,8 @@ define(dict_head, 0);
 dnl $1 - ANS94 error code
 define(`cthrow', `
 {
-  vmstate.errno = $1;
-  vmstate.errstr = ifelse(`$2',`',0,"$2");
+  vmstate->errno = $1;
+  vmstate->errstr = ifelse(`$2',`',0,"$2");
   goto abort;
 }')
 
@@ -106,29 +106,56 @@ static word *find(word *p, const char *key)
 }
 
 
-dnl The entire VM must be contained in main since we make use of GCC's
-dnl Labels as Values extension
 
 int main()
 {
+  int result;
+
+  vmstate.param_stack = param_stack;
+  vmstate.return_stack = return_stack;
+  vmstate.dictionary_stack = dictionary_stack;
+
+  while(1) {
+    vmstate.compiling = 0;
+    vmstate.raw = 0;
+    vmstate.quiet = 0;
+    vmstate.errno = 0;
+
+    if (vmstate.dictionary)
+       result = vm(&vmstate, "quit");
+    else
+       vmstate.base  = 10;
+       result = vm(&vmstate, "boot");
+
+    if (!result)
+       return 0;
+  }
+}
+
+
+dnl The entire VM must be contained in a single function since we make use of GCC's
+dnl Labels as Values extension.
+
+dnl The vm is reentrant and may be called e.g., from interrupt handlers.
+int vm(struct vmstate *vmstate, const char *startword)
+{
+
   cell *ip, *sp, *rp, *w;
   cell t;
 
-  vmstate.base = 10;
 
   initio();
 
-goto quit;
+goto start;
 
 primary(abort)
   my_puts("abort");
-  if (vmstate.errno) {
+  if (vmstate->errno) {
     my_puts(": ");
-    my_puts(vmstate.errstr);
+    my_puts(vmstate->errstr);
   }
   my_puts("\n");
-  vmstate.errno = 0;
-  goto quit;
+  return vmstate->errno;
 
 
 dnl inner interpreter
@@ -166,11 +193,15 @@ dnl $1 - name
 dnl $2 - value
 
 constant(cell, .i=sizeof(cell))
-constant(dp, .a=(&vmstate.dp))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
-constant(d0, .a=dictionary_stack)
-constant(context, .a=&vmstate.dictionary)
+dnl constant(d0, .a=dictionary_stack)
+
+primary(context)
+   (sp++)->a = &vmstate->dictionary;
+
+primary(dp)
+   (sp++)->a = &vmstate->dp;
 
 primary(spload, sp@)
   sp->a = sp-1;
@@ -217,7 +248,7 @@ primary(qstack, ?stack)
     cthrow(-5, return stack overflow)
   if (rp < return_stack)
     cthrow(-6, return stack underflow)
-  if (vmstate.dp > &dictionary_stack[sizeof(dictionary_stack)])
+  if (vmstate->dp > &dictionary_stack[sizeof(dictionary_stack)])
     cthrow(-8, dictionary overflow)
 
 
@@ -303,14 +334,15 @@ primary(emit)
 
 dnl --
 primary(hex)
-  vmstate.base = 16;
+  vmstate->base = 16;
 
 dnl --
 primary(decimal)
-  vmstate.base = 10;
+  vmstate->base = 10;
 
 dnl -- &c
-constant(base, .s=&vmstate.base)
+primary(base)
+   (sp++)->a = &vmstate->base;
 
 dnl -- c
 primary(key)
@@ -366,6 +398,8 @@ primary(fill)
     t.s[n] = c;
 }
 
+secondary(q, ?,, LOAD, PRINT)
+
 
 dnl strings
 
@@ -373,7 +407,7 @@ primary(word)
 dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
 {
    int c;
-   char *s = (char *)vmstate.dp;
+   char *s = (char *)vmstate->dp;
    do {
       c = getchar();
       if (c < 0) return 0;
@@ -384,11 +418,11 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
       c = getchar();
    } while (IS_WORD(c));
   *s++ = 0;
-  (sp++)->s = (char *)vmstate.dp;
+  (sp++)->s = (char *)vmstate->dp;
 
   /* fix alignment */
   while ((typeof(t.i))s & (__alignof__(cell)-1)) s++;
-  vmstate.dp = (cell *)s;
+  vmstate->dp = (cell *)s;
 }
 
 dnl ( addr -- a-addr )
@@ -407,23 +441,28 @@ dnl On failure, abort.
   t.i = 0;
   char *s = sp[-1].s;
   int c;
+  int negate = 0;
   while ((c = *s)) {
-   if (c <= '9')
+   if (c == '-')
+      { negate ^= 1; s++; continue; }
+   else if (c <= '9')
       c -= '0';
    else
     {
       c |= 1 << 5; /* upcase */
       c = c - 'a' + 10;
     }
-   if (c < 0 || c >= vmstate.base) {
-      vmstate.dp = (cell *)sp[-1].s; /* TODO: sanity check */
+   if (c < 0 || c >= vmstate->base) {
+      vmstate->dp = (cell *)sp[-1].s; /* TODO: sanity check */
       cthrow(-24, invalid numeric argument);
    }
-   t.i *= vmstate.base;
+   t.i *= vmstate->base;
    t.i += c;
    s++;
   }
-  vmstate.dp = (cell *)sp[-1].s; /* TODO: sanity check */
+  vmstate->dp = (cell *)sp[-1].s; /* TODO: sanity check */
+  if (negate)
+    t.i = -t.i;
   sp[-1] = t;
 }
 
@@ -432,14 +471,14 @@ dnl dictionary
 
 primary(allot)
 dnl n -- increase dictionary pointer
-  vmstate.dp += (--sp)->i;
+  vmstate->dp += (--sp)->i;
 
 primary(comma, `,')
-  *vmstate.dp++ = *--sp;
+  *vmstate->dp++ = *--sp;
 
 primary(here)
 dnl ( -- a ) push dictionary pointer onto parameter stack
-  (sp++)->a = vmstate.dp;
+  (sp++)->a = vmstate->dp;
 
 primary(type)
 dnl ( s -- ) send zstring
@@ -453,10 +492,10 @@ dnl s -- cfa tf (found) -- s ff (not found)
 dnl s is deallocated when found
 {
    char *key = sp[-1].s;
-   word *p = find(vmstate.dictionary, key);
+   word *p = find(vmstate->dictionary, key);
    if (p)
    {
-     vmstate.dp = (cell *) key; /* TODO: sanity check */
+     vmstate->dp = (cell *) key; /* TODO: sanity check */
      sp--;
      (sp++)->a = &p->code;
      (sp++)->i = 1;
@@ -470,7 +509,7 @@ primary(lit,, compile_only)
   *sp++ = *ip++;
 
 primary(state)
-  (sp++)->i = vmstate.compiling;
+  (sp++)->i = vmstate->compiling;
 
 dnl ( cfa -- cfa i )
 dnl check immediate flag of word around cfa
@@ -481,38 +520,38 @@ primary(immediatep)
 }
 
 primary(recurse,, immediate, compile_only)
-  (vmstate.dp++)->a = &vmstate.dictionary->code;
+  (vmstate->dp++)->a = &vmstate->dictionary->code;
 
 dnl ( -- )
 dnl toggle immediate flag of most recently defined word
 primary(immediate,,)
-  vmstate.dictionary->immediate ^= 1;
+  vmstate->dictionary->immediate ^= 1;
 
 dnl ( -- )
 dnl toggle smudge flag of most recently defined word
 primary(smudge,,)
-  vmstate.dictionary->smudge ^= 1;
+  vmstate->dictionary->smudge ^= 1;
 
 dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
 primary(cons)
 {
-  word *new = (word *)vmstate.dp;
+  word *new = (word *)vmstate->dp;
   new->name = (--sp)->s;
-  new->link = vmstate.dictionary;
+  new->link = vmstate->dictionary;
   new->smudge = 1;
   new->immediate = 0;
   new->compile_only = 0;
-  vmstate.compiling = 1;
-  vmstate.dictionary = new;
-  vmstate.dp = (cell *) &new->code;
+  vmstate->compiling = 1;
+  vmstate->dictionary = new;
+  vmstate->dp = (cell *) &new->code;
 }
 
 primary(suspend, [, immediate)
-  vmstate.compiling = 0;
+  vmstate->compiling = 0;
 
 primary(resume, ], immediate)
-  vmstate.compiling = 1;
+  vmstate->compiling = 1;
 
 secondary(semi, ;, .immediate=1,
   LIT, EXIT, COMMA, SMUDGE, SUSPEND)
@@ -597,26 +636,25 @@ secondary(then,, .immediate=1,
  HERE, SWAP, STORE
 )
 
-secondary(q, ?,, LOAD, PRINT)
-
 secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
 
 secondary(boot,,, HI, QUIT)
 
 primary(cold)
-goto real_cold;
+  vmstate->dictionary = 0;
+  goto start;
 
 primary(raw)
- vmstate.raw = 1;
+ vmstate->raw = 1;
 
 primary(cooked)
- vmstate.raw = 0;
+ vmstate->raw = 0;
 
 primary(echo)
- vmstate.quiet = 0;
+ vmstate->quiet = 0;
 
 primary(quiet)
- vmstate.quiet = 1;
+ vmstate->quiet = 1;
 
 
 dnl convenience
@@ -627,28 +665,21 @@ sinclude(platform.m4)
 
 undivert(1)
 
-quit:
-  sp = param_stack;
-  rp = return_stack;
-  vmstate.compiling = 0;
-  vmstate.raw = 0;
-  vmstate.quiet = 0;
+start:
+    sp = vmstate->param_stack;
+    rp = vmstate->return_stack;
+    if (!vmstate->dictionary) {
+        vmstate->dp = vmstate->dictionary_stack;
+	vmstate->dictionary = dict_head;
+    }
+    ip = 0;
 
-  if (vmstate.dp)
-  {
-    ip = 0;
-    (sp++)->a = QUIT;
-    goto execute;
-  }
-  else
-  {
-real_cold:
-    vmstate.dp = dictionary_stack;
-    vmstate.dictionary = dict_head;
-    sp = param_stack;
-    rp = return_stack;
-    ip = 0;
-    (sp++)->a = &find(vmstate.dictionary, "boot")->code;
-    goto execute;
-  }
+    {
+      word *w = find(vmstate->dictionary, startword);
+      if (!w) {
+        cthrow(-13, undefined word);
+      }
+      (sp++)->a = &w->code;
+      goto execute;
+    }
 }

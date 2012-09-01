@@ -111,5 +111,8 @@ test "word : find drop immediatep ." $false
 test "' hi execute" $name
 test ": foo ' hi execute ; foo" $name
 
+test " -3 3- * ." {9 $}
+test " -3 3 * ." {f7 $}
+
 send "bye\n"
 interact
