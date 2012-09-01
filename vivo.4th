@@ -113,8 +113,6 @@ delay
 : max3221on 1 pbsel set 1 pbdir set 1 pbdata set ;
 
 1 6 << constant s3
-1 14 << constant mirq5
-1 12 << constant mirq3
 1 7 << constant nlcdon
 
 : s3irq  s3 pdsel clear imr @ mirq3 ~ and imr ! ;
