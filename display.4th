@@ -1,8 +1,11 @@
 decimal
 160 constant xdim
 240 constant ydim
-lxmax @ xdim 16 << or lxmax !
-lymax @ ydim 16 << or lymax !
+0 lxmax c!
+xdim lxmax 1+ c!
+0 lymax c!
+ydim lymax 1+ c!
+
 xdim 16 / lvpw c!
 8 lpicf c!
 0 lrra c!
@@ -23,17 +26,21 @@ hex
 
 lcdon
 
-: dac
+: dac ( n -- set lcd contrast )
 3 4 << dup dup pfdir set
 pfdata set pfdata clear
+dup
+0 > if
 1 5 <<
+else
+1 4 <<
+swap minus swap
+then
 begin
 dup pfdata set
 dup pfdata clear
 swap 1 - swap 1 pick
 0 < until ;
-
-10 dac
 
 : fb lssa @ ;
 : cls fb [ decimal ] 4800 0 fill ;
