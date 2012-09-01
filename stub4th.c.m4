@@ -120,11 +120,11 @@ int main()
     vmstate.raw = 0;
     vmstate.quiet = 0;
     vmstate.errno = 0;
-    vmstate.base = 10;
 
     if (vmstate.dictionary)
        result = vm(&vmstate, "quit");
     else
+       vmstate.base  = 10;
        result = vm(&vmstate, "boot");
 
     if (!result)
