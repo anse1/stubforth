@@ -102,3 +102,22 @@ hex
 : icemccr fffffd08 ;
 : icemamr fffffd04 ;
 : icemacr fffffd00 ;
+
+1 0 << constant intspi
+1 1 << constant inttmr
+1 2 << constant intuart
+1 3 << constant intwdt
+1 4 << constant intrtc
+1 6 << constant intkb
+1 7 << constant intpwm
+1 8 << constant intint0
+1 9 << constant intint1
+1 10 << constant intint2
+1 11 << constant intint3
+1 16 << constant intirq1
+1 17 << constant intirq2
+1 18 << constant intirq3
+1 19 << constant intirq6
+1 20 << constant intirq5
+1 22 << constant intsam
+1 23 << constant intemiq
