@@ -158,20 +158,43 @@ static void uart_interrupt()
   }
 }
 
+void forth_handler(const char *word)
+{
+  struct vmstate irqstate = vmstate;
+  cell ps[100];
+  cell rs[100];
+  irqstate.return_stack = rs;
+  irqstate.param_stack = ps;
+  vm(&irqstate, word);
+}
+
 __attribute__((interrupt_handler))
 void ivect_level4 ()
 {
 
-  if (! (ISR & ISR_UART) ) {
-     my_puts(__func__);
-     my_puts(": huh?\n");
-     dumpregs();
+  if ((ISR & ISR_UART) ) {
+    uart_interrupt();
     return;
   }
 
-  uart_interrupt();
+  forth_handler("int-level4");
   return;
+
 }
+
+define(userirq, `
+__attribute__((interrupt_handler))
+void ivect_$1 ()
+{
+  forth_handler("int-$1");
+  return;
+} ')
+
+userirq(level1)
+userirq(level2)
+userirq(level3)
+userirq(level5)
+userirq(level6)
 
 /* Achtung: This table is offset by 2 wrt the manual because the
    linker script already put the reset PC and SP values in this
@@ -201,12 +224,12 @@ void *vectors[] __attribute__((section(".vectors")))
   [20] = ivect_default,
   [21] = ivect_default,
   [22] = ivect_spurious,
-  [23] = ivect_default,
-  [24] = ivect_default,
-  [25] = ivect_default,
+  [23] = ivect_level1,
+  [24] = ivect_level2,
+  [25] = ivect_level3,
   [26] = ivect_level4,
-  [27] = ivect_default,
-  [28] = ivect_default,
+  [27] = ivect_level5,
+  [28] = ivect_level6,
   [29] = ivect_default,
 };
 
