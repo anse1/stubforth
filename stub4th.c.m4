@@ -668,6 +668,13 @@ start:
 	vmstate->dictionary = dict_head;
     }
     ip = 0;
-    (sp++)->a = &find(vmstate->dictionary, startword)->code;
-    goto execute;
+
+    {
+      word *w = find(vmstate->dictionary, startword);
+      if (!w) {
+        cthrow(-13, undefined word);
+      }
+      (sp++)->a = &w->code;
+      goto execute;
+    }
 }
