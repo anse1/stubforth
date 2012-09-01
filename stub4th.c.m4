@@ -195,7 +195,7 @@ dnl $2 - value
 constant(cell, .i=sizeof(cell))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
-constant(d0, .a=dictionary_stack)
+dnl constant(d0, .a=dictionary_stack)
 
 primary(context)
    (sp++)->a = &vmstate->dictionary;
