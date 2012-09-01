@@ -441,8 +441,11 @@ dnl On failure, abort.
   t.i = 0;
   char *s = sp[-1].s;
   int c;
+  int negate = 0;
   while ((c = *s)) {
-   if (c <= '9')
+   if (c == '-')
+      { negate ^= 1; s++; continue; }
+   else if (c <= '9')
       c -= '0';
    else
     {
@@ -458,6 +461,8 @@ dnl On failure, abort.
    s++;
   }
   vmstate->dp = (cell *)sp[-1].s; /* TODO: sanity check */
+  if (negate)
+    t.i = -t.i;
   sp[-1] = t;
 }
 
