@@ -367,6 +367,8 @@ primary(fill)
     t.s[n] = c;
 }
 
+secondary(q, ?,, LOAD, PRINT)
+
 
 dnl strings
 
@@ -597,8 +599,6 @@ dnl ( a -- )
 secondary(then,, .immediate=1,
  HERE, SWAP, STORE
 )
-
-secondary(q, ?,, LOAD, PRINT)
 
 secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
 
