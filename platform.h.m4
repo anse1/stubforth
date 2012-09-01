@@ -2,12 +2,9 @@
 #define PLATFORM_H
 
 #include "types.h"
+#include "MC68EZ328.h"
 
 #define DASM(x)  do { int p; my_puts(x ": ") ; asm("move.w " x  ", %0" : "=r"(p));   cprint(p); } while (0)
-
-/* The platform needs to provide getchar() and putchar() */
-
-#include "MC68EZ328.h"
 
 char *redirect;
 
