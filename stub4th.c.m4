@@ -111,6 +111,8 @@ int main()
 {
   int result;
 
+  initio();
+
   vmstate.param_stack = param_stack;
   vmstate.return_stack = return_stack;
   vmstate.dictionary_stack = dictionary_stack;
@@ -121,12 +123,12 @@ int main()
     vmstate.quiet = 0;
     vmstate.errno = 0;
 
-    if (vmstate.dictionary)
+    if (vmstate.dictionary) {
        result = vm(&vmstate, "quit");
-    else
+    } else {
        vmstate.base  = 10;
        result = vm(&vmstate, "boot");
-
+    }
     if (!result)
        return 0;
   }
@@ -144,7 +146,6 @@ int vm(struct vmstate *vmstate, const char *startword)
   cell t;
 
 
-  initio();
 
 goto start;
 
@@ -677,6 +678,9 @@ start:
     {
       word *w = find(vmstate->dictionary, startword);
       if (!w) {
+        putchar('"');
+        my_puts(startword);
+	my_puts("\" ");
         cthrow(-13, undefined word);
       }
       (sp++)->a = &w->code;
