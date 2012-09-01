@@ -103,6 +103,7 @@ hex
 : icemamr fffffd04 ;
 : icemacr fffffd00 ;
 
+decimal
 1 0 << constant mspi
 1 1 << constant mtmr
 1 2 << constant muart
@@ -121,4 +122,4 @@ hex
 1 20 << constant mirq5
 1 22 << constant msam
 1 23 << constant memiq
-
+hex
