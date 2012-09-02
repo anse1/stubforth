@@ -193,21 +193,11 @@ constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
 dnl constant(d0, .a=dictionary_stack)
 
-primary(context)
-   (sp++)->a = &vmstate->dictionary;
-
-primary(dp)
-   (sp++)->a = &vmstate->dp;
+dnl stack manipulation
 
 primary(spload, sp@)
   sp->a = sp-1;
   sp++;
-
-primary(rpload, rp@)
-  sp->a = rp-1;
-  sp++;
-
-dnl stack manipulation
 
 primary(pick)
   sp[-1] = sp[-2 - sp[-1].i];
@@ -256,6 +246,10 @@ primary(rfrom, r>)
 
 primary(rto, >r)
   *rp++ = *--sp;
+
+primary(rpload, rp@)
+  sp->a = rp-1;
+  sp++;
 
 dnl Arithmetic/Logic
 
@@ -456,6 +450,12 @@ dnl On failure, abort.
 }
 
 dnl dictionary
+
+primary(context)
+   (sp++)->a = &vmstate->dictionary;
+
+primary(dp)
+   (sp++)->a = &vmstate->dp;
 
 primary(allot)
 dnl n -- increase dictionary pointer
