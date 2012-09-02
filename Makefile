@@ -1,7 +1,7 @@
 TARGET = m68k-elf
 GCC = $(TARGET)-gcc
 CC= $(GCC) $(CFLAGS)
-CFLAGS =  -Wall -m68000 -O2 -Wcast-align
+CFLAGS =  -Wall -m68000 -O2 -Wcast-align -I $(HOME)/src/c/vivo/
 LD = $(TARGET)-ld
 OBJCOPY = $(TARGET)-objcopy
 
@@ -87,13 +87,15 @@ init:
 
 .PHONY : %.prog clean %.size init
 
-stub4th.elf : stub4th.o start.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+LIBGCC = modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+
+stub4th.elf : stub4th.o start.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
 
-flash.elf : flash.o stub4th.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+flash.elf : flash.o stub4th.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
 
-dummy.elf : flash.o dummy.o modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+dummy.elf : flash.o dummy.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
 
 flashload: flashload.c
@@ -127,6 +129,7 @@ boot.4th: $(USER) Makefile
 	echo 50 honk >> $@
 
 boot.fprog: boot.4th flashload
+	stty -F $(TTY) raw
 	echo 0 fbblock dup dup funlock ferase fstrap > $(TTY)
 	./flashload < $(TTY) > $(TTY) $<
 
