@@ -9,8 +9,7 @@ cell dictionary_stack[1000];
 
 struct vmstate vmstate;
 
-
-dnl m4 magic
+dnl m4 definitions
 
 define(dict_head, 0);
 
@@ -82,8 +81,7 @@ static word w_$1 = {
   define(translit($1,a-z,A-Z), &w_$1.code)
 ')
 
-
-dnl C helpers
+dnl C helpers
 static int strcmp(const char *a, const char *b) {
   while (*a && *a == *b)
      a++, b++;
@@ -105,8 +103,7 @@ static word *find(word *p, const char *key)
    return p;
 }
 
-
-
+dnl main
 int main()
 {
   int result;
@@ -134,7 +131,7 @@ int main()
   }
 }
 
-
+dnl VM
 dnl The entire VM must be contained in a single function since we make use of GCC's
 dnl Labels as Values extension.
 
@@ -158,8 +155,7 @@ primary(abort)
   my_puts("\n");
   return vmstate->errno;
 
-
-dnl inner interpreter
+dnl inner interpreter
 enter:
   (rp++)->a = ip;
   ip = w + 1;
@@ -179,8 +175,7 @@ primary(exit)
 primary(bye)
   return 0;
 
-
-dnl non-colon secondary words
+dnl non-colon secondary words
 
 docon:
   *(sp++) = *(w + 1);
@@ -212,8 +207,7 @@ primary(rpload, rp@)
   sp->a = rp-1;
   sp++;
 
-
-dnl stack manipulation
+dnl stack manipulation
 
 primary(pick)
   sp[-1] = sp[-2 - sp[-1].i];
@@ -252,8 +246,7 @@ primary(qstack, ?stack)
   if (vmstate->dp > &dictionary_stack[sizeof(dictionary_stack)])
     cthrow(-8, dictionary overflow)
 
-
-dnl return stack
+dnl return stack
 
 primary(r)
   *sp++ = rp[-1];
@@ -264,8 +257,7 @@ primary(rfrom, r>)
 primary(rto, >r)
   *rp++ = *--sp;
 
-
-dnl Arithmetic/Logic
+dnl Arithmetic/Logic
 
 define(binop, `
 primary(`$1', ifelse(`$3',`',`$2',`$3'))
@@ -313,8 +305,7 @@ primary(plus1, 1+)
 primary(minus1, 1-)
   sp[-1].i--;
 
-
-dnl control primitives
+dnl control primitives
 
 dnl --
 primary(branch, , compile_only)
@@ -326,8 +317,7 @@ primary(zbranch, 0branch, compile_only)
       ip++;
    else
       ip = ip->a;
-
-dnl I/O
+dnl I/O
 
 dnl c --
 primary(emit)
@@ -374,8 +364,7 @@ primary(blockcomment, `(', immediate)
 primary(linecomment, `\\', immediate)
   while(getchar() != '\n');
 
-
-dnl MEM
+dnl MEM
 primary(store, !)
   *(sp[-1].aa) = sp[-2].a;
   sp -= 2;
@@ -401,8 +390,7 @@ primary(fill)
 
 secondary(q, ?,, LOAD, PRINT)
 
-
-dnl strings
+dnl strings
 
 primary(word)
 dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
@@ -467,8 +455,7 @@ dnl On failure, abort.
   sp[-1] = t;
 }
 
-
-dnl dictionary
+dnl dictionary
 
 primary(allot)
 dnl n -- increase dictionary pointer
@@ -504,8 +491,7 @@ dnl s is deallocated when found
      else (sp++)->i = 0;
 }
 
-
-dnl compiler
+dnl compiler
 primary(lit,, compile_only)
   *sp++ = *ip++;
 
@@ -562,8 +548,7 @@ secondary(colon, :,, LIT, &&enter, CREATE)
 secondary(``constant'',,, LIT, &&docon, CREATE, COMMA, SMUDGE, SUSPEND)
 secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
 
-
-dnl from fig.txt, unclassified
+dnl from fig.txt, unclassified
 dnl secondary(cr,,, LIT, .i=13, EMIT)
 secondary(lf,,, LIT, .i=10, EMIT)
 dnl secondary(crlf,,, CR, LF)
@@ -657,14 +642,15 @@ primary(echo)
 primary(quiet)
  vmstate->quiet = 1;
 
-
-dnl convenience
+dnl convenience
 
-
+dnl platform
+
 sinclude(platform.m4)
 
-
 undivert(1)
+
+dnl startup
 
 start:
     sp = vmstate->param_stack;
@@ -687,3 +673,9 @@ start:
       goto execute;
     }
 }
+/*
+Local Variables:
+mode: m4
+mode: outline-minor
+End:
+*/
