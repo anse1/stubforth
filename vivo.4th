@@ -118,7 +118,3 @@ delay
 : s3irq  s3 pdsel clear imr @ mirq3 ~ and imr ! ;
 : penirq  2 pfsel clear imr @ mirq5 ~ and imr ! ;
 : suspend 1 3 << pllcr 1+ set max3221off stop max3221on ;
-
-s3irq
-penirq
-
