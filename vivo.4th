@@ -4,6 +4,8 @@ hex
 
 : flash 800000 ;
 : c? c@ . ;
+: w? w@ . ;
+
 : fcmd flash c! ;
 : funlock 60 fcmd D0 swap c! ;
 : fsr 70 fcmd flash 1 + c@ ;
@@ -115,6 +117,9 @@ delay
 1 6 << constant s3
 1 7 << constant nlcdon
 
+\ interrupts
+
 : s3irq  s3 pdsel clear imr @ mirq3 ~ and imr ! ;
 : penirq  2 pfsel clear imr @ mirq5 ~ and imr ! ;
 : suspend 1 3 << pllcr 1+ set max3221off stop max3221on ;
+: rtcirq imr @ mrtc ~ and imr ! ;
