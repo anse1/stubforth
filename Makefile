@@ -1,7 +1,8 @@
 TARGET = m68k-elf
 GCC = $(TARGET)-gcc
 CC= $(GCC) $(CFLAGS)
-CFLAGS =  -Wall -m68000 -O1 -Wcast-align -I $(HOME)/src/c/vivo/
+#CFLAGS =  -Wall -m68000 -O2 -Wcast-align -I $(HOME)/src/c/vivo/  -fno-reorder-functions         
+CFLAGS =  -Wall -m68000 -O1 -Wcast-align -I $(HOME)/src/c/vivo/ 
 LD = $(TARGET)-ld
 OBJCOPY = $(TARGET)-objcopy
 
