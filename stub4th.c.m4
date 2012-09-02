@@ -548,30 +548,6 @@ secondary(colon, :,, LIT, &&enter, CREATE)
 secondary(``constant'',,, LIT, &&docon, CREATE, COMMA, SMUDGE, SUSPEND)
 secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
 
-dnl from fig.txt, unclassified
-dnl secondary(cr,,, LIT, .i=13, EMIT)
-secondary(lf,,, LIT, .i=10, EMIT)
-dnl secondary(crlf,,, CR, LF)
-dnl secondary(bl,,, LIT, .i=32, EMIT)
-
-secondary(tick, ', .immediate=1,
-    WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
-    STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
-)
-
-secondary(tobody, >body,, CELL, ADD)
-
-dnl (void **) --- (word *)
-primary(toword, >word)
-{
-  sp[-1].a = CFA2WORD(sp[-1].a);
-}
-dnl (word *) --- (word **)
-primary(tolink, >link)
-{
-  sp[-1].a = &((word *)sp[-1].a)->link;
-}
-
 dnl (char *) ---
 dnl interpret or compile s
 secondary(interpret,,,
@@ -641,6 +617,30 @@ primary(echo)
 
 primary(quiet)
  vmstate->quiet = 1;
+
+dnl from fig.txt, unclassified
+dnl secondary(cr,,, LIT, .i=13, EMIT)
+secondary(lf,,, LIT, .i=10, EMIT)
+dnl secondary(crlf,,, CR, LF)
+dnl secondary(bl,,, LIT, .i=32, EMIT)
+
+secondary(tick, ', .immediate=1,
+    WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
+    STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
+)
+
+secondary(tobody, >body,, CELL, ADD)
+
+dnl (void **) --- (word *)
+primary(toword, >word)
+{
+  sp[-1].a = CFA2WORD(sp[-1].a);
+}
+dnl (word *) --- (word **)
+primary(tolink, >link)
+{
+  sp[-1].a = &((word *)sp[-1].a)->link;
+}
 
 dnl convenience
 
