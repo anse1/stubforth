@@ -1,7 +1,7 @@
 TARGET = m68k-elf
 GCC = $(TARGET)-gcc
 CC= $(GCC) $(CFLAGS)
-CFLAGS =  -Wall -m68000 -O2 -Wcast-align -I $(HOME)/src/c/vivo/
+CFLAGS =  -Wall -m68000 -O1 -Wcast-align -I $(HOME)/src/c/vivo/
 LD = $(TARGET)-ld
 OBJCOPY = $(TARGET)-objcopy
 
@@ -87,7 +87,8 @@ init:
 
 .PHONY : %.prog clean %.size init
 
-LIBGCC = modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+# LIBGCC = modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
+LIBGCC = /usr/local/lib/gcc/m68k-elf/4.7.2/m68000/libgcc.a
 
 stub4th.elf : stub4th.o start.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
