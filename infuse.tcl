@@ -16,5 +16,5 @@ foreach l $lines {
 
     send -- $l
     send "\n"
-    expect -- $l
+    expect -- "\n"
 }
