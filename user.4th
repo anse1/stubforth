@@ -27,7 +27,7 @@ swap - ;
 
 : forget ( read a word to forget, adjusts dp )
  word find 0= if abort then
- >word dup  >link @ context ! dp ! ;
+ >word dup  >link @ context ! >name @ dp ! ;
 
 : dump ( addr n -- )
 over + swap
