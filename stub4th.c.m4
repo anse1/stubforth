@@ -74,7 +74,7 @@ static word w_$1 = {
   .name = "$1",
   .link = dict_head,
   .code = &&docon,
-  .data = {{ $2 }}
+  .data = { init_union(shift($@)) }
 };
 
   define(`dict_head', &w_$1)
