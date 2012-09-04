@@ -188,7 +188,6 @@ dovar:
 dnl $1 - name
 dnl $2 - value
 
-constant(cell, .i=sizeof(cell))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
 dnl constant(d0, .a=dictionary_stack)
@@ -383,6 +382,12 @@ primary(fill)
 }
 
 secondary(q, ?,, LOAD, PRINT)
+secondary(cq, c?,, CLOAD, PRINT)
+
+constant(cell, .i=sizeof(cell))
+
+primary(cells)
+  sp[-1].i *= sizeof(sp[0]);
 
 dnl strings
 
@@ -640,6 +645,12 @@ dnl (word *) --- (word **)
 primary(tolink, >link)
 {
   sp[-1].a = &((word *)sp[-1].a)->link;
+}
+
+dnl (word *) --- (char **)
+primary(toname, >name)
+{
+  sp[-1].a = &((word *)sp[-1].a)->name;
 }
 
 dnl convenience
