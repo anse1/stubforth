@@ -168,6 +168,20 @@ primary(execute)
   w = (--sp)->a;
   goto *(w->aa);
 
+primary(catch)
+{
+  word *w2 = CFA2WORD(sp[-1].a);
+  struct vmstate new = *vmstate;
+  new.param_stack = sp;
+  new.return_stack = rp;
+  sp[-1].i = vm(&new, w2->name);
+}
+
+primary(throw)
+{
+   return sp[-1].i;
+}
+
 primary(exit)
   ip = (--rp)->a;
   w = ip->a;
@@ -680,8 +694,12 @@ start:
 	my_puts("\" ");
         cthrow(-13, undefined word);
       }
-      (sp++)->a = &w->code;
-      goto execute;
+      {
+	cell thread = { .a=BYE };
+	ip = &thread;
+        (sp++)->a = &w->code;
+        goto execute;
+      }
     }
 }
 /*
