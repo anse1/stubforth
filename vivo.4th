@@ -97,7 +97,7 @@ hex
 
 : DUMP flash 400 raw dump ;
 
-: delay ( n --, pause for approx n milliseconds)
+: ms ( n --, pause for approx n milliseconds)
  [ decimal ]
   27 * begin 1 - dup while repeat drop ;
 
@@ -108,7 +108,7 @@ hex
 3c pwmc 1+ c!
 4 pwms 1+ c!
 8 pwmp c!
-delay
+ms
 0 pwmc 1+ c! ;
 
 : max3221off 1 pbsel set 1 pbdir set 1 pbdata clear ;
