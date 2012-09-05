@@ -22,7 +22,7 @@ proc test {tx rx} {
     send_user " \[OK\]\n"
 }
 
-set true {ffff $}
+set true {-1 $}
 set false {\s0 $}
 set name {stub4th [0-9a-f]+}
 
@@ -41,7 +41,7 @@ expect {
     -re abort:.*
 }
 
-test "85 ." {55 $}
+test "85 1 + ." {86 $}
 
 send "hex\n"
 
@@ -68,12 +68,12 @@ test "1 ifelsethen" U@U
 test "0 ifelsethen" UAU
 
 send ": fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;\n"
-test "20 fib ." 0*1a6d
+test "20 fib ." 6765
 
 send ": tuck swap over ;\n"
 send ": gcd dup if tuck mod recurse else drop then ;\n"
 
-test "decimal 11111 12341 gcd ." {29 $}
+test "decimal 11111 12341 gcd ." {41 $}
 
 send "hex\n"
 
@@ -98,7 +98,7 @@ test "word fubar type" {fubar$}
 send "0 variable scratch 10 allot\n"
 test "scratch 10 55 fill scratch 8 + c@ 11 + ." {66 $}
 
-test "8 base c! 777 ." {1ff $}
+test "8 base c! 777 1 + ." {1000 $}
 send "decimal "
 
 test "word \[ find drop immediatep ." $true
@@ -108,7 +108,7 @@ test "' hi execute" $name
 test ": foo ' hi execute ; foo" $name
 
 test " -3 3- * ." {9 $}
-test " -3 3 * ." {f7 $}
+test " -3 3 * ." {-9 $}
 
 send ": foo 666 throw ; "
 send ": bar ' foo catch 666 = if 85 emit else 65 then ; "
@@ -116,12 +116,12 @@ test bar {U$}
 
 send ": foo . ?stack ; "
 send ": bar ' foo catch . ; "
-test "bar" {fffc $}
+test "bar" {-4 $}
 
 send ": foo 85 ; "
 send ": bar  ' foo catch . . ; "
 
-test bar {0 55 $}
+test bar {0 85 $}
 
 send "bye\n"
 interact
