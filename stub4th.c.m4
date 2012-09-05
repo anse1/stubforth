@@ -382,6 +382,38 @@ primary(catch)
   (sp++)->i = result;
 }
 
+dnl MEM
+primary(store, !)
+  *(sp[-1].aa) = sp[-2].a;
+  sp -= 2;
+
+primary(load, @)
+  sp[-1].a = *(sp[-1].aa);
+
+primary(cstore, c!)
+  *sp[-1].s = sp[-2].i;
+  sp -= 2;
+
+primary(cload, c@)
+  sp[-1].i = *sp[-1].s;
+
+primary(fill)
+{
+  unsigned char c = (--sp)->i;
+  int n = (--sp)->i;
+  t = *--sp;
+  while(n--)
+    t.s[n] = c;
+}
+
+secondary(q, ?,, LOAD, PRINT)
+secondary(cq, c?,, CLOAD, PRINT)
+
+constant(cell, .i=sizeof(cell))
+
+primary(cells)
+  sp[-1].i *= sizeof(sp[0]);
+
 dnl I/O
 
 dnl c --
@@ -417,38 +449,6 @@ primary(blockcomment, `(', immediate)
 
 primary(linecomment, `\\', immediate)
   while(getchar() != '\n');
-
-dnl MEM
-primary(store, !)
-  *(sp[-1].aa) = sp[-2].a;
-  sp -= 2;
-
-primary(load, @)
-  sp[-1].a = *(sp[-1].aa);
-
-primary(cstore, c!)
-  *sp[-1].s = sp[-2].i;
-  sp -= 2;
-
-primary(cload, c@)
-  sp[-1].i = *sp[-1].s;
-
-primary(fill)
-{
-  unsigned char c = (--sp)->i;
-  int n = (--sp)->i;
-  t = *--sp;
-  while(n--)
-    t.s[n] = c;
-}
-
-secondary(q, ?,, LOAD, PRINT)
-secondary(cq, c?,, CLOAD, PRINT)
-
-constant(cell, .i=sizeof(cell))
-
-primary(cells)
-  sp[-1].i *= sizeof(sp[0]);
 
 dnl strings
 
