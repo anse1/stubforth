@@ -93,11 +93,11 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
-static void my_puti(long long i, char base)
+static void my_puti(vmint i, char base)
 {
   const char *basechars = "0123456789abcdefghijklmnopqrstuvwxyz";
-  long long div;
-  long long rest;
+  vmint div;
+  unsigned char rest;
 
   if (i < 0) {
     putchar('-');
