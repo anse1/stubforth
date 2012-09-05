@@ -18,7 +18,7 @@ define(`cthrow', `
 {
   vmstate->errno = $1;
   vmstate->errstr = ifelse(`$2',`',0,"$2");
-  goto abort;
+  return vmstate->errno;
 }')
 
 define(primary, `
@@ -128,6 +128,15 @@ int main()
     }
     if (!result)
        return 0;
+    else {
+
+      my_puts("abort");
+      if (vmstate.errno) {
+	my_puts(": ");
+	my_puts(vmstate.errstr);
+      }
+      my_puts("\n");
+    }
   }
 }
 
@@ -147,12 +156,6 @@ int vm(struct vmstate *vmstate, const char *startword)
 goto start;
 
 primary(abort)
-  my_puts("abort");
-  if (vmstate->errno) {
-    my_puts(": ");
-    my_puts(vmstate->errstr);
-  }
-  my_puts("\n");
   return vmstate->errno;
 
 dnl inner interpreter
@@ -238,13 +241,9 @@ primary(over)
   sp++;
 
 primary(qstack, ?stack)
-  if (sp > &param_stack[sizeof(param_stack)])
-    cthrow(-3, stack overflow)
-  if (sp < param_stack)
+  if (sp < vmstate->param_stack)
     cthrow(-4, stack underflow)
-  if (rp > &return_stack[sizeof(return_stack)])
-    cthrow(-5, return stack overflow)
-  if (rp < return_stack)
+  if (rp < vmstate->return_stack)
     cthrow(-6, return stack underflow)
   if (vmstate->dp > &dictionary_stack[sizeof(dictionary_stack)])
     cthrow(-8, dictionary overflow)
