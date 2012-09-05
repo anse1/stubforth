@@ -15,11 +15,11 @@ define(dict_head, 0);
 
 dnl $1 - ANS94 error code
 define(`cthrow', `
-{
+do {
   vmstate->errno = $1;
-  vmstate->errstr = ifelse(`$2',`',0,"$2");
+dnl  vmstate->errstr = ifelse(`$2',`',0,"$2");
   return vmstate->errno;
-}')
+} while (0)')
 
 define(primary, `
 dnl Cons a primary word
@@ -93,6 +93,23 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
+static void my_puti(int i)
+{
+  char *hex = "0123456789abcdef";
+  int j;
+  int skip = 1;
+  for (j=8 * sizeof(i) - 4; j>=0; j-=4) {
+    char c = hex[0xf & (i>>j)];
+    if (c == '0' && skip)
+      continue;
+    skip = 0;
+    putchar(c);
+  }
+  if (skip)
+    putchar('0');
+  putchar(' ');
+}
+
 static word *find(word *p, const char *key)
 {
    while(p) {
@@ -133,7 +150,7 @@ int main()
       my_puts("abort");
       if (vmstate.errno) {
 	my_puts(": ");
-	my_puts(vmstate.errstr);
+	my_puti(vmstate.errno);
       }
       my_puts("\n");
     }
@@ -141,26 +158,33 @@ int main()
 }
 
 dnl VM
-dnl The entire VM must be contained in a single function since we make use of GCC's
-dnl Labels as Values extension.
 
-dnl The vm is reentrant and may be called e.g., from interrupt handlers.
+/* The VM is reentrant and may, e.g., be reentered from interrupt
+handlers.  It is also reentered on CATCH to implement non-local
+control flow within forth.  The entire VM must be contained in a
+single function since we make use of GCC's Labels as Values
+extension. */
+
 int vm(struct vmstate *vmstate, const char *startword)
 {
 
+  /* The VM registers */
   cell *ip, *sp, *rp, *w;
   cell t;
 
-  cell *sp_base = vmstate->sp;
-  cell *rp_base = vmstate->rp;
-  cell *dp_base = vmstate->dp;
+  /* remember the initial values so we can detect underflow */
+  cell *sp_base, *rp_base, *dp_base;
+
+  sp_base = sp = vmstate->sp;
+  rp_base = rp = vmstate->rp;
+  dp_base = vmstate->dp;
 
 goto start;
 
 primary(abort)
   vmstate->sp = sp;
   vmstate->rp = rp;
-  return vmstate->errno;
+  cthrow(-1, "ABORT");
 
 dnl inner interpreter
 enter:
@@ -174,31 +198,6 @@ next:
 primary(execute)
   w = (--sp)->a;
   goto *(w->aa);
-
-primary(catch)
-{
-  word *w2 = CFA2WORD(sp[-1].a);
-  int result;
-  struct vmstate new = *vmstate;
-  sp--;
-  new.sp = sp;
-  new.rp = rp;
-  result = vm(&new, w2->name);
-  if (!result) {
-     /* local return, adopt state of the child VM */
-     *vmstate = new;
-     sp = new.sp;
-     rp = new.rp;
-  }
-  (sp++)->i = result;
-}
-
-primary(throw)
-{
-   vmstate->sp = sp;
-   vmstate->rp = rp;
-   return sp[-1].i;
-}
 
 primary(exit)
   ip = (--rp)->a;
@@ -259,9 +258,9 @@ primary(over)
 
 primary(qstack, ?stack)
   if (sp < sp_base)
-    cthrow(-4, stack underflow)
+    cthrow(-4, stack underflow);
   if (rp < rp_base)
-    cthrow(-6, return stack underflow)
+    cthrow(-6, return stack underflow);
 
 dnl return stack
 
@@ -338,6 +337,34 @@ primary(zbranch, 0branch, compile_only)
       ip++;
    else
       ip = ip->a;
+
+dnl i --
+primary(throw)
+{
+   vmstate->sp = sp;
+   vmstate->rp = rp;
+   cthrow(sp[-1].i, "THROW");
+}
+
+dnl cfa -- i
+primary(catch)
+{
+  word *w2 = CFA2WORD(sp[-1].a);
+  int result;
+  struct vmstate new = *vmstate;
+  sp--;
+  new.sp = sp;
+  new.rp = rp;
+  result = vm(&new, w2->name);
+  if (!result) {
+     /* local return, adopt state of the child VM */
+     *vmstate = new;
+     sp = new.sp;
+     rp = new.rp;
+  }
+  (sp++)->i = result;
+}
+
 dnl I/O
 
 dnl c --
@@ -362,22 +389,7 @@ primary(key)
 
 dnl n --
 primary(print, .)
-{
-  t.i = (--sp)->i;
-  char *hex = "0123456789abcdef";
-  int j;
-  int skip = 1;
-  for (j=8 * sizeof(t.i) - 4; j>=0; j-=4) {
-    char c = hex[0xf & (t.i>>j)];
-    if (c == '0' && skip)
-      continue;
-    skip = 0;
-    putchar(c);
-  }
-  if (skip)
-    putchar('0');
-  putchar(' ');
-}
+   my_puti((--sp)->i);
 
 primary(blockcomment, `(', immediate)
   while(getchar() != ')');
@@ -651,12 +663,6 @@ primary(echo)
 primary(quiet)
  vmstate->quiet = 1;
 
-dnl from fig.txt, unclassified
-dnl secondary(cr,,, LIT, .i=13, EMIT)
-secondary(lf,,, LIT, .i=10, EMIT)
-dnl secondary(crlf,,, CR, LF)
-dnl secondary(bl,,, LIT, .i=32, EMIT)
-
 secondary(tick, ', .immediate=1,
     WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
     STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
@@ -681,6 +687,12 @@ primary(toname, >name)
   sp[-1].a = &((word *)sp[-1].a)->name;
 }
 
+dnl from fig.txt, unclassified
+dnl secondary(cr,,, LIT, .i=13, EMIT)
+secondary(lf,,, LIT, .i=10, EMIT)
+dnl secondary(crlf,,, CR, LF)
+dnl secondary(bl,,, LIT, .i=32, EMIT)
+
 dnl convenience
 
 dnl platform
@@ -692,8 +704,6 @@ undivert(1)
 dnl startup
 
 start:
-    sp = sp_base;
-    rp = rp_base;
     if (!vmstate->dictionary) {
 	vmstate->dictionary = dict_head;
     }
