@@ -1,10 +1,12 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+typedef long vmint;  /* for efficient use of data structures,
+                        sizeof(vmint) ought to equal sizeof(void *) */
 union cell {
   void *a;
   void **aa;
-  long i;
+  vmint i;
   char *s;
 };
 typedef union cell cell;
