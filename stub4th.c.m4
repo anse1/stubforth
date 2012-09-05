@@ -129,8 +129,6 @@ int main()
 
   initio();
 
-  vmstate.sp = param_stack;
-  vmstate.rp = return_stack;
   if(!vmstate.dp)
       vmstate.dp = dictionary_stack;
 
@@ -139,6 +137,8 @@ int main()
     vmstate.raw = 0;
     vmstate.quiet = 0;
     vmstate.errno = 0;
+    vmstate.sp = param_stack;
+    vmstate.rp = return_stack;
 
     if (vmstate.dictionary) {
        result = vm(&vmstate, "quit");
@@ -224,9 +224,6 @@ dovar:
 dnl $1 - name
 dnl $2 - value
 
-constant(s0, .a=param_stack)
-constant(r0, .a=return_stack)
-dnl constant(d0, .a=dictionary_stack)
 constant(hexchars, .s="0123456789abcdefghijklmnopqrstuvwxyz")
 
 dnl stack manipulation
@@ -260,6 +257,9 @@ primary(over)
   *sp = sp[-2];
   sp++;
 
+primary(s0)
+  (sp++)->a = sp_base;
+
 primary(qstack, ?stack)
   if (sp < sp_base)
     cthrow(-4, stack underflow);
@@ -280,6 +280,9 @@ primary(rto, >r)
 primary(rpload, rp@)
   sp->a = rp-1;
   sp++;
+
+primary(r0)
+  (sp++)->a = rp_base;
 
 dnl Arithmetic/Logic
 
