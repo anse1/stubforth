@@ -93,25 +93,6 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
-static void my_puti(vmint i, char base)
-{
-  const char *basechars = "0123456789abcdefghijklmnopqrstuvwxyz";
-  vmint div;
-  unsigned char rest;
-
-  if (i < 0) {
-    putchar('-');
-    my_puti(-i, base);
-    return;
-  }
-
-  div = i / base;
-  rest = i % base;
-  if (div)
-    my_puti(div, base);
-  putchar(basechars[rest]);
-}
-
 static word *find(word *p, const char *key)
 {
    while(p) {
@@ -439,15 +420,15 @@ primary(key)
 
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
-secondary(print1,,,
+secondary(dot1,,,
  BASE, CLOAD, DIVMOD,
- DUP, ZBRANCH, self[9], PRINT1, BRANCH, self[10], DROP,
+ DUP, ZBRANCH, self[9], DOT1, BRANCH, self[10], DROP,
  HEXCHARS, ADD, CLOAD, EMIT)
 
-secondary(print, .,,
+secondary(dot, .,,
  DUP, LIT, .i=0, LT, ZBRANCH, self[10],
  MINUS, LIT, .i=45, EMIT,
- PRINT1, BL)
+ DOT1, BL)
 
 primary(blockcomment, `(', immediate)
   while(getchar() != ')');
@@ -455,8 +436,8 @@ primary(blockcomment, `(', immediate)
 primary(linecomment, `\\', immediate)
   while(getchar() != '\n');
 
-secondary(q, ?,, LOAD, PRINT)
-secondary(cq, c?,, CLOAD, PRINT)
+secondary(q, ?,, LOAD, DOT)
+secondary(cq, c?,, CLOAD, DOT)
 
 dnl strings
 
