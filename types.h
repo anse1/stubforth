@@ -21,8 +21,8 @@ struct word {
 
 struct vmstate {
   cell *dp;
-  cell *rp;
-  cell *sp;
+  cell *rp;  /* only valid on entry/return of vm() */
+  cell *sp;  /* only valid on entry/return of vm() */
   struct word *dictionary;
   char *errstr;
   char base;
