@@ -110,9 +110,9 @@ int main()
 
   initio();
 
-  vmstate.param_stack = param_stack;
-  vmstate.return_stack = return_stack;
-  vmstate.dictionary_stack = dictionary_stack;
+  vmstate.sp = param_stack;
+  vmstate.rp = return_stack;
+  vmstate.dp = dictionary_stack;
 
   while(1) {
     vmstate.compiling = 0;
@@ -151,11 +151,15 @@ int vm(struct vmstate *vmstate, const char *startword)
   cell *ip, *sp, *rp, *w;
   cell t;
 
-
+  cell *sp_base = vmstate->sp;
+  cell *rp_base = vmstate->rp;
+  cell *dp_base = vmstate->dp;
 
 goto start;
 
 primary(abort)
+  vmstate->sp = sp;
+  vmstate->rp = rp;
   return vmstate->errno;
 
 dnl inner interpreter
@@ -174,14 +178,25 @@ primary(execute)
 primary(catch)
 {
   word *w2 = CFA2WORD(sp[-1].a);
+  int result;
   struct vmstate new = *vmstate;
-  new.param_stack = sp;
-  new.return_stack = rp;
-  sp[-1].i = vm(&new, w2->name);
+  sp--;
+  new.sp = sp;
+  new.rp = rp;
+  result = vm(&new, w2->name);
+  if (!result) {
+     /* local return, adopt state of the child VM */
+     *vmstate = new;
+     sp = new.sp;
+     rp = new.rp;
+  }
+  (sp++)->i = result;
 }
 
 primary(throw)
 {
+   vmstate->sp = sp;
+   vmstate->rp = rp;
    return sp[-1].i;
 }
 
@@ -190,6 +205,8 @@ primary(exit)
   w = ip->a;
 
 primary(bye)
+  vmstate->sp = sp;
+  vmstate->rp = rp;
   return 0;
 
 dnl non-colon secondary words
@@ -241,12 +258,10 @@ primary(over)
   sp++;
 
 primary(qstack, ?stack)
-  if (sp < vmstate->param_stack)
+  if (sp < sp_base)
     cthrow(-4, stack underflow)
-  if (rp < vmstate->return_stack)
+  if (rp < rp_base)
     cthrow(-6, return stack underflow)
-  if (vmstate->dp > &dictionary_stack[sizeof(dictionary_stack)])
-    cthrow(-8, dictionary overflow)
 
 dnl return stack
 
@@ -677,14 +692,11 @@ undivert(1)
 dnl startup
 
 start:
-    sp = vmstate->param_stack;
-    rp = vmstate->return_stack;
+    sp = sp_base;
+    rp = rp_base;
     if (!vmstate->dictionary) {
-        vmstate->dp = vmstate->dictionary_stack;
 	vmstate->dictionary = dict_head;
     }
-    ip = 0;
-
     {
       word *w = find(vmstate->dictionary, startword);
       if (!w) {
