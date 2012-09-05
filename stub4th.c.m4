@@ -406,9 +406,6 @@ primary(fill)
     t.s[n] = c;
 }
 
-secondary(q, ?,, LOAD, PRINT)
-secondary(cq, c?,, CLOAD, PRINT)
-
 constant(cell, .i=sizeof(cell))
 
 primary(cells)
@@ -449,6 +446,9 @@ primary(blockcomment, `(', immediate)
 
 primary(linecomment, `\\', immediate)
   while(getchar() != '\n');
+
+secondary(q, ?,, LOAD, PRINT)
+secondary(cq, c?,, CLOAD, PRINT)
 
 dnl strings
 
