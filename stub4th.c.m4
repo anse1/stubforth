@@ -93,21 +93,23 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
-static void my_puti(int i)
+static void my_puti(long long i, char base)
 {
-  char *hex = "0123456789abcdef";
-  int j;
-  int skip = 1;
-  for (j=8 * sizeof(i) - 4; j>=0; j-=4) {
-    char c = hex[0xf & (i>>j)];
-    if (c == '0' && skip)
-      continue;
-    skip = 0;
-    putchar(c);
+  const char *basechars = "0123456789abcdefghijklmnopqrstuvwxyz";
+  long long div;
+  long long rest;
+
+  if (i < 0) {
+    putchar('-');
+    my_puti(-i, base);
+    return;
   }
-  if (skip)
-    putchar('0');
-  putchar(' ');
+
+  div = i / base;
+  rest = i % base;
+  if (div)
+    my_puti(div, base);
+  putchar(basechars[rest]);
 }
 
 static word *find(word *p, const char *key)
@@ -151,7 +153,7 @@ int main()
       my_puts("abort");
       if (vmstate.errno) {
 	my_puts(": ");
-	my_puti(vmstate.errno);
+	my_puti(vmstate.errno, 10);
       }
       my_puts("\n");
     }
@@ -225,6 +227,7 @@ dnl $2 - value
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
 dnl constant(d0, .a=dictionary_stack)
+constant(hexchars, .s="0123456789abcdefghijklmnopqrstuvwxyz")
 
 dnl stack manipulation
 
@@ -390,7 +393,11 @@ primary(key)
 
 dnl n --
 primary(print, .)
-   my_puti((--sp)->i);
+{
+   t = *--sp;
+   my_puti(t.i, vmstate->base);
+   putchar(' ');
+}
 
 primary(blockcomment, `(', immediate)
   while(getchar() != ')');
