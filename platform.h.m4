@@ -161,8 +161,8 @@ void forth_handler(const char *word)
   struct vmstate irqstate = vmstate;
   cell ps[100];
   cell rs[100];
-  irqstate.return_stack = rs;
-  irqstate.param_stack = ps;
+  irqstate.rp = rs;
+  irqstate.sp = ps;
   vm(&irqstate, word);
 }
 
