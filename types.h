@@ -21,6 +21,8 @@ struct word {
 
 struct vmstate {
   cell *dp;
+  cell *rp;  /* only valid on entry/return of vm() */
+  cell *sp;  /* only valid on entry/return of vm() */
   struct word *dictionary;
   char *errstr;
   char base;
@@ -28,9 +30,6 @@ struct vmstate {
   int raw : 1;
   int quiet : 1;
   int errno : 14;
-  cell *return_stack;
-  cell *param_stack;
-  cell *dictionary_stack;
 };
 
 #define IS_WORD(c) (c > ' ')

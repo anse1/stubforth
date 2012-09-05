@@ -104,6 +104,7 @@ send "0 variable scratch 10 allot\n"
 test "scratch 10 55 fill scratch 8 + c@ 11 + ." {66 $}
 
 test "8 base c! 777 ." {1ff $}
+send "decimal "
 
 test "word \[ find drop immediatep ." $true
 test "word : find drop immediatep ." $false
@@ -113,6 +114,16 @@ test ": foo ' hi execute ; foo" $name
 
 test " -3 3- * ." {9 $}
 test " -3 3 * ." {f7 $}
+
+send ": foo 666 throw ; "
+send ": bar ' foo catch 666 = if 85 emit else 65 then ; "
+test bar {U$}
+
+send ": foo . ?stack ; "
+send ": bar ' foo catch . ; "
+test "bar" {fffc $}
+
+test ": foo 85 ; ' foo catch . ." {0 55 $}
 
 send "bye\n"
 interact

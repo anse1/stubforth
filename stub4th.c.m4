@@ -18,7 +18,7 @@ define(`cthrow', `
 {
   vmstate->errno = $1;
   vmstate->errstr = ifelse(`$2',`',0,"$2");
-  goto abort;
+  return vmstate->errno;
 }')
 
 define(primary, `
@@ -74,7 +74,7 @@ static word w_$1 = {
   .name = "$1",
   .link = dict_head,
   .code = &&docon,
-  .data = {{ $2 }}
+  .data = { init_union(shift($@)) }
 };
 
   define(`dict_head', &w_$1)
@@ -110,9 +110,9 @@ int main()
 
   initio();
 
-  vmstate.param_stack = param_stack;
-  vmstate.return_stack = return_stack;
-  vmstate.dictionary_stack = dictionary_stack;
+  vmstate.sp = param_stack;
+  vmstate.rp = return_stack;
+  vmstate.dp = dictionary_stack;
 
   while(1) {
     vmstate.compiling = 0;
@@ -128,6 +128,15 @@ int main()
     }
     if (!result)
        return 0;
+    else {
+
+      my_puts("abort");
+      if (vmstate.errno) {
+	my_puts(": ");
+	my_puts(vmstate.errstr);
+      }
+      my_puts("\n");
+    }
   }
 }
 
@@ -142,17 +151,15 @@ int vm(struct vmstate *vmstate, const char *startword)
   cell *ip, *sp, *rp, *w;
   cell t;
 
-
+  cell *sp_base = vmstate->sp;
+  cell *rp_base = vmstate->rp;
+  cell *dp_base = vmstate->dp;
 
 goto start;
 
 primary(abort)
-  my_puts("abort");
-  if (vmstate->errno) {
-    my_puts(": ");
-    my_puts(vmstate->errstr);
-  }
-  my_puts("\n");
+  vmstate->sp = sp;
+  vmstate->rp = rp;
   return vmstate->errno;
 
 dnl inner interpreter
@@ -168,11 +175,38 @@ primary(execute)
   w = (--sp)->a;
   goto *(w->aa);
 
+primary(catch)
+{
+  word *w2 = CFA2WORD(sp[-1].a);
+  int result;
+  struct vmstate new = *vmstate;
+  sp--;
+  new.sp = sp;
+  new.rp = rp;
+  result = vm(&new, w2->name);
+  if (!result) {
+     /* local return, adopt state of the child VM */
+     *vmstate = new;
+     sp = new.sp;
+     rp = new.rp;
+  }
+  (sp++)->i = result;
+}
+
+primary(throw)
+{
+   vmstate->sp = sp;
+   vmstate->rp = rp;
+   return sp[-1].i;
+}
+
 primary(exit)
   ip = (--rp)->a;
   w = ip->a;
 
 primary(bye)
+  vmstate->sp = sp;
+  vmstate->rp = rp;
   return 0;
 
 dnl non-colon secondary words
@@ -188,7 +222,6 @@ dovar:
 dnl $1 - name
 dnl $2 - value
 
-constant(cell, .i=sizeof(cell))
 constant(s0, .a=param_stack)
 constant(r0, .a=return_stack)
 dnl constant(d0, .a=dictionary_stack)
@@ -225,16 +258,10 @@ primary(over)
   sp++;
 
 primary(qstack, ?stack)
-  if (sp > &param_stack[sizeof(param_stack)])
-    cthrow(-3, stack overflow)
-  if (sp < param_stack)
+  if (sp < sp_base)
     cthrow(-4, stack underflow)
-  if (rp > &return_stack[sizeof(return_stack)])
-    cthrow(-5, return stack overflow)
-  if (rp < return_stack)
+  if (rp < rp_base)
     cthrow(-6, return stack underflow)
-  if (vmstate->dp > &dictionary_stack[sizeof(dictionary_stack)])
-    cthrow(-8, dictionary overflow)
 
 dnl return stack
 
@@ -383,6 +410,12 @@ primary(fill)
 }
 
 secondary(q, ?,, LOAD, PRINT)
+secondary(cq, c?,, CLOAD, PRINT)
+
+constant(cell, .i=sizeof(cell))
+
+primary(cells)
+  sp[-1].i *= sizeof(sp[0]);
 
 dnl strings
 
@@ -642,6 +675,12 @@ primary(tolink, >link)
   sp[-1].a = &((word *)sp[-1].a)->link;
 }
 
+dnl (word *) --- (char **)
+primary(toname, >name)
+{
+  sp[-1].a = &((word *)sp[-1].a)->name;
+}
+
 dnl convenience
 
 dnl platform
@@ -653,14 +692,11 @@ undivert(1)
 dnl startup
 
 start:
-    sp = vmstate->param_stack;
-    rp = vmstate->return_stack;
+    sp = sp_base;
+    rp = rp_base;
     if (!vmstate->dictionary) {
-        vmstate->dp = vmstate->dictionary_stack;
 	vmstate->dictionary = dict_head;
     }
-    ip = 0;
-
     {
       word *w = find(vmstate->dictionary, startword);
       if (!w) {
@@ -669,8 +705,12 @@ start:
 	my_puts("\" ");
         cthrow(-13, undefined word);
       }
-      (sp++)->a = &w->code;
-      goto execute;
+      {
+	cell thread = { .a=BYE };
+	ip = &thread;
+        (sp++)->a = &w->code;
+        goto execute;
+      }
     }
 }
 /*
