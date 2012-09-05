@@ -56,6 +56,7 @@ dnl $4... - cell data
 define(secondary, `
 undivert(1)
 define(`self', `&w_$1.data')
+define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
   .name = "ifelse($2,`',`$1',`$2')",
   .link = dict_head,
@@ -65,7 +66,6 @@ static word w_$1 = {
 };
   undefine(`self')
   define(`dict_head', &w_$1)
-  define(translit($1,a-z,A-Z), &w_$1.code)
 ')
 
 define(constant, `
@@ -151,10 +151,6 @@ int main()
     else {
 
       my_puts("abort");
-      if (vmstate.errno) {
-	my_puts(": ");
-	my_puti(vmstate.errno, 10);
-      }
       my_puts("\n");
     }
   }
@@ -265,6 +261,9 @@ primary(qstack, ?stack)
     cthrow(-4, stack underflow);
   if (rp < rp_base)
     cthrow(-6, return stack underflow);
+
+primary(lit,, compile_only)
+  *sp++ = *ip++;
 
 dnl return stack
 
@@ -417,6 +416,11 @@ dnl c --
 primary(emit)
   putchar((--sp)->i);
 
+dnl secondary(cr,,, LIT, .i=13, EMIT)
+secondary(lf,,, LIT, .i=10, EMIT)
+secondary(bl,,, LIT, .i=32, EMIT)
+dnl secondary(crlf,,, CR, LF)
+
 dnl --
 primary(hex)
   vmstate->base = 16;
@@ -434,12 +438,16 @@ primary(key)
   (sp++)->i = getchar();
 
 dnl n --
-primary(print, .)
-{
-   t = *--sp;
-   my_puti(t.i, vmstate->base);
-   putchar(' ');
-}
+dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
+secondary(print1,,,
+ BASE, CLOAD, DIVMOD,
+ DUP, ZBRANCH, self[9], PRINT1, BRANCH, self[10], DROP,
+ HEXCHARS, ADD, CLOAD, EMIT)
+
+secondary(print, .,,
+ DUP, LIT, .i=0, LT, ZBRANCH, self[10],
+ MINUS, LIT, .i=45, EMIT,
+ PRINT1, BL)
 
 primary(blockcomment, `(', immediate)
   while(getchar() != ')');
@@ -558,9 +566,6 @@ dnl s is deallocated when found
 }
 
 dnl compiler
-primary(lit,, compile_only)
-  *sp++ = *ip++;
-
 primary(state)
   (sp++)->i = vmstate->compiling;
 
@@ -707,12 +712,6 @@ primary(toname, >name)
 {
   sp[-1].a = &((word *)sp[-1].a)->name;
 }
-
-dnl from fig.txt, unclassified
-dnl secondary(cr,,, LIT, .i=13, EMIT)
-secondary(lf,,, LIT, .i=10, EMIT)
-dnl secondary(crlf,,, CR, LF)
-dnl secondary(bl,,, LIT, .i=32, EMIT)
 
 dnl convenience
 

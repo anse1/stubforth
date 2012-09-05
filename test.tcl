@@ -17,7 +17,7 @@ proc test {tx rx} {
 
     expect \
 	timeout { error timeout } \
-	-re abort: { error abort } \
+	-re abort { error abort } \
 	-re $rx
     send_user " \[OK\]\n"
 }
@@ -32,13 +32,13 @@ send_user "the following should abort...\n"
 send "should-abort\n"
 expect {
     timeout { error }
-    -re abort:.*
+    -re abort.*
 }
 
 send ".\n"
 expect {
     timeout { error }
-    -re abort:.*
+    -re abort.*
 }
 
 test "85 1 + ." {86 $}
@@ -122,6 +122,8 @@ send ": foo 85 ; "
 send ": bar  ' foo catch . . ; "
 
 test bar {0 85 $}
+
+test ": foo 99 13 /mod . . ; foo" {7 8 $}
 
 send "bye\n"
 interact
