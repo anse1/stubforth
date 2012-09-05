@@ -118,7 +118,10 @@ send ": foo . ?stack ; "
 send ": bar ' foo catch . ; "
 test "bar" {fffc $}
 
-test ": foo 85 ; ' foo catch . ." {0 55 $}
+send ": foo 85 ; "
+send ": bar  ' foo catch . . ; "
+
+test bar {0 55 $}
 
 send "bye\n"
 interact
