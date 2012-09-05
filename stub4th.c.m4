@@ -129,7 +129,8 @@ int main()
 
   vmstate.sp = param_stack;
   vmstate.rp = return_stack;
-  vmstate.dp = dictionary_stack;
+  if(!vmstate.dp)
+      vmstate.dp = dictionary_stack;
 
   while(1) {
     vmstate.compiling = 0;
