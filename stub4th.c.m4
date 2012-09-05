@@ -129,8 +129,6 @@ int main()
 
   initio();
 
-  vmstate.sp = param_stack;
-  vmstate.rp = return_stack;
   if(!vmstate.dp)
       vmstate.dp = dictionary_stack;
 
@@ -139,6 +137,8 @@ int main()
     vmstate.raw = 0;
     vmstate.quiet = 0;
     vmstate.errno = 0;
+    vmstate.sp = param_stack;
+    vmstate.rp = return_stack;
 
     if (vmstate.dictionary) {
        result = vm(&vmstate, "quit");
