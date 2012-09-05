@@ -24,7 +24,6 @@ struct vmstate {
   cell *rp;  /* only valid on entry/return of vm() */
   cell *sp;  /* only valid on entry/return of vm() */
   struct word *dictionary;
-  char *errstr;
   char base;
   int compiling : 1;
   int raw : 1;
