@@ -114,5 +114,11 @@ send ": foo 666 throw ; "
 send ": bar ' foo catch 666 = if 85 emit else 65 then ; "
 test bar {U$}
 
+send ": foo . ?stack ; "
+send ": bar ' foo catch . ; "
+test "bar" {fffc $}
+
+test ": foo 85 ; ' foo catch . ." {0 55 $}
+
 send "bye\n"
 interact
