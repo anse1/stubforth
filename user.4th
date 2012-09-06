@@ -37,12 +37,11 @@ lf ;
 \ bit flipping
 
 : flip ( c a -- ) 
-  dup c@ 2 pick xor swap c! drop ;
+  swap over c@ xor swap c! ;
 : set ( c a -- )
-  dup c@ 2 pick or swap c! drop ;
+  swap over c@ or swap c! ;
 : clear ( c a -- )
-  dup c@ 2 pick ~ and swap c! drop ;
-
+  swap over c@ swap ~ and swap c! ;
 
 " 0123456789abcdef" constant hexchars
 hex
