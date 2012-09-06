@@ -121,17 +121,16 @@ int main()
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    if (vmstate.dictionary) {
-       result = vm(&vmstate, "quit");
-    } else {
-       vmstate.base  = 10;
-       result = vm(&vmstate, "boot");
-    }
+    result = vm(&vmstate, vmstate.dictionary ? "quit" : "boot");
+
     if (!result)
        return 0;
     else {
-
-      my_puts("abort");
+      my_puts("abort: ");
+      vmstate.sp = param_stack;
+      vmstate.rp = return_stack;
+      (vmstate.sp++)->i = result;
+      vm(&vmstate, ".");
       my_puts("\n");
     }
   }
