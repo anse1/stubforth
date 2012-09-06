@@ -34,7 +34,7 @@ dup
 1 5 <<
 else
 1 4 <<
-swap minus swap
+swap negate swap
 then
 begin
 dup pfdata set
@@ -66,9 +66,9 @@ pxaddr c@ and ;
 : sq dup * ;
 
 hex
-6000 variable max_abs
-18 variable max_iter
-10 variable shift
+6000 create max_abs ,
+18 create max_iter ,
+10 create shift ,
 
 : csq ( r i -- r i )
 over sq over sq - a >>
@@ -81,8 +81,8 @@ swap >r + swap r> + swap ;
 csq >r >r 2dup r> r> c+ ;
 
 : zabs ( r i -- n )
-dup 0 < if minus then swap
-dup 0 < if minus then + ;
+dup 0 < if negate then swap
+dup 0 < if negate then + ;
 
 : divp ( cr ci -- n)
 0 >r 0 0 begin
