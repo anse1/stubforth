@@ -258,6 +258,10 @@ primary(zero, 0)
 primary(one, 1)
   (sp++)->i = 1;
 
+primary(depth)
+  sp->i = sp - sp_base;
+  sp++;
+
 dnl return stack
 
 primary(r)
