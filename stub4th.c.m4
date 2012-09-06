@@ -246,6 +246,12 @@ primary(qstack, ?stack)
 primary(lit,, compile_only)
   *sp++ = *ip++;
 
+primary(zero, 0)
+  (sp++)->i = 0;
+
+primary(one, 1)
+  (sp++)->i = 1;
+
 dnl return stack
 
 primary(r)
@@ -575,6 +581,7 @@ dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
 primary(cons)
 {
+  /* TODO: standard says align dp here */
   word *new = (word *)vmstate->dp;
   new->name = (--sp)->s;
   new->link = vmstate->dictionary;
