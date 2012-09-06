@@ -135,5 +135,9 @@ test "create foo 66 ,  foo @ 2 * . ;" {132 $}
 send ": cst <builds , does> @ ;\n"
 test "666 cst moo moo 1+ ." {667 $}
 
+test ": t 7 8 2dup . . . . ; t" {8 7 8 7 $}
+test ": t 1 2 3 4 2over . . . . . . ; t" {2 1 4 3 2 1 $}
+test ": t 1 2 3 4 2swap . . . . ; t" {2 1 4 3 $}
+
 send "bye\n"
 interact

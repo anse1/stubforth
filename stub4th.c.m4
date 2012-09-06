@@ -129,6 +129,7 @@ int main()
       my_puts("abort: ");
       vmstate.sp = param_stack;
       vmstate.rp = return_stack;
+      vmstate.base = 10;
       (vmstate.sp++)->i = result;
       vm(&vmstate, ".");
       my_puts("\n");
@@ -229,6 +230,7 @@ primary(dup)
   *sp = sp[-1];
   sp++;
 
+dnl 1 2 3 -- 2 3 1
 primary(rot)
   t = sp[-1];
   sp[-1] = sp[-3];
@@ -260,6 +262,27 @@ primary(one, 1)
 primary(depth)
   sp->i = sp - sp_base;
   sp++;
+
+primary(twodup, 2dup)
+  sp[0] = sp[-2];
+  sp[1] = sp[-1];
+  sp += 2;
+
+primary(twodrop, 2drop)
+  sp -= 2;
+
+primary(twoover, 2over)
+  sp[0] = sp[-4];
+  sp[1] = sp[-3];
+  sp += 2;
+
+primary(twoswap, 2swap)
+  t = sp[-1];
+  sp[-1] = sp[-3];
+  sp[-3] = t;
+  t = sp[-2];
+  sp[-2] = sp[-4];
+  sp[-4] = t;
 
 dnl return stack
 

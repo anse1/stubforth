@@ -5,7 +5,6 @@ hex
 : fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;
 : tuck swap over ;
 : gcd dup if tuck mod recurse else drop then ;
-: 2dup 1 pick 1 pick ;
 
 : c, here c! here 1+ dp ! ;
 : " here begin key dup 22 = 0= while c, repeat drop 0 c, here aligned dp ! ;
@@ -58,7 +57,7 @@ hex
 over cell begin 1-
 2dup 8 * >> ff and ehex
 dup 0= until
-drop drop ." : " ;
+2drop ." : " ;
 
 : dump8 ( addr n )
 8 begin
