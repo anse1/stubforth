@@ -262,6 +262,14 @@ primary(depth)
   sp->i = sp - sp_base;
   sp++;
 
+primary(twodup, 2dup)
+  sp[0] = sp[-2];
+  sp[1] = sp[-1];
+  sp += 2;
+
+primary(twodrop, 2drop)
+  sp -= 2;
+
 dnl return stack
 
 primary(r)
