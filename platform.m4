@@ -4,6 +4,13 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
+primary(mmul, m*)
+{
+  long long r = (long long)sp[-1].i * (long long)sp[-2].i;
+  sp[-1].i = r >> 32;
+  sp[-2].i = r;
+}
+
 primary(srload, sr@)
 {
   short sr;
