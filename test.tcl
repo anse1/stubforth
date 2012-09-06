@@ -90,7 +90,7 @@ test "16 twhile" {U@A@A@A@A@A@U$}
 
 send "hex\n"
 
-test "F6F 1 + variable foo foo ?" {f70 $}
+test "variable foo F6F 1 + foo ! foo ?" {f70 $}
 test "2ff 1 + constant foo foo ." {300 $}
 
 test "word fubar type" {fubar$}
@@ -124,6 +124,8 @@ send ": bar  ' foo catch . . ; "
 test bar {0 85 $}
 
 test ": foo 99 13 /mod . . ; foo" {7 8 $}
+
+test "create foo 66 ,  foo @ 2 * . ;" {132 $}
 
 send "bye\n"
 interact
