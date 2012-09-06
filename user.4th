@@ -43,7 +43,6 @@ lf ;
 : clear ( c a -- )
   swap over c@ swap ~ and swap c! ;
 
-" 0123456789abcdef" constant hexchars
 hex
 
 : ehex
