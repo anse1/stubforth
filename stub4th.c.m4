@@ -270,6 +270,11 @@ primary(twodup, 2dup)
 primary(twodrop, 2drop)
   sp -= 2;
 
+primary(twoover, 2over)
+  sp[0] = sp[-4];
+  sp[1] = sp[-3];
+  sp += 2;
+
 dnl return stack
 
 primary(r)
