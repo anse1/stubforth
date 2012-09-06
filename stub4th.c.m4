@@ -432,7 +432,7 @@ secondary(dot1,,,
  HEXCHARS, ADD, CLOAD, EMIT)
 
 secondary(dot, .,,
- DUP, LIT, .i=0, LT, ZBRANCH, self[10],
+ DUP, ZERO, LT, ZBRANCH, self[9],
  MINUS, LIT, .i=45, EMIT,
  DOT1, BL)
 
@@ -630,7 +630,7 @@ secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
 secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, DP, COMMA /* jump after repeat */)
+ LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
 
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
@@ -643,12 +643,12 @@ secondary(repeat,, .immediate=1,
 
 dnl ( -- a )
 secondary(if,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, DP, COMMA
+ LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 )
 
 dnl ( a -- a )
 secondary(else,, .immediate=1,
- LIT, BRANCH, COMMA, HERE, DP, COMMA,
+ LIT, BRANCH, COMMA, HERE, ZERO, COMMA,
  SWAP, HERE, SWAP, STORE
 )
 
