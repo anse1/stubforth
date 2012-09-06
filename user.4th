@@ -22,7 +22,7 @@ swap - ;
 
 : fstrlen ( s -- n )
 dup
-begin dup c@ 1 minus = 0= while 1+ repeat
+begin dup c@ 1 negate = 0= while 1+ repeat
 swap - ;
 
 : forget ( read a word to forget, adjusts dp )
