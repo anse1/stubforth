@@ -56,6 +56,7 @@ dnl $4... - cell data
 define(secondary, `
 undivert(1)
 define(`self', `&w_$1.data')
+define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
   .name = "ifelse($2,`',`$1',`$2')",
   .link = dict_head,
@@ -65,7 +66,6 @@ static word w_$1 = {
 };
   undefine(`self')
   define(`dict_head', &w_$1)
-  define(translit($1,a-z,A-Z), &w_$1.code)
 ')
 
 define(constant, `
@@ -91,25 +91,6 @@ static int strcmp(const char *a, const char *b) {
 static void my_puts(const char *s) {
   while (*s)
     putchar(*s++);
-}
-
-static void my_puti(vmint i, char base)
-{
-  const char *basechars = "0123456789abcdefghijklmnopqrstuvwxyz";
-  vmint div;
-  unsigned char rest;
-
-  if (i < 0) {
-    putchar('-');
-    my_puti(-i, base);
-    return;
-  }
-
-  div = i / base;
-  rest = i % base;
-  if (div)
-    my_puti(div, base);
-  putchar(basechars[rest]);
 }
 
 static word *find(word *p, const char *key)
@@ -151,10 +132,6 @@ int main()
     else {
 
       my_puts("abort");
-      if (vmstate.errno) {
-	my_puts(": ");
-	my_puti(vmstate.errno, 10);
-      }
       my_puts("\n");
     }
   }
@@ -221,6 +198,12 @@ dovar:
   (sp++)->a = (w + 1);
   goto next;
 
+dnl push &data[1] and enter the thread at *data[0].
+dodoes:
+  (sp++)->a = w + 2;
+  w = *(cell **)(w + 1) - 1;
+  goto enter;
+
 dnl $1 - name
 dnl $2 - value
 
@@ -265,6 +248,19 @@ primary(qstack, ?stack)
     cthrow(-4, stack underflow);
   if (rp < rp_base)
     cthrow(-6, return stack underflow);
+
+primary(lit,, compile_only)
+  *sp++ = *ip++;
+
+primary(zero, 0)
+  (sp++)->i = 0;
+
+primary(one, 1)
+  (sp++)->i = 1;
+
+primary(depth)
+  sp->i = sp - sp_base;
+  sp++;
 
 dnl return stack
 
@@ -313,7 +309,7 @@ primary(`$1', ifelse(`$3',`',`$2',`$3'))
 ')
 
 unop(toggle, ~)
-unop(minus, -, minus)
+unop(minus, -, negate)
 unop(nullp, !, 0=)
 
 primary(max)
@@ -331,6 +327,16 @@ primary(plus1, 1+)
 
 primary(minus1, 1-)
   sp[-1].i--;
+
+dnl dividend divisor -- remainder quotient
+primary(divmod, /mod)
+{
+  vmint quot, rem;
+  quot = sp[-2].i / sp[-1].i;
+  rem = sp[-2].i % sp[-1].i;
+  sp[-2].i = rem;
+  sp[-1].i = quot;
+}
 
 dnl control primitives
 
@@ -372,42 +378,6 @@ primary(catch)
   (sp++)->i = result;
 }
 
-dnl I/O
-
-dnl c --
-primary(emit)
-  putchar((--sp)->i);
-
-dnl --
-primary(hex)
-  vmstate->base = 16;
-
-dnl --
-primary(decimal)
-  vmstate->base = 10;
-
-dnl -- &c
-primary(base)
-   (sp++)->a = &vmstate->base;
-
-dnl -- c
-primary(key)
-  (sp++)->i = getchar();
-
-dnl n --
-primary(print, .)
-{
-   t = *--sp;
-   my_puti(t.i, vmstate->base);
-   putchar(' ');
-}
-
-primary(blockcomment, `(', immediate)
-  while(getchar() != ')');
-
-primary(linecomment, `\\', immediate)
-  while(getchar() != '\n');
-
 dnl MEM
 primary(store, !)
   *(sp[-1].aa) = sp[-2].a;
@@ -432,13 +402,64 @@ primary(fill)
     t.s[n] = c;
 }
 
-secondary(q, ?,, LOAD, PRINT)
-secondary(cq, c?,, CLOAD, PRINT)
-
 constant(cell, .i=sizeof(cell))
 
 primary(cells)
   sp[-1].i *= sizeof(sp[0]);
+
+dnl I/O
+
+dnl c --
+primary(emit)
+  putchar((--sp)->i);
+
+dnl secondary(cr,,, LIT, .i=13, EMIT)
+secondary(lf,,, LIT, .i=10, EMIT)
+secondary(bl,,, LIT, .i=32, EMIT)
+dnl secondary(crlf,,, CR, LF)
+
+dnl --
+primary(hex)
+  vmstate->base = 16;
+
+dnl --
+primary(decimal)
+  vmstate->base = 10;
+
+dnl -- &c
+primary(base)
+   (sp++)->a = &vmstate->base;
+
+dnl -- c
+primary(key)
+  (sp++)->i = getchar();
+
+dnl n --
+dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
+secondary(dot1,,,
+ BASE, CLOAD, DIVMOD,
+ DUP, ZBRANCH, self[9], DOT1, BRANCH, self[10], DROP,
+ HEXCHARS, ADD, CLOAD, EMIT)
+
+secondary(dot, .,,
+ DUP, ZERO, LT, ZBRANCH, self[9],
+ MINUS, LIT, .i=45, EMIT,
+ DOT1, BL)
+
+primary(blockcomment, `(', immediate)
+  while(getchar() != ')');
+
+primary(linecomment, `\\', immediate)
+  while(getchar() != '\n');
+
+secondary(q, ?,, LOAD, DOT)
+secondary(cq, c?,, CLOAD, DOT)
+
+secondary(dumpstack,,,
+ DEPTH, ZBRANCH, self[8], RTO, DUMPSTACK, RFROM, DUP, DOT)
+
+secondary(dots, .s,,
+ QSTACK, LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
 
 dnl strings
 
@@ -547,10 +568,33 @@ dnl s is deallocated when found
      else (sp++)->i = 0;
 }
 
-dnl compiler
-primary(lit,, compile_only)
-  *sp++ = *ip++;
+dnl (void **) --- (cell *)
+secondary(tobody, >body,, CELL, ADD)
 
+dnl (void **) --- (word *)
+primary(toword, >word)
+{
+  sp[-1].a = CFA2WORD(sp[-1].a);
+}
+dnl (word *) --- (word **)
+primary(tolink, >link)
+{
+  sp[-1].a = &((word *)sp[-1].a)->link;
+}
+
+dnl (word *) --- (char **)
+primary(toname, >name)
+{
+  sp[-1].a = &((word *)sp[-1].a)->name;
+}
+
+dnl (word *) --- (void **)
+primary(tocode, >code)
+{
+  sp[-1].a = &((word *)sp[-1].a)->code;
+}
+
+dnl compiler
 primary(state)
   (sp++)->i = vmstate->compiling;
 
@@ -579,6 +623,7 @@ dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
 primary(cons)
 {
+  /* TODO: standard says align dp here */
   word *new = (word *)vmstate->dp;
   new->name = (--sp)->s;
   new->link = vmstate->dictionary;
@@ -599,10 +644,21 @@ primary(resume, ], immediate)
 secondary(semi, ;, .immediate=1,
   LIT, EXIT, COMMA, SMUDGE, SUSPEND)
 
-secondary(create,,, WORD, CONS, COMMA)
-secondary(colon, :,, LIT, &&enter, CREATE)
-secondary(``constant'',,, LIT, &&docon, CREATE, COMMA, SMUDGE, SUSPEND)
-secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
+secondary(create,,, WORD, CONS, LIT, &&dovar, COMMA, SMUDGE, SUSPEND)
+secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
+secondary(``constant'',,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
+secondary(``variable'',,, CREATE, ZERO, COMMA)
+
+dnl start consing a dodoes word
+secondary(builds, <builds,,
+  WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
+
+dnl a -- \ set the dodoes pointer (context->data[0])
+primary(storedoes)
+  vmstate->dictionary->data[0].a = (--sp)->a;
+
+dnl set the dodoes address to the thread following does>
+secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
 
 dnl (char *) ---
 dnl interpret or compile s
@@ -627,7 +683,7 @@ secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
 secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, DP, COMMA /* jump after repeat */)
+ LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
 
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
@@ -640,12 +696,12 @@ secondary(repeat,, .immediate=1,
 
 dnl ( -- a )
 secondary(if,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, DP, COMMA
+ LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 )
 
 dnl ( a -- a )
 secondary(else,, .immediate=1,
- LIT, BRANCH, COMMA, HERE, DP, COMMA,
+ LIT, BRANCH, COMMA, HERE, ZERO, COMMA,
  SWAP, HERE, SWAP, STORE
 )
 
@@ -678,31 +734,6 @@ secondary(tick, ', .immediate=1,
     WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
     STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
 )
-
-secondary(tobody, >body,, CELL, ADD)
-
-dnl (void **) --- (word *)
-primary(toword, >word)
-{
-  sp[-1].a = CFA2WORD(sp[-1].a);
-}
-dnl (word *) --- (word **)
-primary(tolink, >link)
-{
-  sp[-1].a = &((word *)sp[-1].a)->link;
-}
-
-dnl (word *) --- (char **)
-primary(toname, >name)
-{
-  sp[-1].a = &((word *)sp[-1].a)->name;
-}
-
-dnl from fig.txt, unclassified
-dnl secondary(cr,,, LIT, .i=13, EMIT)
-secondary(lf,,, LIT, .i=10, EMIT)
-dnl secondary(crlf,,, CR, LF)
-dnl secondary(bl,,, LIT, .i=32, EMIT)
 
 dnl convenience
 

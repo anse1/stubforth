@@ -18,7 +18,7 @@ proc test {tx rx} {
 
     expect \
 	timeout { error timeout } \
-	-re abort: { error abort } \
+	-re abort { error abort } \
 	-re $rx
     send_user " \[OK\]\n"
 }
@@ -33,13 +33,13 @@ send_user "the following should abort...\n"
 send "should-abort\n"
 expect {
     timeout { error }
-    -re abort:.*
+    -re abort.*
 }
 
 send ".\n"
 expect {
     timeout { error }
-    -re abort:.*
+    -re abort.*
 }
 
 test "85 1 + ." {86 $}
@@ -95,7 +95,7 @@ test "16 twhile" {U@A@A@A@A@A@U$}
 
 send "hex\n"
 
-test "F6F 1 + variable foo foo ?" {f70 $}
+test "variable foo F6F 1 + foo ! foo ?" {f70 $}
 test "2ff 1 + constant foo foo ." {300 $}
 
 test "word fubar type" {fubar$}
@@ -127,6 +127,13 @@ send ": foo 85 ; "
 send ": bar  ' foo catch . . ; "
 
 test bar {0 85 $}
+
+test ": foo 99 13 /mod . . ; foo" {7 8 $}
+
+test "create foo 66 ,  foo @ 2 * . ;" {132 $}
+
+send ": cst <builds , does> @ ;\n"
+test "666 cst moo moo 1+ ." {667 $}
 
 send "bye\n"
 interact
