@@ -201,7 +201,7 @@ dovar:
 dnl push &data[1] and enter the thread at *data[0].
 dodoes:
   (sp++)->a = w + 2;
-  w = *  (cell **) (w + 1);
+  w = *(cell **)(w + 1) - 1;
   goto enter;
 
 dnl $1 - name
@@ -558,6 +558,7 @@ dnl s is deallocated when found
      else (sp++)->i = 0;
 }
 
+dnl (void **) --- (cell *)
 secondary(tobody, >body,, CELL, ADD)
 
 dnl (void **) --- (word *)
@@ -577,12 +578,12 @@ primary(toname, >name)
   sp[-1].a = &((word *)sp[-1].a)->name;
 }
 
-dnl dnl (word *) --- (void **)
-dnl primary(tocode, >code)
-dnl {
-dnl   sp[-1].a = &((word *)sp[-1].a)->code;
-dnl }
-dnl 
+dnl (word *) --- (void **)
+primary(tocode, >code)
+{
+  sp[-1].a = &((word *)sp[-1].a)->code;
+}
+
 dnl compiler
 primary(state)
   (sp++)->i = vmstate->compiling;
@@ -646,14 +647,8 @@ dnl a -- \ set the dodoes pointer (context->data[0])
 primary(storedoes)
   vmstate->dictionary->data[0].a = (--sp)->a;
 
-/* compile code to store a dodoes pointer to the code that follows
-   does> and compile exit */
-
-secondary(does, does>, .immediate=1,
-  /* compile address of thread following does> */
-  LIT, LIT, COMMA, HERE, LIT, .i=2, CELLS, ADD, COMMA,
-  /* compile code to set the dodoes pointer of the current word */
-  LIT, STOREDOES, COMMA, LIT, EXIT, COMMA)
+dnl set the dodoes address to the thread following does>
+secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
 
 dnl (char *) ---
 dnl interpret or compile s
