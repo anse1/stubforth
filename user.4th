@@ -12,9 +12,6 @@ hex
 : ," ' branch , here 0 , " swap here swap ! ' lit , , ; immediate
 : ." ' ," execute ' type , ; immediate
 
-: depth sp@ s0 - cell + cell / ;
-: .s ." #" depth dup . begin dup 0 > while dup pick . 1 - repeat lf drop ;
-
 : strlen ( s -- n )
 dup
 begin dup c@ while 1+ repeat
@@ -62,7 +59,6 @@ over cell begin 1-
 2dup 8 * >> ff and ehex
 dup 0= until
 drop drop ." : " ;
-
 
 : dump8 ( addr n )
 8 begin
