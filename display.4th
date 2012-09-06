@@ -78,7 +78,7 @@ over sq over sq - a >>
 swap >r + swap r> + swap ;
 
 : zn ( cr ci zr zi )
-csq >r >r 2dup r> r> c+ ;
+csq 2over c+ ;
 
 : zabs ( r i -- n )
 dup 0 < if negate then swap
@@ -87,8 +87,8 @@ dup 0 < if negate then + ;
 : divp ( cr ci -- n)
 0 >r 0 0 begin
 zn
-2dup zabs max_abs @ > if drop drop drop drop r> exit then
-r> 1+ dup >r max_iter @ > if drop drop drop drop r> drop 0 exit then
+2dup zabs max_abs @ > if 2drop 2drop r> exit then
+r> 1+ dup >r max_iter @ > if 2drop 2drop r> drop 0 exit then
 again ;
 
 : mset2nd
