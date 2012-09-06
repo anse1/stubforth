@@ -230,6 +230,7 @@ primary(dup)
   *sp = sp[-1];
   sp++;
 
+dnl 1 2 3 -- 2 3 1
 primary(rot)
   t = sp[-1];
   sp[-1] = sp[-3];
@@ -274,6 +275,14 @@ primary(twoover, 2over)
   sp[0] = sp[-4];
   sp[1] = sp[-3];
   sp += 2;
+
+primary(twoswap, 2swap)
+  t = sp[-1];
+  sp[-1] = sp[-3];
+  sp[-3] = t;
+  t = sp[-2];
+  sp[-2] = sp[-4];
+  sp[-4] = t;
 
 dnl return stack
 
