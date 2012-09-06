@@ -129,6 +129,7 @@ int main()
       my_puts("abort: ");
       vmstate.sp = param_stack;
       vmstate.rp = return_stack;
+      vmstate.base = 10;
       (vmstate.sp++)->i = result;
       vm(&vmstate, ".");
       my_puts("\n");
