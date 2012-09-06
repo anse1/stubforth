@@ -602,10 +602,10 @@ primary(resume, ], immediate)
 secondary(semi, ;, .immediate=1,
   LIT, EXIT, COMMA, SMUDGE, SUSPEND)
 
-secondary(create,,, WORD, CONS, COMMA)
-secondary(colon, :,, LIT, &&enter, CREATE)
-secondary(``constant'',,, LIT, &&docon, CREATE, COMMA, SMUDGE, SUSPEND)
-secondary(``variable'',,, LIT, &&dovar, CREATE, COMMA, SMUDGE, SUSPEND)
+secondary(create,,, WORD, CONS, LIT, &&dovar, COMMA, SMUDGE, SUSPEND)
+secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
+secondary(``constant'',,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
+secondary(``variable'',,, CREATE, ZERO, COMMA)
 
 dnl (char *) ---
 dnl interpret or compile s
