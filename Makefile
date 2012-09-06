@@ -107,11 +107,13 @@ flash.prog : flash.bin flashload
 	stty -F $(TTY) raw
 	echo flash dup dup funlock ferase fstrap > $(TTY)
 	./flashload $< < $(TTY) > $(TTY)
+	sendbreak > $(TTY)
 
 dummy.prog : dummy.bin flashload
 	stty -F $(TTY) raw
 	echo flash dup dup funlock ferase fstrap > $(TTY)
 	./flashload $< < $(TTY) > $(TTY)
+	sendbreak > $(TTY)
 
 boot:
 	make init
@@ -134,6 +136,7 @@ boot.fprog: boot.4th flashload
 	stty -F $(TTY) raw
 	echo 0 fbblock dup dup funlock ferase fstrap > $(TTY)
 	./flashload < $(TTY) > $(TTY) $<
+	sendbreak > $(TTY)
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
