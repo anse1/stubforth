@@ -127,5 +127,8 @@ test ": foo 99 13 /mod . . ; foo" {7 8 $}
 
 test "create foo 66 ,  foo @ 2 * . ;" {132 $}
 
+send ": cst <builds , does> @ ;\n"
+test "666 cst moo moo 1+ ." {667 $}
+
 send "bye\n"
 interact

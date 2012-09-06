@@ -198,6 +198,12 @@ dovar:
   (sp++)->a = (w + 1);
   goto next;
 
+dnl push &data[1] and enter the thread at *data[0].
+dodoes:
+  (sp++)->a = w + 2;
+  w = *  (cell **) (w + 1);
+  goto enter;
+
 dnl $1 - name
 dnl $2 - value
 
@@ -552,6 +558,31 @@ dnl s is deallocated when found
      else (sp++)->i = 0;
 }
 
+secondary(tobody, >body,, CELL, ADD)
+
+dnl (void **) --- (word *)
+primary(toword, >word)
+{
+  sp[-1].a = CFA2WORD(sp[-1].a);
+}
+dnl (word *) --- (word **)
+primary(tolink, >link)
+{
+  sp[-1].a = &((word *)sp[-1].a)->link;
+}
+
+dnl (word *) --- (char **)
+primary(toname, >name)
+{
+  sp[-1].a = &((word *)sp[-1].a)->name;
+}
+
+dnl dnl (word *) --- (void **)
+dnl primary(tocode, >code)
+dnl {
+dnl   sp[-1].a = &((word *)sp[-1].a)->code;
+dnl }
+dnl 
 dnl compiler
 primary(state)
   (sp++)->i = vmstate->compiling;
@@ -606,6 +637,23 @@ secondary(create,,, WORD, CONS, LIT, &&dovar, COMMA, SMUDGE, SUSPEND)
 secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
 secondary(``constant'',,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
 secondary(``variable'',,, CREATE, ZERO, COMMA)
+
+dnl start consing a dodoes word
+secondary(builds, <builds,,
+  WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
+
+dnl a -- \ set the dodoes pointer (context->data[0])
+primary(storedoes)
+  vmstate->dictionary->data[0].a = (--sp)->a;
+
+/* compile code to store a dodoes pointer to the code that follows
+   does> and compile exit */
+
+secondary(does, does>, .immediate=1,
+  /* compile address of thread following does> */
+  LIT, LIT, COMMA, HERE, LIT, .i=2, CELLS, ADD, COMMA,
+  /* compile code to set the dodoes pointer of the current word */
+  LIT, STOREDOES, COMMA, LIT, EXIT, COMMA)
 
 dnl (char *) ---
 dnl interpret or compile s
@@ -681,25 +729,6 @@ secondary(tick, ', .immediate=1,
     WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
     STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
 )
-
-secondary(tobody, >body,, CELL, ADD)
-
-dnl (void **) --- (word *)
-primary(toword, >word)
-{
-  sp[-1].a = CFA2WORD(sp[-1].a);
-}
-dnl (word *) --- (word **)
-primary(tolink, >link)
-{
-  sp[-1].a = &((word *)sp[-1].a)->link;
-}
-
-dnl (word *) --- (char **)
-primary(toname, >name)
-{
-  sp[-1].a = &((word *)sp[-1].a)->name;
-}
 
 dnl convenience
 
