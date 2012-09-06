@@ -455,6 +455,12 @@ primary(linecomment, `\\', immediate)
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
 
+secondary(dumpstack,,,
+ DEPTH, ZBRANCH, self[8], RTO, DUMPSTACK, RFROM, DUP, DOT)
+
+secondary(dots, .s,,
+ LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
+
 dnl strings
 
 primary(word)
