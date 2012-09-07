@@ -22,6 +22,8 @@ stub4th:  stub4th.o
 
 %.size: %
 	nm -t d --size-sort --print-size $<
+	strip $<
+	ls -l $<
 
 %.c: %.c.m4 Makefile platform.m4
 	m4 -s $< > $@
