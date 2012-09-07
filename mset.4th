@@ -45,7 +45,7 @@ divp
 : save <builds
    lssa @ , radius @ , iterations @ , 
    zoom @ , ioff @ , roff @ ,
-does> dup @ lssa ! @+dup radius ! @+dup @ iterations !
+does> dup @ lssa ! @+dup radius ! @+dup iterations !
       @+dup zoom ! @+dup ioff ! @+dup roff ! ;
 
 1 fix ydim / zoom !
