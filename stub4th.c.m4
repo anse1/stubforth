@@ -786,8 +786,8 @@ start:
         cthrow(-13, undefined word);
       }
       {
-	cell mythread = { .a=BYE };
-	ip = &mythread;
+	thread(top, BYE)
+	ip = TOP;
         (sp++)->a = &w->code;
         goto execute;
       }
