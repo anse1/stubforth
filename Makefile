@@ -38,6 +38,6 @@ clean:
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
 	--regex-forth='/: *([^ ]+)/\1/' \
-	--regex-forth='/(primary|secondary|constant)\([^,]+, ([^,\)]+)/\2/' \
-	--regex-forth='/(primary|secondary|constant)\(([a-z0-9_]+)/\2/' \
+	--regex-forth='/(primary|secondary|constant|master)\([^,]+, ([^,\)]+)/\2/' \
+	--regex-forth='/(primary|secondary|constant|master)\(([a-z0-9_]+)/\2/' \
 	 *.4th *.c.m4 platform.h *.m4
