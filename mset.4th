@@ -74,3 +74,11 @@ does> dup @ lssa ! @+dup radius ! @+dup iterations !
 \ -15639236 ioff !
 \ 70 iterations !
 \ 3 fix ydim / 10000 / zoom !
+
+\ [-1.118664654, 0.303922178]
+
+\ bolt
+\ 3 fix ydim / 245 / zoom !
+\ -75072314 roff !
+\ 20395872 ioff !
+\ 35 iterations !
