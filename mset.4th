@@ -48,10 +48,13 @@ divp
 does> dup @ lssa ! @+dup radius ! @+dup iterations !
       @+dup zoom ! @+dup ioff ! @+dup roff ! ;
 
-1 fix ydim / zoom !
--1 fix 3 * 4 / roff !
-0 fix ioff !
-20 iterations !
+: new here lssa ! 4800 allot cls ;
+
+\ entire
+\ 3 fix ydim / zoom !
+\ -1 fix 3 * 4 / roff !
+\ 0 fix ioff !
+\ 16 iterations !
 
 \ 
 \ pretty
