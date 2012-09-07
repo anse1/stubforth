@@ -1,6 +1,13 @@
+variable radius
+variable iterations
+variable zoom
+variable roff
+variable ioff
 
 decimal
 : fix 26 << ; : unfix 26 >> ;
+
+4 fix radius !
 
 : fix* m* 6 << swap 26 >> 1 6 << 1 - and or ;
 : fixsq dup fix* ;
@@ -15,16 +22,9 @@ csq 2over c+ ;
 : divp ( cr ci -- n)
 0 >r 0 0 begin
 zn
-2dup zabs max_abs @ > if 2drop 2drop r> exit then
-r> 1+ dup >r max_iter @ > if 2drop 2drop r> drop 0 exit then
+2dup zabs radius @ > if 2drop 2drop r> exit then
+r> 1+ dup >r iterations @ > if 2drop 2drop r> drop 0 exit then
 again ;
-
-6 fix max_abs !
-
-variable zoom
-variable roff
-variable ioff
-1 fix ydim / zoom !
 
 : mset
 xdim 1- begin
@@ -39,24 +39,35 @@ divp
 1- dup 0= until drop
 ;
 
--79667952 roff !
-20351413 ioff !
+: cell+ cell + ;
+: @+dup cell+ dup @ ;
 
-3 fix ydim / 150 / zoom !
+: save <builds
+   lssa @ , radius @ , iterations @ , 
+   zoom @ , ioff @ , roff @ ,
+does> dup @ lssa ! @+dup radius ! @+dup @ iterations !
+      @+dup zoom ! @+dup ioff ! @+dup roff ! ;
 
-0 ioff !
--109236968 roff !
+1 fix ydim / zoom !
+-1 fix 3 * 4 / roff !
+0 fix ioff !
+20 iterations !
 
-mset
-
--39817688 roff !
--33292653 ioff !
-3 fix ydim / 4600 / zoom !
-
-mset
-
--38306646 roff !
-37746640 ioff !
-3 fix ydim / 200 / zoom !
-
-mset
+\ 
+\ pretty
+\ 60 iterations !
+\ -39817688 roff !
+\ -33292653 ioff !
+\ 3 fix ydim / 4600 / zoom !
+\  
+\ spiral
+\ 60 iterations !
+\ -38306646 roff !
+\ 37746640 ioff !
+\ 3 fix ydim / 200 / zoom !
+\
+\ underflows :-/
+\ -49353771 roff !
+\ -15639236 ioff !
+\ 70 iterations !
+\ 3 fix ydim / 10000 / zoom !
