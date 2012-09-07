@@ -265,6 +265,7 @@ void initio(void)
 {
   volatile int bogus;
   bogus = URX;
+  (void) bogus;
   IMR &= ~IMR_MUART;
   USTCNT |= USTCNT_RXRE;
   sei();
