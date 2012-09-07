@@ -69,12 +69,12 @@ does> dup @ lssa ! @+dup radius ! @+dup iterations !
 \ 37746640 ioff !
 \ 3 fix ydim / 200 / zoom !
 \
-\ underflows :-/
+\ deep
 \ -49353771 roff !
 \ -15639236 ioff !
 \ 70 iterations !
-\ 3 fix ydim / 10000 / zoom !
-
+\ 3 fix ydim / 9000 / zoom !
+\ 
 \\ bolt
 \ 3 fix ydim / 245 / zoom !
 \ -75072314 roff !
