@@ -62,19 +62,22 @@ void dumpregs()
   }
 }
 
+static void banner(const char *s)
+{
+  my_puts("\n x_x ");
+  my_puts(s);
+  my_puts(" x_x ");
+  my_puts("\n");
+}
 
 define(excepth, `
 __attribute__((interrupt_handler))
 void ivect_$1 ()
 {
-  my_puts("\n x_x ");
-  my_puts("$1");
-  my_puts(" x_x ");
-  my_puts("\n");
-
   long l;
   short s;
 
+  banner("$1");
  my_puts("function: ") ;
  asm("move.w 4(%%fp), %0" : "=r"(s));
  cprint(s);
@@ -99,14 +102,11 @@ excepth(bus_err)
 excepth(addr_err)
 
 define(defaulth, `
+
 __attribute__((interrupt_handler))
 void ivect_$1 ()
 {
-  my_puts("\n");
-  my_puts(" x_x ");
-  my_puts("$1");
-  my_puts(" x_x ");
-  my_puts("\n");
+  banner("$1");
 
   DASM("4(%%fp)");
   DASM("6(%%fp)");
