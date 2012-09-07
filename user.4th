@@ -7,7 +7,7 @@ hex
 : gcd dup if tuck mod recurse else drop then ;
 
 : c, here c! here 1+ dp ! ;
-: " here begin key dup 22 = 0= while c, repeat drop 0 c, here aligned dp ! ;
+: " here begin key dup 22 = 0= while c, repeat drop 0 c, align ;
 : ," ' branch , here 0 , " swap here swap ! ' lit , , ; immediate
 : ." ' ," execute ' type , ; immediate
 
