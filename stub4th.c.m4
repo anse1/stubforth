@@ -675,10 +675,6 @@ dnl start consing a dodoes word
 secondary(builds, <builds,,
   WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
 
-dnl a -- \ set the dodoes pointer (context->data[0])
-primary(storedoes)
-  vmstate->dictionary->data[0].a = (--sp)->a;
-
 dnl set the dodoes address to the thread following does>
 secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
 
