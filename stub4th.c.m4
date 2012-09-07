@@ -47,6 +47,8 @@ divert
 
 define(`init_union', `ifelse(`$1',,,`{ $1 } ifelse(`$2',,,`,') init_union(shift($@))') ')
 
+define(`l', `ifelse(`$#', `0', ``$0'', `patsubst(`$*', `[ ,]+', `,')')')
+
 dnl Cons a secondary word
 dnl $1 - C identifier
 dnl $2 - forth word (default: $1)
