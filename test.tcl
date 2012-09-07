@@ -139,5 +139,10 @@ test ": t 7 8 2dup . . . . ; t" {8 7 8 7 $}
 test ": t 1 2 3 4 2over . . . . . . ; t" {2 1 4 3 2 1 $}
 test ": t 1 2 3 4 2swap . . . . ; t" {2 1 4 3 $}
 
+send "abort\n" ;
+expect -re abort.*
+
+test "depth 1 2 3 666 5 .s" {#6 0 1 2 3 666 5}
+
 send "bye\n"
 interact

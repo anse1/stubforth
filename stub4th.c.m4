@@ -68,6 +68,7 @@ static word w_$1 = {
   define(`dict_head', &w_$1)
 ')
 
+dnl Cons a constant
 define(constant, `
 undivert(1)
 static word w_$1 = {
@@ -79,6 +80,14 @@ static word w_$1 = {
 
   define(`dict_head', &w_$1)
   define(translit($1,a-z,A-Z), &w_$1.code)
+')
+
+dnl Cons a headerless thread.
+define(thread, `
+define(`self', `&t_$1')
+define(translit($1,a-z,A-Z), t_$1)
+static cell t_$1[] = { init_union(shift($@)) };
+undefine(`self')
 ')
 
 dnl C helpers
@@ -458,10 +467,11 @@ primary(key)
 
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
-secondary(dot1,,,
- BASE, CLOAD, DIVMOD,
- DUP, ZBRANCH, self[9], DOT1, BRANCH, self[10], DROP,
- HEXCHARS, ADD, CLOAD, EMIT)
+
+thread(dot1,
+ &&enter, BASE, CLOAD, DIVMOD,
+ DUP, ZBRANCH, self[10], self, BRANCH, self[11], DROP,
+ HEXCHARS, ADD, CLOAD, EMIT, EXIT)
 
 secondary(dot, .,,
  DUP, ZERO, LT, ZBRANCH, self[9],
@@ -477,8 +487,8 @@ primary(linecomment, `\\', immediate)
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
 
-secondary(dumpstack,,,
- DEPTH, ZBRANCH, self[8], RTO, DUMPSTACK, RFROM, DUP, DOT)
+thread(dumpstack,
+ &&enter, DEPTH, ZBRANCH, self[9], RTO, self, RFROM, DUP, DOT, EXIT)
 
 secondary(dots, .s,,
  QSTACK, LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
@@ -776,8 +786,8 @@ start:
         cthrow(-13, undefined word);
       }
       {
-	cell thread = { .a=BYE };
-	ip = &thread;
+	thread(top, BYE)
+	ip = TOP;
         (sp++)->a = &w->code;
         goto execute;
       }
