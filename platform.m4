@@ -41,4 +41,4 @@ dnl override boot
 
 secondary(boot2, boot,,
    HI, LIT, .s="booting from block 0.\n", TYPE,
-   LIT, .a=0x9f0000, REDIRECT, STORE, QUIT)
+   LIT, .a=(void *)0x9f0000, REDIRECT, STORE, QUIT)
