@@ -31,6 +31,7 @@ struct vmstate {
   int raw : 1;
   int quiet : 1;
   int errno : 14;
+  const char *errstr;
 };
 
 #define IS_WORD(c) (c > ' ')

@@ -17,7 +17,7 @@ dnl $1 - ANS94 error code
 define(`cthrow', `
 do {
   vmstate->errno = $1;
-dnl  vmstate->errstr = ifelse(`$2',`',0,"$2");
+  vmstate->errstr = ifelse(`$2',`',0,"$2");
   return vmstate->errno;
 } while (0)')
 
@@ -129,6 +129,7 @@ int main()
     vmstate.raw = 0;
     vmstate.quiet = 0;
     vmstate.errno = 0;
+    vmstate.errstr = 0;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
@@ -143,6 +144,8 @@ int main()
       vmstate.base = 10;
       (vmstate.sp++)->i = result;
       vm(&vmstate, ".");
+      if (vmstate.errstr)
+        my_puts(vmstate.errstr);
       my_puts("\n");
     }
   }
@@ -175,7 +178,7 @@ goto start;
 primary(abort)
   vmstate->sp = sp;
   vmstate->rp = rp;
-  cthrow(-1, "ABORT");
+  cthrow(-1, abort);
 
 dnl inner interpreter
 enter:
@@ -389,7 +392,7 @@ primary(throw)
 {
    vmstate->sp = sp;
    vmstate->rp = rp;
-   cthrow(sp[-1].i, "THROW");
+   cthrow(sp[-1].i, throw);
 }
 
 dnl cfa -- i
