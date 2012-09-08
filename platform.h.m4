@@ -126,12 +126,6 @@ void ivect_$1 ()
 defaulth(illinstr)
 defaulth(zero_div)
 defaulth(default)
-defaulth(privilege)
-defaulth(spurious)
-defaulth(emu)
-defaulth(trace)
-defaulth(trap)
-defaulth(chk)
 
 struct {
   short beg;
@@ -203,12 +197,12 @@ void *vectors[] __attribute__((section(".vectors")))
    [1] = ivect_addr_err,
    [2] = ivect_illinstr,
    [3] = ivect_zero_div,
-   [4] = ivect_chk,
-   [5] = ivect_trap,
-   [6] = ivect_privilege,
-   [7] = ivect_trace,
-   [8] = ivect_emu,
-   [9] = ivect_emu,
+   [4] = ivect_default,
+   [5] = ivect_default,
+   [6] = ivect_default,
+   [7] = ivect_default,
+   [8] = ivect_default,
+   [9] = ivect_default,
   [10] = ivect_default,
   [11] = ivect_default,
   [12] = ivect_default,
@@ -221,7 +215,7 @@ void *vectors[] __attribute__((section(".vectors")))
   [19] = ivect_default,
   [20] = ivect_default,
   [21] = ivect_default,
-  [22] = ivect_spurious,
+  [22] = ivect_default,
   [23] = ivect_level1,
   [24] = ivect_level2,
   [25] = ivect_level3,
