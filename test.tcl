@@ -141,5 +141,8 @@ test "depth 1 2 3 666 5 .s" {#6 0 1 2 3 666 5}
 
 send ": w2345678 ;\n"
 test "here word w2345678 find drop drop here = ." {1 $}
+
+test "here 10 allot here swap - ." {10 $}
+
 send "bye\n"
 interact
