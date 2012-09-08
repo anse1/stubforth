@@ -99,6 +99,22 @@ static int strcmp(const char *a, const char *b) {
   return (*a == *b) ? 0 : (*a > *b) ? 1 : -1;
 }
 
+dnl increase p until it has cell alignment
+void *aligned(char *p) {
+  while ((vmint)p & (__alignof__(cell)-1))
+    p++;
+  return (cell *)p;
+}
+
+dnl pop string from stack if it is at the top
+static void try_deallocate(char *s, cell **sp) {
+  char *p = s;
+  while(*p++);
+  p = aligned(p);
+  if (*(char **)sp == p)
+     *sp = (cell *)s;
+}
+
 static void my_puts(const char *s) {
   while (*s)
     putchar(*s++);
@@ -518,16 +534,14 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
   (sp++)->s = (char *)vmstate->dp;
 
   /* fix alignment */
-  while ((typeof(t.i))s & (__alignof__(cell)-1)) s++;
-  vmstate->dp = (cell *)s;
+  vmstate->dp = aligned(s);
 }
 
 dnl ( addr -- a-addr )
 primary(aligned)
 {
   char *s = sp[-1].a;
-  while ((typeof(t.i))s & (__alignof__(cell)-1)) s++;
-  sp[-1].a = s;
+  sp[-1].a = aligned(s);
 }
 
 primary(number)
@@ -550,14 +564,14 @@ dnl On failure, abort.
       c = c - 'a' + 10;
     }
    if (c < 0 || c >= vmstate->base) {
-      vmstate->dp = (cell *)sp[-1].s; /* TODO: sanity check */
+      try_deallocate(sp[-1].s, &vmstate->dp);
       cthrow(-24, invalid numeric argument);
    }
    t.i *= vmstate->base;
    t.i += c;
    s++;
   }
-  vmstate->dp = (cell *)sp[-1].s; /* TODO: sanity check */
+  try_deallocate(sp[-1].s, &vmstate->dp);
   if (negate)
     t.i = -t.i;
   sp[-1] = t;
@@ -597,12 +611,12 @@ dnl s is deallocated when found
    word *p = find(vmstate->dictionary, key);
    if (p)
    {
-     vmstate->dp = (cell *) key; /* TODO: sanity check */
      sp--;
+     try_deallocate(sp[0].a, &vmstate->dp);
      (sp++)->a = &p->code;
      (sp++)->i = 1;
    }
-     else (sp++)->i = 0;
+   else (sp++)->i = 0;
 }
 
 dnl (void **) --- (cell *)

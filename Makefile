@@ -20,8 +20,8 @@ stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h
 stub4th:  stub4th.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
-%.size: %
-	nm -t d --size-sort --print-size $<
+%.size: % size
+	./size $<
 	strip $<
 	ls -l $<
 
