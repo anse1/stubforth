@@ -3,7 +3,6 @@ hex
 \ flash chip control
 
 : flash 800000 ;
-: c? c@ . ;
 : w? w@ . ;
 
 : fcmd flash c! ;
