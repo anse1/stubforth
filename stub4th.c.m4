@@ -586,8 +586,9 @@ primary(dp)
    (sp++)->a = &vmstate->dp;
 
 primary(allot)
-dnl n -- increase dictionary pointer
-  vmstate->dp += (--sp)->i;
+dnl n -- change dictionary pointer by n bytes
+  sp--;
+  vmstate->dp = (cell *)((char *)vmstate->dp + sp->i);
 
 primary(comma, `,')
   *vmstate->dp++ = *--sp;
