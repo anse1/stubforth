@@ -23,8 +23,8 @@ struct word {
 
 struct vmstate {
   cell *dp;
-  cell *rp;  /* only valid on entry/return of vm() */
-  cell *sp;  /* only valid on entry/return of vm() */
+  cell *rp; /* not valid during execution of a VM */
+  cell *sp; /* not valid during execution of a VM */
   struct word *dictionary;
   char base;
   int compiling : 1;
@@ -38,7 +38,7 @@ struct vmstate {
 
 #define offsetof(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
 
-#define CFA2WORD(cfa)  cfa - offsetof(word, code)
+#define CFA2WORD(cfa)  ((word *)(((char *)cfa) - offsetof(word, code)))
 
 extern struct vmstate vmstate;
 
