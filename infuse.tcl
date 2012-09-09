@@ -16,6 +16,6 @@ foreach l $lines {
 
     send -- $l
     send "\n"
-    expect -re .*abort: { error abort } -re "\n"
+    expect -re .*abort:.* { error [list $expect_out(0,string)] } -re "\n"
 
 }
