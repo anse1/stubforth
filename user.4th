@@ -76,12 +76,15 @@ dup 0= if exit then
 word hexchars find drop @ constant xtdocon
 word hi find drop @ constant xtenter
 word exit find drop @ constant xtexit
+: doesnothing <builds does> ;
+word doesnothing find drop @
+forget doesnothing
+constant xtdodoes
 
-
-\ xt word --
+\ xt &word -- \ throws 1 if found
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
 
-\ xt -- \ return 1 if xt is in the dictionary
+\ xt -- t/f \ check if xt is in the dictionary
 : xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
@@ -89,7 +92,15 @@ word exit find drop @ constant xtexit
 
 \ addr -- \ disassemble thread
 
-: disas begin dup . dup @ dup xtp if dup ." '" xttype else dup . then lf ' exit = 0= while cell + repeat ;
+\ check for end of thread
+: eotp \ &cfa -- &cfa t/f
+dup @ ' exit =
+over cell - @ ' lit =
+2 pick cell + @ xtp
+or 0= and ;
 
-: see word find 0= if abort then ." .code = " dup @ xtenter = if ." enter" lf ." .data = " disas else @ . then lf ;
+: disas
+  begin dup . dup @ dup xtp if dup xttype else dup . then lf drop eotp 0= while cell + repeat ;
+
+: see word find 0= if abort then ." .code: " dup @ xtenter = if ." enter" lf ." .data:" lf cell + disas else @ . then ;
 
