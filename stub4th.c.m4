@@ -200,6 +200,7 @@ primary(abort)
 enter:
   (rp++)->a = ip;
   ip = w + 1;
+  /* fall through */
 
 next:
   w = (ip++)->a;
@@ -660,7 +661,7 @@ primary(dostr)
   ip = aligned(s);
 }
 
-secondary(ccomma,,,
+secondary(ccomma, `c,',,
   HERE, CSTORE, HERE, PLUS1, DP, STORE)
 
 secondary(quote, `\"',,
