@@ -38,7 +38,7 @@ struct vmstate {
 
 #define offsetof(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
 
-#define CFA2WORD(cfa)  cfa - offsetof(word, code)
+#define CFA2WORD(cfa)  ((word *)(cfa - offsetof(word, code)))
 
 extern struct vmstate vmstate;
 
