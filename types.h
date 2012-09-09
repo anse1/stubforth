@@ -13,7 +13,7 @@ typedef union cell cell;
 
 struct word {
   const char *name;
-  int compile_only : 1;
+  int compile_only : 1; /* Not verified */
   int immediate : 1;
   int smudge : 1;
   struct word *link;
@@ -22,15 +22,20 @@ struct word {
 };
 
 struct vmstate {
-  cell *dp;
-  cell *rp; /* not valid during execution of a VM */
-  cell *sp; /* not valid during execution of a VM */
+  cell *dp; /* Points above top of data stack. */
+  cell *rp; /* Invalid during execution of a VM. */
+  cell *sp; /* Invalid during execution of a VM. */
   struct word *dictionary;
-  char base;
-  int compiling : 1;
-  int raw : 1;
-  int quiet : 1;
-  int errno : 14;
+  char base; /* This ought to be cell-sized according to standards. */
+  int errno : 14; /* Set when vm() returns because of a THROW */
+
+  int compiling : 1; /* Used by state-aware words INTERPRET and TICK */
+
+  /* I/O configuration */
+  int raw : 1;  /* Avoid translating lf to crlf, etc.  Set this if you
+		   want to process binary data. */
+  int quiet : 1; /* Don't echo incoming characters as they are
+		    consumed by the VM. */
   const char *errstr;
 };
 
