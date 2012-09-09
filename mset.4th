@@ -50,63 +50,62 @@ does> dup @ lssa ! @+dup radius ! @+dup iterations !
 
 : new here lssa ! 4800 allot cls ;
 
-\ entire
-\ 3 fix ydim / zoom !
-\ -1 fix 3 * 4 / roff !
-\ 0 fix ioff !
-\ 16 iterations !
+3 fix ydim / zoom !
+-1 fix 3 * 4 / roff !
+0 fix ioff !
+16 iterations !
+save entire
 
-\ 
-\\ pretty
-\ 60 iterations !
-\ -39817688 roff !
-\ -33292653 ioff !
-\ 3 fix ydim / 4600 / zoom !
-\  
-\\ spiral
-\ 60 iterations !
-\ -38306646 roff !
-\ 37746640 ioff !
-\ 3 fix ydim / 200 / zoom !
-\
-\ deep
-\ -49353771 roff !
-\ -15639236 ioff !
-\ 70 iterations !
-\ 3 fix ydim / 9000 / zoom !
-\ 
-\ \ bolt
-\ 3 fix ydim / 245 / zoom !
-\ -75072314 roff !
-\ 20395872 ioff !
-\ 35 iterations !
+60 iterations !
+-39817688 roff !
+-33292653 ioff !
+3 fix ydim / 4600 / zoom !
+save pretty
 
-\ \ dragon
-\ -55606285 roff !
-\ 14428028 ioff !
-\ 3 fix ydim / 2000 / zoom !
-\ 60 iterations !
+60 iterations !
+-38306646 roff !
+37746640 ioff !
+3 fix ydim / 200 / zoom !
+save spiral
 
-\ \ horses
-\ -50162660 roff !
-\ -9096344 ioff !
-\ 3 fix ydim / 700 / zoom !
-\ 100 iterations !
-\ 
-\ \ antenna
-\ 27787769 roff !
-\ 14156046 ioff !
-\ 3 fix ydim / 600 / zoom !
-\ 100 iterations !
-\ 
-\ \ tail
-\ -50013170 roff !
-\ -7587480 ioff !
-\ 3 fix ydim / 9500 / zoom !
-\ 160 iterations !
-\ 
-\ \ spots
-\ -17343002 roff !
-\ 44280635 ioff !
-\ 3 fix ydim / 3000 / zoom !
-\ 100 iterations !
+-49353771 roff !
+-15639236 ioff !
+70 iterations !
+3 fix ydim / 9000 / zoom !
+save deep
+
+3 fix ydim / 245 / zoom !
+-75072314 roff !
+20395872 ioff !
+35 iterations !
+save bolt
+
+-55606285 roff !
+14428028 ioff !
+3 fix ydim / 2000 / zoom !
+60 iterations !
+save dragon
+
+-50162660 roff !
+-9096344 ioff !
+3 fix ydim / 700 / zoom !
+100 iterations !
+save horses
+
+27787769 roff !
+14156046 ioff !
+3 fix ydim / 600 / zoom !
+100 iterations !
+save antenna
+
+-50013170 roff !
+-7587480 ioff !
+3 fix ydim / 9500 / zoom !
+160 iterations !
+save tail
+
+-17343002 roff !
+44280635 ioff !
+3 fix ydim / 3000 / zoom !
+100 iterations !
+save spots
