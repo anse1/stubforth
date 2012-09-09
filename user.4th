@@ -6,12 +6,6 @@ hex
 : tuck swap over ;
 : gcd dup if tuck mod recurse else drop then ;
 
-\ : c, here c! here 1+ dp ! ;
-\ : align here aligned dp ! ;
-\ : " here begin key dup 22 = 0= while c, repeat drop 0 c, align ;
-\ : ," ' branch , here 0 , " swap here swap ! ' lit , , ; immediate
-\ : ." ' ," execute ' type , ; immediate
-
 : strlen ( s -- n )
 dup
 begin dup c@ while 1+ repeat
@@ -76,7 +70,8 @@ dup 0= if exit then
 word hexchars find drop @ constant xtdocon
 word hi find drop @ constant xtenter
 
-: doesnothing <builds does> ;
+: buildsnothing <builds does> ;
+buildsnothing doesnothing
 word doesnothing find drop @
 forget doesnothing
 constant xtdodoes
@@ -93,7 +88,7 @@ constant xtdovar
 : xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: dumpdict begin dup >code xttype lf >link @ dup 0= until ;
+: vlist begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
@@ -134,7 +129,19 @@ or 0= and ;
   else
     cell +
   then
-repeat ;
+repeat drop ;
 
-: see word find 0= if abort then ." .code: " dup @ xtenter = if dup @ .pretty lf ." .data:" lf cell + disas else @ . then ;
-
+: see
+  word find 0= if -13 throw then
+  ." .code: " dup @ .pretty lf
+  ." .data: "
+  dup cell +
+  over @ case
+    xtenter of lf disas endof
+    xtdocon of @ .pretty lf endof
+    xtdovar of @ .pretty lf endof
+    xtdodoes of ." does>" lf @ disas endof
+    drop lf
+  endcase
+  drop
+; 
