@@ -147,5 +147,7 @@ test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy d
 
 test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
+test {: t 1 if ." moo" else ." bar" then ; t} {moo$}
+
 send "bye\n"
 interact

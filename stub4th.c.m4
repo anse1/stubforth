@@ -669,7 +669,7 @@ secondary(quote, `\"',,
   DROP, ZERO, CCOMMA)
 
 secondary(commaquote, `,\"', .immediate=1,
-   LIT, DOSTR, COMMA, QUOTE, ALIGN)
+   LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
 secondary(dotquote, `.\"', .immediate=1,
    COMMAQUOTE, LIT, TYPE, COMMA)
