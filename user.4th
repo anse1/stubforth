@@ -72,3 +72,23 @@ dup 0= if exit then
 ."  " dump8 ." 
 " repeat ." 
 " ;
+
+word hexchars find drop @ constant xtdocon
+word hi find drop @ constant xtenter
+word exit find drop @ constant xtexit
+
+
+\ xt word --
+: xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
+
+\ xt -- \ return 1 if xt is in the dictionary
+: xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
+
+: xttype >word >name @ type bl ;
+: dumpdict begin dup >code xttype lf >link @ dup 0= until ;
+
+\ addr -- \ disassemble thread
+
+: disas begin dup @ dup xtp if dup xttype else dup . then ' exit = 0= while cell + repeat ;
+
+: see word find 0= if abort then ." .code = " dup @ xtenter = if ." enter" lf ." .data = " disas else @ . then lf ;
