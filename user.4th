@@ -75,11 +75,16 @@ dup 0= if exit then
 
 word hexchars find drop @ constant xtdocon
 word hi find drop @ constant xtenter
-word exit find drop @ constant xtexit
+
 : doesnothing <builds does> ;
 word doesnothing find drop @
 forget doesnothing
 constant xtdodoes
+
+variable somevar
+word somevar find drop @
+forget somevar
+constant xtdovar
 
 \ xt &word -- \ throws 1 if found
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
@@ -99,8 +104,22 @@ over cell - @ ' lit =
 2 pick cell + @ xtp
 or 0= and ;
 
+\ pretty print a cell value
+: .pretty ( cell -- )
+  dup xtp if
+    xttype
+  else
+    case
+      xtenter of ." &&enter" endof
+      xtdocon of ." &&docon" endof
+      xtdodoes of ." &&dodoes" endof
+      xtdovar of ." &&dovar" endof
+      r .
+    endcase
+  then
+;
+
 : disas
-  begin dup . dup @ dup xtp if dup xttype else dup . then lf drop eotp 0= while cell + repeat ;
+  begin dup . dup @ .pretty lf eotp 0= while cell + repeat ;
 
-: see word find 0= if abort then ." .code: " dup @ xtenter = if ." enter" lf ." .data:" lf cell + disas else @ . then ;
-
+: see word find 0= if abort then ." .code: " dup @ xtenter = if dup @ .pretty lf ." .data:" lf cell + disas else @ . then ;
