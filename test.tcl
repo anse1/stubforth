@@ -141,5 +141,11 @@ test "depth 1 2 3 666 5 .s" {#6 0 1 2 3 666 5}
 
 send ": w2345678 ;\n"
 test "here word w2345678 find drop drop here = ." {1 $}
+
+test {" fox" " quick brown " type type} {quick brown fox$}
+test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy dog$}
+
+test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
+
 send "bye\n"
 interact
