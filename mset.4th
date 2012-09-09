@@ -48,7 +48,7 @@ divp
 does> dup @ lssa ! @+dup radius ! @+dup iterations !
       @+dup zoom ! @+dup ioff ! @+dup roff ! ;
 
-: new here lssa ! 1200 allot cls ;
+: new here lssa ! 4800 allot cls ;
 
 \ entire
 \ 3 fix ydim / zoom !
