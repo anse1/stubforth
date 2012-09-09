@@ -1,5 +1,3 @@
-decimal
-: \ begin key 10 = until ;
 \ non-platform-specific forth code
 
 hex
