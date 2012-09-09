@@ -3,3 +3,10 @@
    "boot" will be looked up by name on boot, so it is possible to
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
+
+primary(sync)
+{
+  v->head = vmstate->dictionary;
+  v->dp = vmstate->dp;
+}
+

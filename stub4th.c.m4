@@ -2,12 +2,16 @@ changecom(/*,*/)
 #include "platform.h"
 #include "types.h"
 #include "config.h"
+#include <sys/mman.h>
+#include <fcntl.h>
 
 cell return_stack[1000];
 cell param_stack[1000];
-cell dictionary_stack[1000];
 
 struct vmstate vmstate;
+
+int dataspace_fd;
+struct vocabulary *v;
 
 dnl m4 definitions
 
@@ -131,19 +135,47 @@ static word *find(word *p, const char *key)
 }
 
 dnl main
-int main()
+int main(int argc, char *argv[])
 {
   int result;
-
+  static int fd, flags;
   initio();
 
-  if(!vmstate.dp)
-      vmstate.dp = dictionary_stack;
+  if (argc > 1) {
+     fd = open(argv[1], O_RDWR);
+     if (fd < 0) {
+       perror("opening dataspace read-write");
+       fd = open(argv[1], O_RDONLY);
+       if (fd < 0) {
+         perror("opening dataspace read-only");
+         flags = MAP_ANONYMOUS;
+       }
+       flags |= MAP_PRIVATE;
+     } else {
+       flags = MAP_SHARED;
+     }
+  } else {
+    flags = MAP_ANONYMOUS | MAP_PRIVATE;
+    fd = -1;
+  }
+
+  v = mmap((void *)0x100000000ULL, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|flags, fd, 0);
+  if (v == MAP_FAILED) {
+    perror("mmap");
+    return -1;
+  } else {
+    printf("dataspace mapped %s.\n",
+     (flags&MAP_SHARED) ? "read-write" : "copy-on-write");
+  }
+
+  vmstate.dp = v->dp ? v->dp :(cell *) (v + 1);
+  vmstate.dictionary = v->head;
 
   while(1) {
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
+    vmstate.base = 10;
     vmstate.errno = 0;
     vmstate.errstr = 0;
     vmstate.sp = param_stack;
@@ -151,8 +183,11 @@ int main()
 
     result = vm(&vmstate, vmstate.dictionary ? "quit" : "boot");
 
-    if (!result)
+    if (!result) {
+       v->dp = vmstate.dp;
+       v->head = vmstate.dictionary;
        return 0;
+    }
     else {
       my_puts("abort: ");
       vmstate.sp = param_stack;

@@ -20,6 +20,7 @@ struct word {
   void *code;
   cell data[];
 };
+typedef struct word word;
 
 struct vmstate {
   cell *dp;
@@ -34,6 +35,11 @@ struct vmstate {
   const char *errstr;
 };
 
+struct vocabulary {
+  cell *dp;
+  word *head;
+};
+
 #define IS_WORD(c) (c > ' ')
 
 #define offsetof(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
@@ -41,8 +47,6 @@ struct vmstate {
 #define CFA2WORD(cfa)  cfa - offsetof(word, code)
 
 extern struct vmstate vmstate;
-
-typedef struct word word;
 
 int vm(struct vmstate *vmstate, const char *startword);
 
