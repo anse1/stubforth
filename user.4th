@@ -119,8 +119,22 @@ or 0= and ;
   then
 ;
 
+: ,key ' lit , key , ; immediate
+
 : disas
-  begin dup . dup @ .pretty lf eotp 0= while cell + repeat ;
+  begin dup . dup @ .pretty lf eotp 0= while
+  dup @ ' dostr = if
+    cell +
+    dup .
+    ,key " emit
+    dup type
+    ,key " emit
+    lf
+    dup strlen + 1+ aligned
+  else
+    cell +
+  then
+repeat ;
 
 : see word find 0= if abort then ." .code: " dup @ xtenter = if dup @ .pretty lf ." .data:" lf cell + disas else @ . then ;
 
