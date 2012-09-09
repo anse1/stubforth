@@ -89,6 +89,7 @@ word exit find drop @ constant xtexit
 
 \ addr -- \ disassemble thread
 
-: disas begin dup @ dup xtp if dup xttype else dup . then ' exit = 0= while cell + repeat ;
+: disas begin dup . dup @ dup xtp if dup ." '" xttype else dup . then lf ' exit = 0= while cell + repeat ;
 
 : see word find 0= if abort then ." .code = " dup @ xtenter = if ." enter" lf ." .data = " disas else @ . then lf ;
+
