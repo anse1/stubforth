@@ -114,7 +114,7 @@ or 0= and ;
       xtdocon of ." &&docon" endof
       xtdodoes of ." &&dodoes" endof
       xtdovar of ." &&dovar" endof
-      r .
+      ." .i = " r .
     endcase
   then
 ;
