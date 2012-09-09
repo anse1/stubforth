@@ -60,7 +60,7 @@ undivert(1)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
-  .name = "ifelse($2,`',`$1',`$2')",
+  .name = "ifelse(`$2',`',`$1',`$2')",
   .link = dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
@@ -514,69 +514,6 @@ thread(dumpstack,
 secondary(dots, .s,,
  QSTACK, LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
 
-dnl strings
-
-primary(word)
-dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
-{
-   int c;
-   char *s = (char *)vmstate->dp;
-   do {
-      c = getchar();
-      if (c < 0) return 0;
-   } while (!IS_WORD(c));
-   do {
-      if (c < 0) return 0;
-      *s++ = c;
-      c = getchar();
-   } while (IS_WORD(c));
-  *s++ = 0;
-  (sp++)->s = (char *)vmstate->dp;
-
-  /* fix alignment */
-  vmstate->dp = aligned(s);
-}
-
-dnl ( addr -- a-addr )
-primary(aligned)
-{
-  char *s = sp[-1].a;
-  sp[-1].a = aligned(s);
-}
-
-primary(number)
-dnl ( s -- n )
-dnl Convert string to number according to base variable.
-dnl On failure, abort.
-{
-  t.i = 0;
-  char *s = sp[-1].s;
-  int c;
-  int negate = 0;
-  while ((c = *s)) {
-   if (c == '-')
-      { negate ^= 1; s++; continue; }
-   else if (c <= '9')
-      c -= '0';
-   else
-    {
-      c |= 1 << 5; /* upcase */
-      c = c - 'a' + 10;
-    }
-   if (c < 0 || c >= vmstate->base) {
-      try_deallocate(sp[-1].s, &vmstate->dp);
-      cthrow(-24, invalid numeric argument);
-   }
-   t.i *= vmstate->base;
-   t.i += c;
-   s++;
-  }
-  try_deallocate(sp[-1].s, &vmstate->dp);
-  if (negate)
-    t.i = -t.i;
-  sp[-1] = t;
-}
-
 dnl dictionary
 
 primary(context)
@@ -644,6 +581,98 @@ primary(tocode, >code)
 {
   sp[-1].a = &((word *)sp[-1].a)->code;
 }
+
+dnl strings
+
+primary(word)
+dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
+{
+   int c;
+   char *s = (char *)vmstate->dp;
+   do {
+      c = getchar();
+      if (c < 0) return 0;
+   } while (!IS_WORD(c));
+   do {
+      if (c < 0) return 0;
+      *s++ = c;
+      c = getchar();
+   } while (IS_WORD(c));
+  *s++ = 0;
+  (sp++)->s = (char *)vmstate->dp;
+
+  /* fix alignment */
+  vmstate->dp = aligned(s);
+}
+
+dnl ( addr -- a-addr )
+primary(aligned)
+{
+  char *s = sp[-1].a;
+  sp[-1].a = aligned(s);
+}
+
+dnl ( addr -- a-addr )
+primary(align)
+{
+  vmstate->dp = aligned((char *)vmstate->dp);
+}
+
+primary(number)
+dnl ( s -- n )
+dnl Convert string to number according to base variable.
+dnl On failure, abort.
+{
+  t.i = 0;
+  char *s = sp[-1].s;
+  int c;
+  int negate = 0;
+  while ((c = *s)) {
+   if (c == '-')
+      { negate ^= 1; s++; continue; }
+   else if (c <= '9')
+      c -= '0';
+   else
+    {
+      c |= 1 << 5; /* upcase */
+      c = c - 'a' + 10;
+    }
+   if (c < 0 || c >= vmstate->base) {
+      try_deallocate(sp[-1].s, &vmstate->dp);
+      cthrow(-24, invalid numeric argument);
+   }
+   t.i *= vmstate->base;
+   t.i += c;
+   s++;
+  }
+  try_deallocate(sp[-1].s, &vmstate->dp);
+  if (negate)
+    t.i = -t.i;
+  sp[-1] = t;
+}
+
+primary(dostr)
+{
+  char *s = (void *)ip;
+  (sp++)->s = s;
+  while(*s++)
+    ;
+  ip = aligned(s);
+}
+
+secondary(ccomma,,,
+  HERE, CSTORE, HERE, PLUS1, DP, STORE)
+
+secondary(quote, `\"',,
+  HERE,
+  KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
+  DROP, ZERO, CCOMMA)
+
+secondary(commaquote, `,\"', .immediate=1,
+   LIT, DOSTR, COMMA, QUOTE, ALIGN)
+
+secondary(dotquote, `.\"', .immediate=1,
+   COMMAQUOTE, LIT, TYPE, COMMA)
 
 dnl compiler
 primary(state)
