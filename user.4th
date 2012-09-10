@@ -20,15 +20,6 @@ swap - ;
  word find 0= if abort then
  >word dup  >link @ context ! >name @ dp ! ;
 
-: dump ( addr n -- )
-over + swap
-( endaddr addr )
-begin
-dup c@ emit
-1 + 2dup <
-until
-lf ;
-
 \ bit flipping
 
 : flip ( c a -- ) 
@@ -43,8 +34,6 @@ hex
 : ehex
   dup 4 >> f and hexchars + c@ emit
   f and hexchars + c@ emit ;
-
-: bl 20 emit ;
 
 : dumpaddr ( addr n -- )
 over cell begin 1-
