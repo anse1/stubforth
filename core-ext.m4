@@ -1,6 +1,9 @@
 primary(pick)
   sp[-1] = sp[-2 - sp[-1].i];
 
+dnl ( a -- )
+secondary(again,, .immediate=1, LIT, BRANCH, COMMA, COMMA)
+
 dnl -- 0
 secondary(case,, .immediate=1,
  ZERO, LIT, RTO, COMMA)

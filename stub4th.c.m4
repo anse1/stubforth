@@ -745,8 +745,6 @@ secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 dnl ( -- a )
 secondary(begin,, .immediate=1, HERE)
 dnl ( a -- )
-secondary(again,, .immediate=1, LIT, BRANCH, COMMA, COMMA)
-dnl ( a -- )
 secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
