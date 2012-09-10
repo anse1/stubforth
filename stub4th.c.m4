@@ -124,7 +124,7 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
-static word *find(word *p, const char *key)
+word *find(word *p, const char *key)
 {
    while(p) {
       if(! p->smudge && (0 == strcmp(p->name, key)))

@@ -153,11 +153,13 @@ static void uart_interrupt()
 void forth_handler(const char *word)
 {
   struct vmstate irqstate = vmstate;
+  struct word *w = find(vmstate.dictionary, word);
+  if (!w) return;
   cell ps[100];
   cell rs[100];
   irqstate.rp = rs;
   irqstate.sp = ps;
-  vm(&irqstate, word);
+  vm(&irqstate, &w->code);
 }
 
 __attribute__((interrupt_handler))
