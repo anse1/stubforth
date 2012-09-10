@@ -16,6 +16,13 @@ decimal
 over fixsq over fixsq - >r
 fix* 1 << r> swap ;
 
+: zabs ( r i -- n )
+dup 0 < if negate then swap
+dup 0 < if negate then + ;
+
+: c+ ( r i r i -- r i )
+swap >r + swap r> + swap ;
+
 : zn ( cr ci zr zi )
 csq 2over c+ ;
 
