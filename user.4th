@@ -88,7 +88,7 @@ constant &&dovar
 : xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: words context @ vlist begin dup >code xttype lf >link @ dup 0= until ;
+: words context @ begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
