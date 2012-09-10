@@ -32,6 +32,3 @@ secondary(endcase,, .immediate=1, l(
  DROP
  LIT RFROM COMMA LIT DROP COMMA
 ))
-
-dnl ( a -- )
-secondary(again,, .immediate=1, LIT, BRANCH, COMMA, COMMA)
