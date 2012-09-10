@@ -30,8 +30,6 @@ _start:
  	moveb #0x18,   0xFFFFF300 /* ivr */
  	moveb #0x1C,  	0xfffff000 /* orig, SCR */
 
-/*	moveb #0x7B,   0xFFFFF42B /* pbpuen */
-
 	moveb #'M',   0xFFFFF907
 
 	jsr uwait
