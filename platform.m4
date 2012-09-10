@@ -26,11 +26,11 @@ primary(srstore, sr!)
 }
 
 primary(wstore, w!)
-  *(short *)sp[-1].s = sp[-2].i;
+  *(short *)(void *)sp[-1].s = sp[-2].i;
   sp -= 2;
 
 primary(wload, w@)
-  sp[-1].i = *(short *)sp[-1].s;
+  sp[-1].i = *(short *)(void *)sp[-1].s;
 
 primary(stop)
 asm("stop #0x2000");
