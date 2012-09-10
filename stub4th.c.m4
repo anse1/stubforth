@@ -85,6 +85,8 @@ static word w_$1 = {
 ')
 
 dnl Cons a headerless thread.
+dnl $1 - C identifier
+dnl $2... - cell data
 define(thread, `
 define(`self', `&t_$1')
 define(translit($1,a-z,A-Z), t_$1)
