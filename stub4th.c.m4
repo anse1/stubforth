@@ -256,6 +256,12 @@ primary(dup)
   *sp = sp[-1];
   sp++;
 
+primary(qdup, ?dup)
+if (sp[-1].i) {
+    *sp = sp[-1];
+    sp++;
+}
+
 dnl 1 2 3 -- 2 3 1
 primary(rot)
   t = sp[-1];
