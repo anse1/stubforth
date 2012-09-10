@@ -9,6 +9,8 @@ cell dictionary_stack[10000];
 
 struct vmstate vmstate;
 
+word *forth;
+
 dnl m4 definitions
 
 define(dict_head, 0);
@@ -139,8 +141,10 @@ int main()
 
   initio();
 
-  if(!vmstate.dp)
+  if(!vmstate.dp) {
       vmstate.dp = dictionary_stack;
+      vmstate.dictionary = forth;
+  }
 
   while(1) {
     vmstate.compiling = 0;
@@ -152,7 +156,7 @@ int main()
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, vmstate.dictionary ? "quit" : "boot");
+    result = vm(&vmstate, &find(forth, "quit")->code);
 
     if (!result)
        return 0;
@@ -162,7 +166,7 @@ int main()
       vmstate.rp = return_stack;
       vmstate.base = 10;
       (vmstate.sp++)->i = result;
-      vm(&vmstate, ".");
+      vm(&vmstate, &find(forth, ".")->code);
       if (vmstate.errstr)
         my_puts(vmstate.errstr);
       my_puts("\n");
@@ -178,12 +182,15 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-int vm(struct vmstate *vmstate, const char *startword)
+int vm(struct vmstate *vmstate, void **xt)
 {
 
   /* The VM registers */
   cell *ip, *sp, *rp, *w;
   cell t;
+
+  if (!vmstate)
+     goto init;
 
   /* remember the initial values so we can detect underflow */
   cell *sp_base, *rp_base, *dp_base;
@@ -244,9 +251,6 @@ primary(spload, sp@)
   sp->a = sp-1;
   sp++;
 
-primary(pick)
-  sp[-1] = sp[-2 - sp[-1].i];
-
 primary(drop)
   sp--;
 
@@ -258,6 +262,12 @@ primary(swap)
 primary(dup)
   *sp = sp[-1];
   sp++;
+
+primary(qdup, ?dup)
+if (sp[-1].i) {
+    *sp = sp[-1];
+    sp++;
+}
 
 dnl 1 2 3 -- 2 3 1
 primary(rot)
@@ -413,13 +423,13 @@ primary(throw)
 dnl cfa -- i
 primary(catch)
 {
-  word *w2 = CFA2WORD(sp[-1].a);
+  void **xt = sp[-1].a;
   int result;
   struct vmstate new = *vmstate;
   sp--;
   new.sp = sp;
   new.rp = rp;
-  result = vm(&new, w2->name);
+  result = vm(&new, xt);
   if (!result) {
      /* local return, adopt state of the child VM */
      *vmstate = new;
@@ -508,12 +518,6 @@ primary(linecomment, `\\', immediate)
 
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
-
-thread(dumpstack,
- &&enter, DEPTH, ZBRANCH, self[9], RTO, self, RFROM, DUP, DOT, EXIT)
-
-secondary(dots, .s,,
- QSTACK, LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
 
 dnl dictionary
 
@@ -754,8 +758,6 @@ secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 dnl ( -- a )
 secondary(begin,, .immediate=1, HERE)
 dnl ( a -- )
-secondary(again,, .immediate=1, LIT, BRANCH, COMMA, COMMA)
-dnl ( a -- )
 secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
@@ -787,35 +789,6 @@ secondary(then,, .immediate=1,
  HERE, SWAP, STORE
 )
 
-dnl -- 0
-secondary(case,, .immediate=1,
- ZERO, LIT, RTO, COMMA)
-
-dnl n -- ofpad n+1
-secondary(of,, .immediate=1, l(
- PLUS1
- LIT R COMMA LIT EQ COMMA LIT ZBRANCH COMMA
- HERE SWAP LIT ZERO COMMA
-))
-
-dnl ofpad n -- endofpad n
-secondary(endof,, .immediate=1, l(
- RTO
- LIT BRANCH COMMA HERE LIT ZERO COMMA
- SWAP HERE SWAP STORE
- RFROM
-))
-
-dnl pad1 ... padn n --
-secondary(endcase,, .immediate=1, l(
- DUP ZBRANCH self[10]
-  MINUS1 SWAP
-  HERE SWAP STORE
- BRANCH self[0]
- DROP
- LIT RFROM COMMA LIT DROP COMMA
-))
-
 secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
 
 secondary(boot,,, HI, QUIT)
@@ -837,11 +810,20 @@ primary(quiet)
  vmstate->quiet = 1;
 
 secondary(tick, ', .immediate=1,
-    WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
-    STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
+    WORD, FIND, NULLP, ZBRANCH, self[7], .i=-13, THROW,
+    STATE, NULLP, ZBRANCH, self[12], EXIT, LIT, LIT, COMMA, COMMA
 )
 
+secondary(postpone,, .immediate=1, l(
+   WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW
+   IMMEDIATEP ZBRANCH self[13] COMMA EXIT
+   LIT LIT COMMA COMMA LIT COMMA COMMA
+))
 dnl convenience
+
+dnl non-core
+include(core-ext.m4)
+include(tools.m4)
 
 dnl platform
 
@@ -855,22 +837,23 @@ start:
     if (!vmstate->dictionary) {
 	vmstate->dictionary = dict_head;
     }
-    {
-      word *w = find(vmstate->dictionary, startword);
-      if (!w) {
-        putchar('"');
-        my_puts(startword);
-	my_puts("\" ");
-        cthrow(-13, undefined word);
-      }
-      {
-	thread(top, BYE)
-	ip = TOP;
-        (sp++)->a = &w->code;
-        goto execute;
-      }
-    }
+    thread(top, BYE)
+    ip = TOP;
+    (sp++)->a = xt;
+    goto execute;
+
+init:
+  forth = dict_head;
+  return 0;
 }
+
+__attribute__((constructor))
+void stub4th_init ()
+{
+   /* Initialize forth with the static list head. */
+   vm(0,0);
+}
+
 /*
 Local Variables:
 mode: m4

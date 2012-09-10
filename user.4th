@@ -67,19 +67,19 @@ dup 0= if exit then
 " repeat ." 
 " ;
 
-word hexchars find drop @ constant xtdocon
-word hi find drop @ constant xtenter
+word hexchars find drop @ constant &&docon
+word hi find drop @ constant &&enter
 
 : buildsnothing <builds does> ;
 buildsnothing doesnothing
 word doesnothing find drop @
 forget doesnothing
-constant xtdodoes
+constant &&dodoes
 
 variable somevar
 word somevar find drop @
 forget somevar
-constant xtdovar
+constant &&dovar
 
 \ xt &word -- \ throws 1 if found
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
@@ -105,10 +105,10 @@ or 0= and ;
     xttype
   else
     case
-      xtenter of ." &&enter" endof
-      xtdocon of ." &&docon" endof
-      xtdodoes of ." &&dodoes" endof
-      xtdovar of ." &&dovar" endof
+      &&enter of ." &&enter" endof
+      &&docon of ." &&docon" endof
+      &&dodoes of ." &&dodoes" endof
+      &&dovar of ." &&dovar" endof
       ." .i = " r .
     endcase
   then
@@ -137,11 +137,22 @@ repeat drop ;
   ." .data: "
   dup cell +
   over @ case
-    xtenter of lf disas endof
-    xtdocon of @ .pretty lf endof
-    xtdovar of @ .pretty lf endof
-    xtdodoes of ." does>" lf @ disas endof
+    &&enter of lf disas endof
+    &&docon of @ .pretty lf endof
+    &&dovar of @ .pretty lf endof
+    &&dodoes of ." does>" lf @ disas endof
     drop lf
   endcase
   drop
 ; 
+
+\ inline catching of exceptions
+
+: try ( -- pad xt )
+  postpone ahead here &&enter , ; immediate
+
+: catch> ( pad xt -- pad )
+  postpone exit swap postpone then
+  postpone lit , postpone catch postpone ?dup  postpone if ; immediate
+
+: endtry ( pad -- ) postpone then ; immediate

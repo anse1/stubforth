@@ -14,5 +14,6 @@ stub4th
 *.brec
 *.elf
 flashload
-core*
 boot.4th
+core
+core.*
