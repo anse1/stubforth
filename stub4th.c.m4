@@ -502,7 +502,7 @@ constant(hexchars, .s="0123456789abcdefghijklmnopqrstuvwxyz")
 
 thread(dot1,
  &&enter, BASE, CLOAD, DIVMOD,
- DUP, ZBRANCH, self[10], self, BRANCH, self[11], DROP,
+ QDUP, ZBRANCH, self[8], self,
  HEXCHARS, ADD, CLOAD, EMIT, EXIT)
 
 secondary(dot, .,,
