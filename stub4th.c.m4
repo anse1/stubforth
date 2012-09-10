@@ -10,8 +10,11 @@ cell param_stack[1000];
 
 struct vmstate vmstate;
 
+word *forth;
+
 int dataspace_fd;
 struct vocabulary *v;
+
 
 dnl m4 definitions
 
@@ -89,6 +92,8 @@ static word w_$1 = {
 ')
 
 dnl Cons a headerless thread.
+dnl $1 - C identifier
+dnl $2... - cell data
 define(thread, `
 define(`self', `&t_$1')
 define(translit($1,a-z,A-Z), t_$1)
@@ -171,17 +176,22 @@ int main(int argc, char *argv[])
   vmstate.dp = v->dp ? v->dp :(cell *) (v + 1);
   vmstate.dictionary = v->head;
 
+  if(!vmstate.dictionary) {
+      vmstate.dictionary = forth;
+  }
+
   while(1) {
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
     vmstate.base = 10;
     vmstate.errno = 0;
+    vmstate.base = 10;
     vmstate.errstr = 0;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, vmstate.dictionary ? "quit" : "boot");
+    result = vm(&vmstate, &find(forth, "quit")->code);
 
     if (!result) {
        v->dp = vmstate.dp;
@@ -194,7 +204,7 @@ int main(int argc, char *argv[])
       vmstate.rp = return_stack;
       vmstate.base = 10;
       (vmstate.sp++)->i = result;
-      vm(&vmstate, ".");
+      vm(&vmstate, &find(forth, ".")->code);
       if (vmstate.errstr)
         my_puts(vmstate.errstr);
       my_puts("\n");
@@ -210,12 +220,15 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-int vm(struct vmstate *vmstate, const char *startword)
+int vm(struct vmstate *vmstate, void **xt)
 {
 
   /* The VM registers */
   cell *ip, *sp, *rp, *w;
   cell t;
+
+  if (!vmstate)
+     goto init;
 
   /* remember the initial values so we can detect underflow */
   cell *sp_base, *rp_base, *dp_base;
@@ -235,6 +248,7 @@ primary(abort)
 enter:
   (rp++)->a = ip;
   ip = w + 1;
+  /* fall through */
 
 next:
   w = (ip++)->a;
@@ -269,19 +283,11 @@ dodoes:
   w = *(cell **)(w + 1) - 1;
   goto enter;
 
-dnl $1 - name
-dnl $2 - value
-
-constant(hexchars, .s="0123456789abcdefghijklmnopqrstuvwxyz")
-
 dnl stack manipulation
 
 primary(spload, sp@)
   sp->a = sp-1;
   sp++;
-
-primary(pick)
-  sp[-1] = sp[-2 - sp[-1].i];
 
 primary(drop)
   sp--;
@@ -294,6 +300,12 @@ primary(swap)
 primary(dup)
   *sp = sp[-1];
   sp++;
+
+primary(qdup, ?dup)
+if (sp[-1].i) {
+    *sp = sp[-1];
+    sp++;
+}
 
 dnl 1 2 3 -- 2 3 1
 primary(rot)
@@ -449,13 +461,13 @@ primary(throw)
 dnl cfa -- i
 primary(catch)
 {
-  word *w2 = CFA2WORD(sp[-1].a);
+  void **xt = sp[-1].a;
   int result;
   struct vmstate new = *vmstate;
   sp--;
   new.sp = sp;
   new.rp = rp;
-  result = vm(&new, w2->name);
+  result = vm(&new, xt);
   if (!result) {
      /* local return, adopt state of the child VM */
      *vmstate = new;
@@ -524,6 +536,8 @@ primary(key)
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
 
+constant(hexchars, .s="0123456789abcdefghijklmnopqrstuvwxyz")
+
 thread(dot1,
  &&enter, BASE, CLOAD, DIVMOD,
  DUP, ZBRANCH, self[10], self, BRANCH, self[11], DROP,
@@ -542,12 +556,6 @@ primary(linecomment, `\\', immediate)
 
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
-
-thread(dumpstack,
- &&enter, DEPTH, ZBRANCH, self[9], RTO, self, RFROM, DUP, DOT, EXIT)
-
-secondary(dots, .s,,
- QSTACK, LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
 
 dnl dictionary
 
@@ -695,7 +703,7 @@ primary(dostr)
   ip = aligned(s);
 }
 
-secondary(ccomma,,,
+secondary(ccomma, `c,',,
   HERE, CSTORE, HERE, PLUS1, DP, STORE)
 
 secondary(quote, `\"',,
@@ -704,7 +712,7 @@ secondary(quote, `\"',,
   DROP, ZERO, CCOMMA)
 
 secondary(commaquote, `,\"', .immediate=1,
-   LIT, DOSTR, COMMA, QUOTE, ALIGN)
+   LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
 secondary(dotquote, `.\"', .immediate=1,
    COMMAQUOTE, LIT, TYPE, COMMA)
@@ -788,8 +796,6 @@ secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 dnl ( -- a )
 secondary(begin,, .immediate=1, HERE)
 dnl ( a -- )
-secondary(again,, .immediate=1, LIT, BRANCH, COMMA, COMMA)
-dnl ( a -- )
 secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
@@ -848,6 +854,10 @@ secondary(tick, ', .immediate=1,
 
 dnl convenience
 
+dnl non-core
+include(core-ext.m4)
+include(tools.m4)
+
 dnl platform
 
 sinclude(platform.m4)
@@ -860,22 +870,23 @@ start:
     if (!vmstate->dictionary) {
 	vmstate->dictionary = dict_head;
     }
-    {
-      word *w = find(vmstate->dictionary, startword);
-      if (!w) {
-        putchar('"');
-        my_puts(startword);
-	my_puts("\" ");
-        cthrow(-13, undefined word);
-      }
-      {
-	thread(top, BYE)
-	ip = TOP;
-        (sp++)->a = &w->code;
-        goto execute;
-      }
-    }
+    thread(top, BYE)
+    ip = TOP;
+    (sp++)->a = xt;
+    goto execute;
+
+init:
+  forth = dict_head;
+  return 0;
 }
+
+__attribute__((constructor))
+void stub4th_init ()
+{
+   /* Initialize forth with the static list head. */
+   vm(0,0);
+}
+
 /*
 Local Variables:
 mode: m4

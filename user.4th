@@ -6,12 +6,6 @@ hex
 : tuck swap over ;
 : gcd dup if tuck mod recurse else drop then ;
 
-\ : c, here c! here 1+ dp ! ;
-\ : align here aligned dp ! ;
-\ : " here begin key dup 22 = 0= while c, repeat drop 0 c, align ;
-\ : ," ' branch , here 0 , " swap here swap ! ' lit , , ; immediate
-\ : ." ' ," execute ' type , ; immediate
-
 : strlen ( s -- n )
 dup
 begin dup c@ while 1+ repeat
@@ -75,20 +69,79 @@ dup 0= if exit then
 
 word hexchars find drop @ constant xtdocon
 word hi find drop @ constant xtenter
-word exit find drop @ constant xtexit
 
+: buildsnothing <builds does> ;
+buildsnothing doesnothing
+word doesnothing find drop @
+forget doesnothing
+constant xtdodoes
 
-\ xt word --
+variable somevar
+word somevar find drop @
+forget somevar
+constant xtdovar
+
+\ xt &word -- \ throws 1 if found
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
 
-\ xt -- \ return 1 if xt is in the dictionary
+\ xt -- t/f \ check if xt is in the dictionary
 : xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: dumpdict begin dup >code xttype lf >link @ dup 0= until ;
+: vlist begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
-: disas begin dup @ dup xtp if dup xttype else dup . then ' exit = 0= while cell + repeat ;
+\ check for end of thread
+: eotp \ &cfa -- &cfa t/f
+dup @ ' exit =
+over cell - @ ' lit =
+2 pick cell + @ xtp
+or 0= and ;
 
-: see word find 0= if abort then ." .code = " dup @ xtenter = if ." enter" lf ." .data = " disas else @ . then lf ;
+\ pretty print a cell value
+: .pretty ( cell -- )
+  dup xtp if
+    xttype
+  else
+    case
+      xtenter of ." &&enter" endof
+      xtdocon of ." &&docon" endof
+      xtdodoes of ." &&dodoes" endof
+      xtdovar of ." &&dovar" endof
+      ." .i = " r .
+    endcase
+  then
+;
+
+: ,key ' lit , key , ; immediate
+
+: disas
+  begin dup . dup @ .pretty lf eotp 0= while
+  dup @ ' dostr = if
+    cell +
+    dup .
+    ,key " emit
+    dup type
+    ,key " emit
+    lf
+    dup strlen + 1+ aligned
+  else
+    cell +
+  then
+repeat drop ;
+
+: see
+  word find 0= if -13 throw then
+  ." .code: " dup @ .pretty lf
+  ." .data: "
+  dup cell +
+  over @ case
+    xtenter of lf disas endof
+    xtdocon of @ .pretty lf endof
+    xtdovar of @ .pretty lf endof
+    xtdodoes of ." does>" lf @ disas endof
+    drop lf
+  endcase
+  drop
+; 

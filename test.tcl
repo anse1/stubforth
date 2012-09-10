@@ -147,5 +147,12 @@ test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy d
 
 test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
+test {: t 1 if ." moo" else ." bar" then ; t} {moo$}
+
+send {: t case 0 of ." looks like zero" endof 1 of ." looks like one" endof 2 of ." looks like two" endof ." i dunno" endcase lf ; }
+
+test "4 t" {i dunno}
+test "1 t" {looks like one}
+
 send "bye\n"
 interact
