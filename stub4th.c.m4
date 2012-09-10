@@ -848,13 +848,14 @@ primary(quiet)
  vmstate->quiet = 1;
 
 secondary(tick, ', .immediate=1,
-    WORD, FIND, NULLP, ZBRANCH, self[6], ABORT,
-    STATE, NULLP, ZBRANCH, self[11], EXIT, LIT, LIT, COMMA, COMMA
+    WORD, FIND, NULLP, ZBRANCH, self[7], .i=-13, THROW,
+    STATE, NULLP, ZBRANCH, self[12], EXIT, LIT, LIT, COMMA, COMMA
 )
 
 secondary(postpone,, .immediate=1, l(
    WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW
-   COMMA
+   IMMEDIATEP ZBRANCH self[13] COMMA EXIT
+   LIT LIT COMMA COMMA LIT COMMA COMMA
 ))
 dnl convenience
 
