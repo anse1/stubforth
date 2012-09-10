@@ -22,11 +22,11 @@ secondary(endof,, .immediate=1, l(
 
 dnl pad1 ... padn n --
 secondary(endcase,, .immediate=1, l(
- DUP ZBRANCH self[8]
+ QDUP ZBRANCH self[8]
   MINUS1 SWAP
   THEN
  BRANCH self[0]
- DROP LIT RFROM COMMA LIT DROP COMMA
+ LIT RFROM COMMA LIT DROP COMMA
 ))
 
 dnl -- pad
