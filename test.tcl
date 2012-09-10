@@ -154,5 +154,11 @@ send {: t case 0 of ." looks like zero" endof 1 of ." looks like one" endof 2 of
 test "4 t" {i dunno}
 test "1 t" {looks like one}
 
+send ": t postpone if ; immediate\n"
+test {: t2 1 t ." moo" else ." bar" then ; t2} {moo$}
+
+send ": t postpone hi ; immediate\n"
+test {: t2 t ; t2} {stub4th.*$}
+
 send "bye\n"
 interact

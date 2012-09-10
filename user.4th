@@ -73,7 +73,7 @@ word hi find drop @ constant &&enter
 : buildsnothing <builds does> ;
 buildsnothing doesnothing
 word doesnothing find drop @
-forget doesnothing
+forget buildsnothing
 constant &&dodoes
 
 variable somevar
@@ -88,7 +88,7 @@ constant &&dovar
 : xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: vlist begin dup >code xttype lf >link @ dup 0= until ;
+: words context @ vlist begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
