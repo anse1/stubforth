@@ -152,7 +152,7 @@ repeat drop ;
   postpone ahead here xtenter , ; immediate
 
 : catch> ( pad xt -- pad )
-  ' exit , swap postpone then
-  ' lit , , ' catch , ' ?dup , postpone if ; immediate
+  postpone exit swap postpone then
+  postpone lit , postpone catch postpone ?dup  postpone if ; immediate
 
 : endtry ( pad -- ) postpone then ; immediate
