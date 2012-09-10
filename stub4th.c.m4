@@ -14,6 +14,8 @@ word *forth;
 dnl m4 definitions
 
 define(dict_head, 0);
+define(div_init, 2);
+define(div_start, 3);
 
 dnl $1 - ANS94 error code
 define(`cthrow', `
@@ -833,6 +835,7 @@ secondary(postpone,, .immediate=1, l(
 dnl non-core
 include(core-ext.m4)
 include(tools.m4)
+dnl include(floating.m4)
 
 dnl platform
 
@@ -849,10 +852,12 @@ start:
     thread(top, BYE)
     ip = TOP;
     (sp++)->a = xt;
+    undivert(div_start)
     goto execute;
 
 init:
   forth = dict_head;
+  undivert(div_init)
   return 0;
 }
 
