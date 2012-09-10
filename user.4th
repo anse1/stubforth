@@ -73,7 +73,7 @@ word hi find drop @ constant &&enter
 : buildsnothing <builds does> ;
 buildsnothing doesnothing
 word doesnothing find drop @
-forget doesnothing
+forget buildsnothing
 constant &&dodoes
 
 variable somevar
