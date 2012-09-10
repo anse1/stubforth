@@ -10,7 +10,6 @@ cell dictionary_stack[1000];
 struct vmstate vmstate;
 
 word *forth;
-f
 dnl m4 definitions
 
 define(dict_head, 0);
