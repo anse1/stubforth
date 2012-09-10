@@ -148,14 +148,11 @@ repeat drop ;
 
 \ inline catching of exceptions
 
-: ahead ( -- a )
- ' branch , here 0 , ; immediate
-
 : try ( -- a xt )
-  [ ' ahead , ] here xtenter , ; immediate
+  postpone ahead here xtenter , ; immediate
 
-: recover ( a xt -- a )
- ' exit , swap [ ' then , ]
- ' lit , , ' catch , ' ?dup , [ ' if , ] ; immediate
+: catch> ( a xt -- a )
+  ' exit , swap postpone then
+  ' lit , , ' catch , ' ?dup , postpone if ; immediate
 
-: endtry [ ' then , ] ; immediate
+: endtry postpone then ; immediate
