@@ -33,7 +33,7 @@ stub4th:  stub4th.o
 	strip $<
 	ls -l $<
 
-%.c: %.c.m4 Makefile platform.m4
+%.c: %.c.m4 Makefile *.m4
 	m4 -s $< > $@
 
 %.h: %.h.m4
