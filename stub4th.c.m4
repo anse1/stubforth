@@ -141,6 +141,7 @@ int main()
   char *startword;
 
   initio();
+  stub4th_init();
 
   if(!vmstate.dp) {
       vmstate.dp = dictionary_stack;
