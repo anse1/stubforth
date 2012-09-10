@@ -148,8 +148,6 @@ repeat drop ;
 
 \ inline catching of exceptions
 
-: ahead ( -- a )
- ' branch , here 0 , ; immediate
 
 : try ( -- a xt )
   [ ' ahead , ] here xtenter , ; immediate
