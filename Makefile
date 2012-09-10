@@ -41,3 +41,13 @@ TAGS: .
 	--regex-forth='/(primary|secondary|constant|master)\([^,]+, ([^,\)]+)/\2/' \
 	--regex-forth='/(primary|secondary|constant|master)\(([a-z0-9_]+)/\2/' \
 	 *.4th *.c.m4 platform.h *.m4
+
+dict: user.4th stub4th
+	dd if=/dev/zero of=$@ bs=1k count=128
+	./stub4th dict < $<
+
+run: dict
+	./stub4th dict
+
+wordlist: stub4th user.4th
+	(cat user.4th ; echo words)|./stub4th|sort|(while read x; do echo -n "$$x ";done; echo)| fold -s > $@
