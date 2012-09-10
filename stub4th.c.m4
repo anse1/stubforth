@@ -174,11 +174,11 @@ int main(int argc, char *argv[])
   }
 
   vmstate.dp = v->dp ? v->dp :(cell *) (v + 1);
-  vmstate.dictionary = v->head;
 
-  if(!vmstate.dictionary) {
-      vmstate.dictionary = forth;
-  }
+  if(!v->head)
+      v->head = forth;
+
+  vmstate.dictionary = v->head;
 
   while(1) {
     vmstate.compiling = 0;
