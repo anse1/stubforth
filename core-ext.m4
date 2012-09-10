@@ -11,25 +11,21 @@ secondary(case,, .immediate=1,
 dnl n -- ofpad n+1
 secondary(of,, .immediate=1, l(
  PLUS1
- LIT R COMMA LIT EQ COMMA LIT ZBRANCH COMMA
- HERE SWAP LIT ZERO COMMA
+ LIT R COMMA LIT EQ COMMA
+ IF  SWAP
 ))
 
 dnl ofpad n -- endofpad n
 secondary(endof,, .immediate=1, l(
- RTO
- LIT BRANCH COMMA HERE LIT ZERO COMMA
- SWAP HERE SWAP STORE
- RFROM
+ RTO ELSE  RFROM
 ))
 
 dnl pad1 ... padn n --
 secondary(endcase,, .immediate=1, l(
- DUP ZBRANCH self[10]
+ QDUP ZBRANCH self[8]
   MINUS1 SWAP
-  HERE SWAP STORE
+  THEN
  BRANCH self[0]
- DROP
  LIT RFROM COMMA LIT DROP COMMA
 ))
 
