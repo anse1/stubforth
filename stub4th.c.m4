@@ -506,6 +506,11 @@ constant(cell, .i=sizeof(cell))
 primary(cells)
   sp[-1].i *= sizeof(sp[0]);
 
+dnl ( n|u a-addr -- )
+primary(plusstore, +!)
+*(vmint *)sp[-1].a += sp[-2].i;
+sp -= 2;
+
 dnl I/O
 
 dnl c --
@@ -848,8 +853,8 @@ primary(quiet)
  vmstate->quiet = 1;
 
 secondary(tick, ', .immediate=1,
-    WORD, FIND, NULLP, ZBRANCH, self[7], .i=-13, THROW,
-    STATE, NULLP, ZBRANCH, self[12], EXIT, LIT, LIT, COMMA, COMMA
+    WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .i=-13, THROW,
+    STATE, NULLP, ZBRANCH, self[13], EXIT, LIT, LIT, COMMA, COMMA
 )
 
 secondary(postpone,, .immediate=1, l(
