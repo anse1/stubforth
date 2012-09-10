@@ -470,7 +470,7 @@ primary(cells)
 
 dnl ( n|u a-addr -- )
 primary(plusstore, +!)
-sp[-1].i += sp[-2].i;
+*(vmint *)sp[-1].a += sp[-2].i;
 sp -= 2;
 
 dnl I/O
