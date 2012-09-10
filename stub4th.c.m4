@@ -816,7 +816,8 @@ secondary(tick, ', .immediate=1,
 
 secondary(postpone,, .immediate=1, l(
    WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW
-   COMMA
+   IMMEDIATEP ZBRANCH self[13] COMMA EXIT
+   LIT LIT COMMA COMMA LIT COMMA COMMA
 ))
 dnl convenience
 
