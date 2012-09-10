@@ -138,13 +138,18 @@ static word *find(word *p, const char *key)
 int main()
 {
   int result;
+  char *startword;
 
   initio();
 
   if(!vmstate.dp) {
       vmstate.dp = dictionary_stack;
       vmstate.dictionary = forth;
+      startword = "boot";
+  } else {
+      startword = "quit";
   }
+
 
   while(1) {
     vmstate.compiling = 0;
@@ -156,7 +161,7 @@ int main()
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, &find(forth, "quit")->code);
+    result = vm(&vmstate, &find(forth, startword)->code);
 
     if (!result)
        return 0;
