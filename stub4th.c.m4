@@ -10,10 +10,11 @@ cell dictionary_stack[1000];
 struct vmstate vmstate;
 
 word *forth;
-
+f
 dnl m4 definitions
 
 define(dict_head, 0);
+define(div_word, 1);
 define(div_init, 2);
 define(div_start, 3);
 
@@ -30,9 +31,9 @@ dnl Cons a primary word
 dnl $1 - C identifier
 dnl $2 - forth word (default: $1)
 dnl $3... - flags
-undivert(1)
+undivert(div_word)
 $1:
-divert(1)
+divert(div_word)
   goto next;
   static word w_$1 = {
     .name = "ifelse(`$2',`',`$1',`$2')",
@@ -60,7 +61,7 @@ dnl $3 - flags
 dnl $4... - cell data
 
 define(secondary, `
-undivert(1)
+undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
@@ -76,7 +77,7 @@ static word w_$1 = {
 
 dnl Cons a constant
 define(constant, `
-undivert(1)
+undivert(div_word)
 static word w_$1 = {
   .name = "$1",
   .link = dict_head,
@@ -841,7 +842,7 @@ dnl include(floating.m4)
 
 sinclude(platform.m4)
 
-undivert(1)
+undivert(div_word)
 
 dnl startup
 
