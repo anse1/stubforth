@@ -468,6 +468,11 @@ constant(cell, .i=sizeof(cell))
 primary(cells)
   sp[-1].i *= sizeof(sp[0]);
 
+dnl ( n|u a-addr -- )
+primary(plusstore, +!)
+sp[-1].i += sp[-2].i;
+sp -= 2;
+
 dnl I/O
 
 dnl c --
