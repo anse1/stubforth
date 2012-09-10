@@ -678,6 +678,7 @@ secondary(quote, `\"',,
   KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
   DROP, ZERO, CCOMMA)
 
+dnl S" in ans94
 secondary(commaquote, `,\"', .immediate=1,
    LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
@@ -814,14 +815,17 @@ primary(echo)
 primary(quiet)
  vmstate->quiet = 1;
 
+secondary(qword, ?word,,
+  l(WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW ))
+
 secondary(tick, ', .immediate=1,
-    WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .i=-13, THROW,
-    STATE, NULLP, ZBRANCH, self[13], EXIT, LIT, LIT, COMMA, COMMA
+    QWORD,
+    STATE, NULLP, ZBRANCH, self[6], EXIT, LIT, LIT, COMMA, COMMA
 )
 
 secondary(postpone,, .immediate=1, l(
-   WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW
-   IMMEDIATEP ZBRANCH self[13] COMMA EXIT
+   QWORD,
+   IMMEDIATEP ZBRANCH self[6] COMMA EXIT
    LIT LIT COMMA COMMA LIT COMMA COMMA
 ))
 dnl convenience
