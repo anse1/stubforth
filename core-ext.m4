@@ -12,15 +12,12 @@ dnl n -- ofpad n+1
 secondary(of,, .immediate=1, l(
  PLUS1
  LIT R COMMA LIT EQ COMMA
- IF
- SWAP
+ IF  SWAP
 ))
 
 dnl ofpad n -- endofpad n
 secondary(endof,, .immediate=1, l(
- RTO
- ELSE
- RFROM
+ RTO ELSE  RFROM
 ))
 
 dnl pad1 ... padn n --
@@ -29,8 +26,7 @@ secondary(endcase,, .immediate=1, l(
   MINUS1 SWAP
   THEN
  BRANCH self[0]
- DROP
- LIT RFROM COMMA LIT DROP COMMA
+ DROP LIT RFROM COMMA LIT DROP COMMA
 ))
 
 dnl -- pad
