@@ -9,6 +9,8 @@ cell dictionary_stack[1000];
 
 struct vmstate vmstate;
 
+word *forth;
+
 dnl m4 definitions
 
 define(dict_head, 0);
@@ -139,8 +141,10 @@ int main()
 
   initio();
 
-  if(!vmstate.dp)
+  if(!vmstate.dp) {
       vmstate.dp = dictionary_stack;
+      vmstate.dictionary = forth;
+  }
 
   while(1) {
     vmstate.compiling = 0;
@@ -152,7 +156,7 @@ int main()
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, vmstate.dictionary ? "quit" : "boot");
+    result = vm(&vmstate, &find(forth, "quit")->code);
 
     if (!result)
        return 0;
@@ -162,7 +166,7 @@ int main()
       vmstate.rp = return_stack;
       vmstate.base = 10;
       (vmstate.sp++)->i = result;
-      vm(&vmstate, ".");
+      vm(&vmstate, &find(forth, ".")->code);
       if (vmstate.errstr)
         my_puts(vmstate.errstr);
       my_puts("\n");
@@ -178,12 +182,15 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-int vm(struct vmstate *vmstate, const char *startword)
+int vm(struct vmstate *vmstate, void **xt)
 {
 
   /* The VM registers */
   cell *ip, *sp, *rp, *w;
   cell t;
+
+  if (!vmstate)
+     goto init;
 
   /* remember the initial values so we can detect underflow */
   cell *sp_base, *rp_base, *dp_base;
@@ -416,13 +423,13 @@ primary(throw)
 dnl cfa -- i
 primary(catch)
 {
-  word *w2 = CFA2WORD(sp[-1].a);
+  void **xt = sp[-1].a;
   int result;
   struct vmstate new = *vmstate;
   sp--;
   new.sp = sp;
   new.rp = rp;
-  result = vm(&new, w2->name);
+  result = vm(&new, xt);
   if (!result) {
      /* local return, adopt state of the child VM */
      *vmstate = new;
@@ -825,22 +832,22 @@ start:
     if (!vmstate->dictionary) {
 	vmstate->dictionary = dict_head;
     }
-    {
-      word *w = find(vmstate->dictionary, startword);
-      if (!w) {
-        putchar('"');
-        my_puts(startword);
-	my_puts("\" ");
-        cthrow(-13, undefined word);
-      }
-      {
-	thread(top, BYE)
-	ip = TOP;
-        (sp++)->a = &w->code;
-        goto execute;
-      }
-    }
+    thread(top, BYE)
+    ip = TOP;
+    (sp++)->a = xt;
+    goto execute;
+
+init:
+  forth = dict_head;
+  return 0;
 }
+
+__attribute__((constructor))
+void stub4th_init ()
+{
+   vm(0,0);
+}
+
 /*
 Local Variables:
 mode: m4

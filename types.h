@@ -51,6 +51,8 @@ extern struct vmstate vmstate;
 
 typedef struct word word;
 
-int vm(struct vmstate *vmstate, const char *startword);
+extern struct word *forth; /* points to the head of head of the static
+                              dictionary.  */
+int vm(struct vmstate *vmstate, void **xt);
 
 #endif
