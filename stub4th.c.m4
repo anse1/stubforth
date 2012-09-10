@@ -244,9 +244,6 @@ primary(spload, sp@)
   sp->a = sp-1;
   sp++;
 
-primary(pick)
-  sp[-1] = sp[-2 - sp[-1].i];
-
 primary(drop)
   sp--;
 
@@ -508,12 +505,6 @@ primary(linecomment, `\\', immediate)
 
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
-
-thread(dumpstack,
- &&enter, DEPTH, ZBRANCH, self[9], RTO, self, RFROM, DUP, DOT, EXIT)
-
-secondary(dots, .s,,
- QSTACK, LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
 
 dnl dictionary
 
@@ -816,6 +807,7 @@ secondary(tick, ', .immediate=1,
 
 dnl non-core
 include(core-ext.m4)
+include(tools.m4)
 
 dnl platform
 
