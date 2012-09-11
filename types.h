@@ -54,5 +54,7 @@ typedef struct word word;
 extern struct word *forth; /* points to the head of head of the static
                               dictionary.  */
 int vm(struct vmstate *vmstate, void **xt);
+void stub4th_init();
+word *find(word *p, const char *key);
 
 #endif
