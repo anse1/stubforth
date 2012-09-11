@@ -64,7 +64,7 @@ undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
-  .name = "ifelse(`$2',`',`$1',`$2')",
+  .name = "ifelse($2,`',$1,$2)",
   .link = dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
@@ -75,7 +75,7 @@ static word w_$1 = {
 ')
 
 dnl Cons a constant
-define(constant, `
+define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
 static word w_$1 = {
   .name = "$1",
@@ -86,7 +86,7 @@ static word w_$1 = {
 
   define(`dict_head', &w_$1)
   define(translit($1,a-z,A-Z), &w_$1.code)
-')
+')')
 
 dnl Cons a headerless thread.
 dnl $1 - C identifier
@@ -745,8 +745,8 @@ secondary(semi, ;, .immediate=1,
 
 secondary(create,,, WORD, CONS, LIT, &&dovar, COMMA, SMUDGE, SUSPEND)
 secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
-secondary(``constant'',,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
-secondary(``variable'',,, CREATE, ZERO, COMMA)
+secondary(constant,,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
+secondary(variable,,, CREATE, ZERO, COMMA)
 
 dnl start consing a dodoes word
 secondary(builds, <builds,,
