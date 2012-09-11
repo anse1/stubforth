@@ -85,7 +85,7 @@ constant &&dovar
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
 
 \ xt -- t/f \ check if xt is in the dictionary
-: xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
+: xtp context @ ['] xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
 : words context @ begin dup >code xttype lf >link @ dup 0= until ;
@@ -94,8 +94,8 @@ constant &&dovar
 
 \ check for end of thread
 : eotp \ &cfa -- &cfa t/f
-dup @ ' exit =
-over cell - @ ' lit =
+dup @ ['] exit =
+over cell - @ ['] lit =
 2 pick cell + @ xtp
 or 0= and ;
 
@@ -114,11 +114,11 @@ or 0= and ;
   then
 ;
 
-: ,key ' lit , key , ; immediate
+: ,key ['] lit , key , ; immediate
 
 : disas
   begin dup . dup @ .pretty lf eotp 0= while
-  dup @ ' dostr = if
+  dup @ ['] dostr = if
     cell +
     dup .
     ,key " emit
