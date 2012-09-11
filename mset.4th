@@ -49,75 +49,51 @@ divp
 : cell+ cell + ;
 : @+dup cell+ dup @ ;
 
-: fractal <builds
-   radius @ , iterations @ , 
-   zoom @ , ioff @ , roff @ ,
-does> dup @ radius ! @+dup iterations !
-      @+dup zoom ! @+dup ioff ! @+dup roff ! ;
+
+\ iterations roff ioff zoom --
+: fractal <builds , , , ,
+does>
+ dup @ 3 fix swap / ydim / zoom ! cell +
+ dup @ ioff ! cell +
+ dup @ roff ! cell +
+ dup @ iterations ! cell +
+drop ; 
+
+@+dup zoom
 
 : save <builds
    lssa @ ,
 does> @ lssa ! ;
 
-
 : new here lssa ! 4800 allot cls ;
 
-3 fix ydim / zoom !
--1 fix 3 * 4 / roff !
-0 fix ioff !
-16 iterations !
+16 -1 fix 0 fix 1
 fractal entire
 
-60 iterations !
--39817688 roff !
--33292653 ioff !
-3 fix ydim / 4600 / zoom !
+60 -39817688 -33292653 4600
 fractal pretty
 
-60 iterations !
--38306646 roff !
-37746640 ioff !
-3 fix ydim / 200 / zoom !
+60 -38306646 37746640 200
 fractal spiral
 
--49353771 roff !
--15639236 ioff !
-70 iterations !
-3 fix ydim / 9000 / zoom !
+70 -49353771 -15639236 9000
 fractal deep
 
-3 fix ydim / 245 / zoom !
--75072314 roff !
-20395872 ioff !
-35 iterations !
+35 -75072314 20395872 245
 fractal bolt
 
--55606285 roff !
-14428028 ioff !
-3 fix ydim / 2000 / zoom !
-60 iterations !
+60 -55606285 14428028 2000
 fractal dragon
 
--50162660 roff !
--9096344 ioff !
-3 fix ydim / 700 / zoom !
-100 iterations !
+100 -50162660 -9096344 700
 fractal horses
 
-27787769 roff !
-14156046 ioff !
-3 fix ydim / 600 / zoom !
-100 iterations !
+100 27787769 14156046 600
 fractal antenna
 
--50013170 roff !
--7587480 ioff !
-3 fix ydim / 9500 / zoom !
-160 iterations !
+160 -50013170 -7587480 9500
 fractal tail
 
--17343002 roff !
-44280635 ioff !
-3 fix ydim / 3000 / zoom !
-100 iterations !
+100 -17343002 44280635 3000
 fractal spots
+
