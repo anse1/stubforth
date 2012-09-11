@@ -4,10 +4,15 @@
 
 int main(int argc, char *argv[])
 {
-  FILE *f = fopen(argv[1], "r");
+  FILE *f;
   int c;
   int e;
   int count = 0;
+
+  if (!(f = fopen(argv[1], "r"))) {
+    perror("fopen");
+    return 3;
+  }
 
   while ((c = fgetc(f)) > -1) {
     putchar(c);
