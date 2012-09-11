@@ -171,5 +171,9 @@ test { here " foo" drop" here = .} {1 $}
 # test { 0 [if] 85 emit bl [else] 64 emit bl [then] } {@ $}
 # test { here = . } { 1$}
 
+test {: t 85 emit try 666 throw catch> 1+ . endtry 64 emit ; t } {U667 @$}
+test {: t 125 try 666 1 throw catch> drop endtry 1+ . ; t } {126 $}
+test {: t 125 try 666 catch> drop endtry 1+ . ; t } {667 $}
+
 send "bye\n"
 interact
