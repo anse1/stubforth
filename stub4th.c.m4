@@ -693,7 +693,7 @@ secondary(squote, `s\"', .immediate=1,
 secondary(dotquote, `.\"', .immediate=1,
    SQUOTE, LIT, TYPE, COMMA)
 
-primary(sdrop, \"drop)
+primary(drops, drop\")
  try_deallocate(sp[-1].s, &vmstate->dp);
  sp--;
 
