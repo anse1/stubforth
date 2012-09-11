@@ -160,5 +160,9 @@ test {: t2 1 t ." moo" else ." bar" then ; t2} {moo$}
 send ": t postpone hi ; immediate\n"
 test {: t2 t ; t2} {stub4th.*$}
 
+test { " foo" " barz" compare .} {1 $}
+test { " 999" " ba" compare .} {-1 $}
+test { " hmm" " hmm" compare .} {0 $}
+
 send "bye\n"
 interact

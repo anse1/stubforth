@@ -841,6 +841,7 @@ secondary(postpone,, .immediate=1, l(
 dnl non-core
 include(core-ext.m4)
 include(tools.m4)
+include(string.m4)
 dnl include(floating.m4)
 
 dnl platform
