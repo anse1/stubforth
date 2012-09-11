@@ -10,10 +10,12 @@ cell dictionary_stack[10000];
 struct vmstate vmstate;
 
 word *forth;
-
 dnl m4 definitions
 
 define(dict_head, 0);
+define(div_word, 1);
+define(div_init, 2);
+define(div_start, 3);
 
 dnl $1 - ANS94 error code
 define(`cthrow', `
@@ -28,9 +30,9 @@ dnl Cons a primary word
 dnl $1 - C identifier
 dnl $2 - forth word (default: $1)
 dnl $3... - flags
-undivert(1)
+undivert(div_word)
 $1:
-divert(1)
+divert(div_word)
   goto next;
   static word w_$1 = {
     .name = "ifelse(`$2',`',`$1',`$2')",
@@ -58,7 +60,7 @@ dnl $3 - flags
 dnl $4... - cell data
 
 define(secondary, `
-undivert(1)
+undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
@@ -74,7 +76,7 @@ static word w_$1 = {
 
 dnl Cons a constant
 define(constant, `
-undivert(1)
+undivert(div_word)
 static word w_$1 = {
   .name = "$1",
   .link = dict_head,
@@ -684,6 +686,7 @@ secondary(quote, `\"',,
   KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
   DROP, ZERO, CCOMMA)
 
+dnl S" in ans94
 secondary(commaquote, `,\"', .immediate=1,
    LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
@@ -820,14 +823,17 @@ primary(echo)
 primary(quiet)
  vmstate->quiet = 1;
 
+secondary(qword, ?word,,
+  l(WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW ))
+
 secondary(tick, ', .immediate=1,
-    WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .i=-13, THROW,
-    STATE, NULLP, ZBRANCH, self[13], EXIT, LIT, LIT, COMMA, COMMA
+    QWORD,
+    STATE, NULLP, ZBRANCH, self[6], EXIT, LIT, LIT, COMMA, COMMA
 )
 
 secondary(postpone,, .immediate=1, l(
-   WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW
-   IMMEDIATEP ZBRANCH self[13] COMMA EXIT
+   QWORD,
+   IMMEDIATEP ZBRANCH self[6] COMMA EXIT
    LIT LIT COMMA COMMA LIT COMMA COMMA
 ))
 dnl convenience
@@ -835,12 +841,13 @@ secondary(postpone,, .immediate=1, l(
 dnl non-core
 include(core-ext.m4)
 include(tools.m4)
+dnl include(floating.m4)
 
 dnl platform
 
 sinclude(platform.m4)
 
-undivert(1)
+undivert(div_word)
 
 dnl startup
 
@@ -851,10 +858,12 @@ start:
     thread(top, BYE)
     ip = TOP;
     (sp++)->a = xt;
+    undivert(div_start)
     goto execute;
 
 init:
   forth = dict_head;
+  undivert(div_init)
   return 0;
 }
 

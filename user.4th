@@ -20,15 +20,6 @@ swap - ;
  word find 0= if abort then
  >word dup  >link @ context ! >name @ dp ! ;
 
-: dump ( addr n -- )
-over + swap
-( endaddr addr )
-begin
-dup c@ emit
-1 + 2dup <
-until
-lf ;
-
 \ bit flipping
 
 : flip ( c a -- ) 
@@ -43,8 +34,6 @@ hex
 : ehex
   dup 4 >> f and hexchars + c@ emit
   f and hexchars + c@ emit ;
-
-: bl 20 emit ;
 
 : dumpaddr ( addr n -- )
 over cell begin 1-
@@ -88,7 +77,7 @@ constant &&dovar
 : xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: vlist begin dup >code xttype lf >link @ dup 0= until ;
+: words context @ begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
