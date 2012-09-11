@@ -65,6 +65,8 @@ dup c@ emit
 until
 lf ;
 
+decimal
+
 word hexchars find drop @ constant &&docon
 word hi find drop @ constant &&enter
 
@@ -154,3 +156,53 @@ repeat drop ;
   postpone lit , postpone catch postpone ?dup  postpone if ; immediate
 
 : endtry ( pad -- ) postpone then ; immediate
+
+\ TOOLS-EXT
+
+\ read and discard till [then] is read, recurse on [if]
+: skip[if] ( -- )
+ begin
+   word
+   dup s" [if]" compare 0= if
+     drop" recurse 1
+   else
+     dup s" [then]" compare swap drop"
+   then
+   while
+ repeat
+;
+
+\ read and discard till [then] or [else] is read, skipif on [if]
+\ leaves t/f on stack when then/else was read
+: skip[block] ( -- t/f )
+ begin
+   word
+   dup s" [if]" compare 0= if
+     drop" skip[if]
+   else
+     dup s" [then]" compare 0= if drop" 1 exit then
+     dup s" [else]" compare 0= if drop" 0 exit then
+     drop"
+   then
+again ;
+
+
+: [else] -512 throw ; immediate
+: [then] -513 throw ; immediate
+
+: [if]
+  0= if skip[block] if exit then then
+  try
+    begin
+      word
+      interpret
+    again
+  catch>
+    case
+      -512 of skip[if] endof
+      -513 of endof
+      r throw
+    endcase
+    exit
+  endtry
+; immediate
