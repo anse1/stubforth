@@ -117,7 +117,8 @@ or 0= and ;
 : ,key ' lit , key , ; immediate
 
 : disas
-  begin dup . dup @ .pretty lf eotp 0= while
+begin dup . dup @ .pretty lf
+  eotp 0= while
   dup @ ' dostr = if
     cell +
     dup .
