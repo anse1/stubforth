@@ -126,7 +126,7 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
-static word *find(word *p, const char *key)
+word *find(word *p, const char *key)
 {
    while(p) {
       if(! p->smudge && (0 == strcmp(p->name, key)))
@@ -140,13 +140,19 @@ static word *find(word *p, const char *key)
 int main()
 {
   int result;
+  char *startword;
 
   initio();
+  stub4th_init();
 
   if(!vmstate.dp) {
       vmstate.dp = dictionary_stack;
       vmstate.dictionary = forth;
+      startword = "boot";
+  } else {
+      startword = "quit";
   }
+
 
   while(1) {
     vmstate.compiling = 0;
@@ -158,7 +164,7 @@ int main()
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, &find(forth, "quit")->code);
+    result = vm(&vmstate, &find(forth, startword)->code);
 
     if (!result)
        return 0;
