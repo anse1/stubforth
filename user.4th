@@ -114,7 +114,7 @@ or 0= and ;
   then
 ;
 
-: [char] ['] lit , key , ; immediate
+: [char] key literal ; immediate
 
 : disas
   begin dup . dup @ .pretty lf eotp 0= while
