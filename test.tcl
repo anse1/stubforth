@@ -164,5 +164,12 @@ test { " foo" " barz" compare .} {1 $}
 test { " 999" " ba" compare .} {-1 $}
 test { " hmm" " hmm" compare .} {0 $}
 
+test { here " foo" drop" here = .} {1 $}
+
+# send {here }
+# test { 1 [if] 85 emit bl [else] 64 emit bl [then] } {U $}
+# test { 0 [if] 85 emit bl [else] 64 emit bl [then] } {@ $}
+# test { here = . } { 1$}
+
 send "bye\n"
 interact
