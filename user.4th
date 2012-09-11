@@ -157,8 +157,6 @@ repeat drop ;
 
 : endtry ( pad -- ) postpone then ; immediate
 
-\ TOOLS-EXT
-
 \ read and discard till [then] is read, recurse on [if]
 : skip[if] ( -- )
  begin
