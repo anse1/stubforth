@@ -56,6 +56,15 @@ dup 0= if exit then
 " repeat ." 
 " ;
 
+: dumpraw ( addr n -- )
+over + swap
+( endaddr addr )
+begin
+dup c@ emit
+1 + 2dup <
+until
+lf ;
+
 word hexchars find drop @ constant &&docon
 word hi find drop @ constant &&enter
 
