@@ -106,7 +106,8 @@ static int strcmp(const char *a, const char *b) {
 }
 
 dnl increase p until it has cell alignment
-void *aligned(char *p) {
+void *aligned(void *vp) {
+  char *p = vp;
   while ((vmint)p & (__alignof__(cell)-1))
     p++;
   return (cell *)p;
@@ -633,7 +634,7 @@ primary(aligned)
 dnl ( addr -- a-addr )
 primary(align)
 {
-  vmstate->dp = aligned((char *)vmstate->dp);
+  vmstate->dp = aligned(vmstate->dp);
 }
 
 primary(number)
@@ -684,7 +685,7 @@ secondary(ccomma, `c,',,
 secondary(quote, `\"',,
   HERE,
   KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
-  DROP, ZERO, CCOMMA)
+  DROP, ZERO, CCOMMA, ALIGN)
 
 secondary(squote, `s\"', .immediate=1,
    LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
@@ -721,7 +722,7 @@ dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
 primary(cons)
 {
-  /* TODO: standard says align dp here */
+  vmstate->dp = aligned(vmstate->dp);
   word *new = (word *)vmstate->dp;
   new->name = (--sp)->s;
   new->link = vmstate->dictionary;
