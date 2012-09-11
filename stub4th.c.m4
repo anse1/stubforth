@@ -686,12 +686,11 @@ secondary(quote, `\"',,
   KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
   DROP, ZERO, CCOMMA)
 
-dnl S" in ans94
-secondary(commaquote, `,\"', .immediate=1,
+secondary(squote, `s\"', .immediate=1,
    LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
 secondary(dotquote, `.\"', .immediate=1,
-   COMMAQUOTE, LIT, TYPE, COMMA)
+   SQUOTE, LIT, TYPE, COMMA)
 
 dnl compiler
 primary(state)
