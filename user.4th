@@ -146,18 +146,6 @@ repeat drop ;
   drop
 ; 
 
-\ inline catching of exceptions
-
-: try ( -- pad xt )
-  postpone ahead here &&enter , ; immediate
-
-: catch> ( pad xt -- pad )
-  postpone exit swap postpone then
-  postpone lit , postpone catch postpone ?dup  postpone if ; immediate
-
-: endtry ( pad -- ) postpone then ; immediate
-
-\ read and discard till [then] is read, recurse on [if]
 : skip[if] ( -- )
  begin
    word
