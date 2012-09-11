@@ -134,6 +134,7 @@ repeat drop ;
 : see
   word find 0= if -13 throw then
   ." .code: " dup @ .pretty lf
+  ." .immediate " dup immediatep . lf
   ." .data: "
   dup cell +
   over @ case
