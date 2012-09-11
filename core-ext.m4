@@ -30,6 +30,27 @@ secondary(endcase,, .immediate=1, l(
 ))
 
 dnl -- pad
-secondary(ahead,,.immediate=1, l(
+secondary(ahead,, .immediate=1, l(
  LIT BRANCH COMMA HERE ZERO COMMA
+))
+
+dnl -- pad xt
+secondary(try,, .immediate=1, l(
+  AHEAD HERE
+  LIT &&enter COMMA
+))
+
+dnl pad xt -- pad
+secondary(catchfrom, catch>, .immediate=1, l(
+  LIT EXIT COMMA
+  SWAP THEN
+  LIT LIT COMMA
+  COMMA
+  LIT CATCH COMMA
+  LIT QDUP COMMA
+  IF))
+
+dnl pad --
+secondary(endtry,,.immediate=1, l(
+  THEN EXIT
 ))
