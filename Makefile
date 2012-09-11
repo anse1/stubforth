@@ -1,6 +1,7 @@
 
 GCC = gcc
 CFLAGS = -O2  -g -Wall -Wcast-align
+SYNC = -s
 
 all: stub4th
 
@@ -26,7 +27,7 @@ stub4th:  stub4th.o
 	ls -l $<
 
 %.c: %.c.m4 Makefile *.m4
-	m4 -s $< > $@
+	m4 $(SYNC) $< > $@
 
 check: stub4th
 	expect test.tcl
