@@ -694,6 +694,10 @@ secondary(dotquote, `.\"', .immediate=1,
    SQUOTE, LIT, TYPE, COMMA)
 
 dnl compiler
+secondary(literal,, .immediate=1, l(
+   LIT LIT COMMA COMMA
+))
+
 primary(state)
   (sp++)->i = vmstate->compiling;
 
@@ -765,7 +769,7 @@ COMMA, EXIT,
 EXECUTE, EXIT,
 NUMBER,
 STATE, NULLP, ZBRANCH, self[19], EXIT,
-LIT, LIT, COMMA, COMMA)
+LITERAL)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
@@ -829,13 +833,13 @@ secondary(qword, ?word,,
 secondary(tick, ',, QWORD)
 
 secondary(brackettick, ['], .immediate=1, l(
-    QWORD LIT LIT COMMA COMMA
+    QWORD LITERAL
 ))
 
 secondary(postpone,, .immediate=1, l(
    QWORD,
    IMMEDIATEP ZBRANCH self[6] COMMA EXIT
-   LIT LIT COMMA COMMA LIT COMMA COMMA
+   LITERAL LIT COMMA COMMA
 ))
 dnl convenience
 
