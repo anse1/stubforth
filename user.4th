@@ -202,6 +202,5 @@ again ;
       -513 of endof
       r throw
     endcase
-    exit
   endtry
 ; immediate
