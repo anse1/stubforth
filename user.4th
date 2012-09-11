@@ -114,16 +114,16 @@ or 0= and ;
   then
 ;
 
-: ,key ['] lit , key , ; immediate
+: [char] ['] lit , key , ; immediate
 
 : disas
   begin dup . dup @ .pretty lf eotp 0= while
   dup @ ['] dostr = if
     cell +
     dup .
-    ,key " emit
+    [char] " emit
     dup type
-    ,key " emit
+    [char] " emit
     lf
     dup strlen + 1+ aligned
   else
