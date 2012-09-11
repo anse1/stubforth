@@ -110,21 +110,21 @@ test "word \[ find drop immediatep ." $true
 test "word : find drop immediatep ." $false
 
 test "' hi execute" $name
-test ": foo ' hi execute ; foo" $name
+test {: foo ['] hi execute ; foo} $name
 
 test " -3 3- * ." {9 $}
 test " -3 3 * ." {-9 $}
 
 send ": foo 666 throw ; "
-send ": bar ' foo catch 666 = if 85 emit else 65 then ; "
+send {: bar ['] foo catch 666 = if 85 emit else 65 then ; }
 test bar {U$}
 
 send ": foo . ?stack ; "
-send ": bar ' foo catch . ; "
+send {: bar ['] foo catch . ; }
 test "bar" {-4 $}
 
 send ": foo 85 ; "
-send ": bar  ' foo catch . . ; "
+send {: bar ['] foo catch . . ; }
 
 test bar {0 85 $}
 
@@ -165,7 +165,7 @@ send ": t postpone if ; immediate\n"
 test {: t2 1 t ." moo" else ." bar" then ; t2} {moo$}
 
 send ": t postpone hi ; immediate\n"
-test {: t2 t ; t2} {stub4th.*$}
+test {: t2 t ; t2} $name
 
 test { " foo" " barz" compare .} {1 $}
 test { " 999" " ba" compare .} {-1 $}
@@ -177,6 +177,10 @@ test { here " foo" drop" here = .} {1 $}
 # test { 1 [if] 85 emit bl [else] 64 emit bl [then] } {U $}
 # test { 0 [if] 85 emit bl [else] 64 emit bl [then] } {@ $}
 # test { here = . } { 1$}
+
+test {: t 85 emit try 666 throw catch> 1+ . endtry 64 emit ; t } {U667 @$}
+test {: t 125 try 666 1 throw catch> drop endtry 1+ . ; t } {126 $}
+test {: t 125 try 666 catch> drop endtry 1+ . ; t } {667 $}
 
 send "bye\n"
 interact

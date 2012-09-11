@@ -64,7 +64,7 @@ undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
-  .name = "ifelse(`$2',`',`$1',`$2')",
+  .name = "ifelse($2,`',$1,$2)",
   .link = dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
@@ -75,7 +75,7 @@ static word w_$1 = {
 ')
 
 dnl Cons a constant
-define(constant, `
+define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
 static word w_$1 = {
   .name = "$1",
@@ -86,7 +86,7 @@ static word w_$1 = {
 
   define(`dict_head', &w_$1)
   define(translit($1,a-z,A-Z), &w_$1.code)
-')
+')')
 
 dnl Cons a headerless thread.
 dnl $1 - C identifier
@@ -694,6 +694,10 @@ secondary(dotquote, `.\"', .immediate=1,
    SQUOTE, LIT, TYPE, COMMA)
 
 dnl compiler
+secondary(literal,, .immediate=1, l(
+   LIT LIT COMMA COMMA
+))
+
 primary(state)
   (sp++)->i = vmstate->compiling;
 
@@ -745,8 +749,8 @@ secondary(semi, ;, .immediate=1,
 
 secondary(create,,, WORD, CONS, LIT, &&dovar, COMMA, SMUDGE, SUSPEND)
 secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
-secondary(``constant'',,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
-secondary(``variable'',,, CREATE, ZERO, COMMA)
+secondary(constant,,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
+secondary(variable,,, CREATE, ZERO, COMMA)
 
 dnl start consing a dodoes word
 secondary(builds, <builds,,
@@ -765,7 +769,7 @@ COMMA, EXIT,
 EXECUTE, EXIT,
 NUMBER,
 STATE, NULLP, ZBRANCH, self[19], EXIT,
-LIT, LIT, COMMA, COMMA)
+LITERAL)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
@@ -826,15 +830,16 @@ primary(quiet)
 secondary(qword, ?word,,
   l(WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW ))
 
-secondary(tick, ', .immediate=1,
-    QWORD,
-    STATE, NULLP, ZBRANCH, self[6], EXIT, LIT, LIT, COMMA, COMMA
-)
+secondary(tick, ',, QWORD)
+
+secondary(brackettick, ['], .immediate=1, l(
+    QWORD LITERAL
+))
 
 secondary(postpone,, .immediate=1, l(
    QWORD,
    IMMEDIATEP ZBRANCH self[6] COMMA EXIT
-   LIT LIT COMMA COMMA LIT COMMA COMMA
+   LITERAL LIT COMMA COMMA
 ))
 dnl convenience
 

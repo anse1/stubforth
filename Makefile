@@ -9,6 +9,7 @@ OBJCOPY = $(TARGET)-objcopy
 TTY = /dev/ttyUSB0
 
 VPATH = $(HOME)/src/c/vivo/:$(HOME)/ext/linux-2.6/arch/m68k/lib/
+SYNC = -s
 
 all: stub4th
 
@@ -34,7 +35,7 @@ stub4th:  stub4th.o
 	ls -l $<
 
 %.c: %.c.m4 Makefile *.m4
-	m4 -s $< > $@
+	m4 $(SYNC) $< > $@
 
 %.h: %.h.m4
 	m4 -s $< > $@

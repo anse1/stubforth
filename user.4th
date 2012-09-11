@@ -85,7 +85,7 @@ constant &&dovar
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
 
 \ xt -- t/f \ check if xt is in the dictionary
-: xtp context @ ' xtp1 catch if 2drop 1 else 2drop 0 then ;
+: xtp context @ ['] xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
 : words context @ begin dup >code xttype lf >link @ dup 0= until ;
@@ -94,8 +94,8 @@ constant &&dovar
 
 \ check for end of thread
 : eotp \ &cfa -- &cfa t/f
-dup @ ' exit =
-over cell - @ ' lit =
+dup @ ['] exit =
+over cell - @ ['] lit =
 2 pick cell + @ xtp
 or 0= and ;
 
@@ -114,17 +114,16 @@ or 0= and ;
   then
 ;
 
-: ,key ' lit , key , ; immediate
+: [char] key literal ; immediate
 
 : disas
-begin dup . dup @ .pretty lf
-  eotp 0= while
-  dup @ ' dostr = if
+  begin dup . dup @ .pretty lf eotp 0= while
+  dup @ ['] dostr = if
     cell +
     dup .
-    ,key " emit
+    [char] " emit
     dup type
-    ,key " emit
+    [char] " emit
     lf
     dup strlen + 1+ aligned
   else
@@ -135,6 +134,7 @@ repeat drop ;
 : see
   word find 0= if -13 throw then
   ." .code: " dup @ .pretty lf
+  ." .immediate " dup immediatep . lf
   ." .data: "
   dup cell +
   over @ case
@@ -147,18 +147,6 @@ repeat drop ;
   drop
 ; 
 
-\ inline catching of exceptions
-
-: try ( -- pad xt )
-  postpone ahead here &&enter , ; immediate
-
-: catch> ( pad xt -- pad )
-  postpone exit swap postpone then
-  postpone lit , postpone catch postpone ?dup  postpone if ; immediate
-
-: endtry ( pad -- ) postpone then ; immediate
-
-\ read and discard till [then] is read, recurse on [if]
 : skip[if] ( -- )
  begin
    word
