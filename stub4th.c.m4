@@ -26,7 +26,9 @@ dnl $1 - ANS94 error code
 define(`cthrow', `
 do {
   vmstate->errno = $1;
-  vmstate->errstr = ifelse(`$2',`',0,"$2");
+  ifelse(`$2',`', `', `
+    vmstate->errstr = "$2";
+  ')
   return vmstate->errno;
 } while (0)')
 
@@ -69,7 +71,7 @@ undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
-  .name = "ifelse(`$2',`',`$1',`$2')",
+  .name = "ifelse($2,`',$1,$2)",
   .link = dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
@@ -80,7 +82,7 @@ static word w_$1 = {
 ')
 
 dnl Cons a constant
-define(constant, `
+define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
 static word w_$1 = {
   .name = "$1",
@@ -91,7 +93,7 @@ static word w_$1 = {
 
   define(`dict_head', &w_$1)
   define(translit($1,a-z,A-Z), &w_$1.code)
-')
+')')
 
 dnl Cons a headerless thread.
 dnl $1 - C identifier
@@ -111,7 +113,8 @@ static int strcmp(const char *a, const char *b) {
 }
 
 dnl increase p until it has cell alignment
-void *aligned(char *p) {
+void *aligned(void *vp) {
+  char *p = vp;
   while ((vmint)p & (__alignof__(cell)-1))
     p++;
   return (cell *)p;
@@ -131,7 +134,7 @@ static void my_puts(const char *s) {
     putchar(*s++);
 }
 
-static word *find(word *p, const char *key)
+word *find(word *p, const char *key)
 {
    while(p) {
       if(! p->smudge && (0 == strcmp(p->name, key)))
@@ -146,7 +149,10 @@ int main(int argc, char *argv[])
 {
   int result;
   static int fd, flags;
+  char *startword;
+
   initio();
+  stub4th_init();
 
   if (argc > 1) {
      fd = open(argv[1], O_RDWR);
@@ -182,6 +188,8 @@ int main(int argc, char *argv[])
 
   vmstate.dictionary = v->head;
 
+  startword = "boot";
+
   while(1) {
     vmstate.compiling = 0;
     vmstate.raw = 0;
@@ -193,7 +201,7 @@ int main(int argc, char *argv[])
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, &find(forth, "quit")->code);
+    result = vm(&vmstate, &find(forth, startword)->code);
 
     if (!result) {
        v->dp = vmstate.dp;
@@ -210,6 +218,8 @@ int main(int argc, char *argv[])
       if (vmstate.errstr)
         my_puts(vmstate.errstr);
       my_puts("\n");
+      if (ftell(stdin) != -1)
+        printf("ftell(stdin): %lu\n", ftell(stdin));
     }
   }
 }
@@ -240,11 +250,6 @@ int vm(struct vmstate *vmstate, void **xt)
   dp_base = vmstate->dp;
 
 goto start;
-
-primary(abort)
-  vmstate->sp = sp;
-  vmstate->rp = rp;
-  cthrow(-1, abort);
 
 dnl inner interpreter
 enter:
@@ -442,6 +447,12 @@ primary(divmod, /mod)
 dnl control primitives
 
 dnl --
+primary(abort)
+  vmstate->sp = sp;
+  vmstate->rp = rp;
+  cthrow(-1, abort);
+
+dnl --
 primary(branch, , compile_only)
    ip = ip->a;
 
@@ -457,7 +468,7 @@ primary(throw)
 {
    vmstate->sp = sp;
    vmstate->rp = rp;
-   cthrow(sp[-1].i, throw);
+   cthrow(sp[-1].i);
 }
 
 dnl cfa -- i
@@ -510,8 +521,8 @@ primary(cells)
 
 dnl ( n|u a-addr -- )
 primary(plusstore, +!)
-*(vmint *)sp[-1].a += sp[-2].i;
-sp -= 2;
+ *(vmint *)sp[-1].a += sp[-2].i;
+ sp -= 2;
 
 dnl I/O
 
@@ -665,7 +676,7 @@ primary(aligned)
 dnl ( addr -- a-addr )
 primary(align)
 {
-  vmstate->dp = aligned((char *)vmstate->dp);
+  vmstate->dp = aligned(vmstate->dp);
 }
 
 primary(number)
@@ -716,16 +727,19 @@ secondary(ccomma, `c,',,
 secondary(quote, `\"',,
   HERE,
   KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
-  DROP, ZERO, CCOMMA)
+  DROP, ZERO, CCOMMA, ALIGN)
 
-dnl S" in ans94
-secondary(commaquote, `,\"', .immediate=1,
+secondary(squote, `s\"', .immediate=1,
    LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
 secondary(dotquote, `.\"', .immediate=1,
-   COMMAQUOTE, LIT, TYPE, COMMA)
+   SQUOTE, LIT, TYPE, COMMA)
 
 dnl compiler
+secondary(literal,, .immediate=1, l(
+   LIT LIT COMMA COMMA
+))
+
 primary(state)
   (sp++)->i = vmstate->compiling;
 
@@ -754,7 +768,7 @@ dnl ( s -- )
 dnl cons the header of a dictionary entry for s, switch state
 primary(cons)
 {
-  /* TODO: standard says align dp here */
+  vmstate->dp = aligned(vmstate->dp);
   word *new = (word *)vmstate->dp;
   new->name = (--sp)->s;
   new->link = vmstate->dictionary;
@@ -777,8 +791,8 @@ secondary(semi, ;, .immediate=1,
 
 secondary(create,,, WORD, CONS, LIT, &&dovar, COMMA, SMUDGE, SUSPEND)
 secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
-secondary(``constant'',,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
-secondary(``variable'',,, CREATE, ZERO, COMMA)
+secondary(constant,,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
+secondary(variable,,, CREATE, ZERO, COMMA)
 
 dnl start consing a dodoes word
 secondary(builds, <builds,,
@@ -797,7 +811,7 @@ COMMA, EXIT,
 EXECUTE, EXIT,
 NUMBER,
 STATE, NULLP, ZBRANCH, self[19], EXIT,
-LIT, LIT, COMMA, COMMA)
+LITERAL)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
@@ -858,21 +872,23 @@ primary(quiet)
 secondary(qword, ?word,,
   l(WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW ))
 
-secondary(tick, ', .immediate=1,
-    QWORD,
-    STATE, NULLP, ZBRANCH, self[6], EXIT, LIT, LIT, COMMA, COMMA
-)
+secondary(tick, ',, QWORD)
+
+secondary(brackettick, ['], .immediate=1, l(
+    QWORD LITERAL
+))
 
 secondary(postpone,, .immediate=1, l(
    QWORD,
    IMMEDIATEP ZBRANCH self[6] COMMA EXIT
-   LIT LIT COMMA COMMA LIT COMMA COMMA
+   LITERAL LIT COMMA COMMA
 ))
 dnl convenience
 
 dnl non-core
 include(core-ext.m4)
 include(tools.m4)
+include(string.m4)
 dnl include(floating.m4)
 
 dnl platform
