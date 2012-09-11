@@ -48,7 +48,6 @@ clean:
 	rm -f *.o *.s *.elf *.srec *.brec *.bin
 	rm -f flashload
 
-
 init:
 #	stty -F $(TTY) -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
 	stty -F $(TTY) 9600
@@ -105,12 +104,6 @@ dummy.elf : flash.o dummy.o $(LIBGCC)
 flashload: flashload.c
 	gcc -g -Wall flashload.c -o flashload
 
-flash.prog : flash.bin flashload
-	stty -F $(TTY) raw
-	echo flash dup dup funlock ferase fstrap > $(TTY)
-	./flashload $< < $(TTY) > $(TTY)
-	sendbreak > $(TTY)
-
 dummy.prog : dummy.bin flashload
 	stty -F $(TTY) raw
 	echo flash dup dup funlock ferase fstrap > $(TTY)
@@ -128,15 +121,32 @@ user:
 	make vivo.prog
 	make display.prog
 
-USER = user.4th dragon.4th vivo.4th display.4th
+block.0.bin : flash.bin
+	cp flash.bin block.0.bin
 
-boot.4th: $(USER) Makefile
-	cat $(USER) > $@
-	echo 50 honk >> $@
+bblock.%.bin:
+	rm -f $@
+	for f in $+; do cat $$f >> tmp-$@; done
+	stat -c %s tmp-$@
+	[[ 8192 -ge $$(stat -c %s tmp-$@) ]]
+	mv tmp-$@ $@
 
-boot.fprog: boot.4th flashload
+bblock.0.bin: user.4th dragon.4th vivo.4th display.4th
+bblock.1.bin: mset.4th
+
+bblock.%.fprog: bblock.%.bin flashload
+	stat -c %s $<
+	[[ 8192 -ge $$(stat -c %s $<) ]]
 	stty -F $(TTY) raw
-	echo 0 fbblock dup dup funlock ferase fstrap > $(TTY)
+	echo $(<:bblock.%.bin=%) fbblock dup dup funlock ferase fstrap > $(TTY)
+	./flashload < $(TTY) > $(TTY) $<
+	sendbreak > $(TTY)
+
+block.%.fprog: block.%.bin flashload
+	stat -c %s $<
+	[[ 65536 -ge $$(stat -c %s $<) ]]
+	stty -F $(TTY) raw
+	echo $(<:block.%.bin=%) fblock dup dup funlock ferase fstrap > $(TTY)
 	./flashload < $(TTY) > $(TTY) $<
 	sendbreak > $(TTY)
 
