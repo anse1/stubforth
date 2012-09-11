@@ -150,7 +150,7 @@ test "here word w2345678 find drop drop here = ." {1 $}
 test "here 10 allot here swap - ." {10 $}
 
 test {" fox" " quick brown " type type} {quick brown fox$}
-test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy dog$}
+test {: t s" lazy dog" s" jumps over the " type type ; t} {jumps over the lazy dog$}
 
 test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
@@ -166,6 +166,17 @@ test {: t2 1 t ." moo" else ." bar" then ; t2} {moo$}
 
 send ": t postpone hi ; immediate\n"
 test {: t2 t ; t2} {stub4th.*$}
+
+test { " foo" " barz" compare .} {1 $}
+test { " 999" " ba" compare .} {-1 $}
+test { " hmm" " hmm" compare .} {0 $}
+
+test { here " foo" drop" here = .} {1 $}
+
+# send {here }
+# test { 1 [if] 85 emit bl [else] 64 emit bl [then] } {U $}
+# test { 0 [if] 85 emit bl [else] 64 emit bl [then] } {@ $}
+# test { here = . } { 1$}
 
 send "bye\n"
 interact
