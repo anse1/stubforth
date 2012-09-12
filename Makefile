@@ -139,8 +139,8 @@ chainload.%:
 	echo $(@:chainload.%=%) fbblock chainload > $@
 	touch -r chainload.4th $@
 
-bblock.0.bin: user.4th dragon.4th vivo.4th chainload.4th chainload.1
-bblock.1.bin: display.4th chainload.2
+bblock.0.bin: user.4th dragon.4th flash.4th chainload.4th chainload.1
+bblock.1.bin: vivo.4th display.4th chainload.2
 bblock.2.bin: mset.4th chainload.3
 
 sourceblocks: bblock.0.fprog bblock.1.fprog bblock.2.fprog
