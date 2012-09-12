@@ -59,10 +59,10 @@ hex
 ;
 
 decimal
-316 constant touch.xmin
+300 constant touch.xmin
 1492 constant touch.xmax
-540 constant touch.ymin
-1838 constant touch.ymax
+583 constant touch.ymin
+1640 constant touch.ymax
 
 
 : .cords
