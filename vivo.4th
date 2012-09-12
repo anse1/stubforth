@@ -129,6 +129,4 @@ ms
 : rtcirq imr @ mrtc ~ and imr ! ;
 : batirq 1 7 << pdpuen set imr @ mirq6 ~ and imr ! ;
 
-: chainload redirect @ if redirect ! then ;
-    
-1 fbblock chainload
+2 fbblock chainload
