@@ -45,7 +45,9 @@ hex
 		10 of 0100000 endof \ aux1
 		11 of 1100000 endof \ aux 2
 	endcase
-	10000011 or
+\	10000011  \ always-on, penirq off
+	10000000  \ power-down, penirq enabled
+	or
 	spitx
 	[ hex ]
 	0 spitx
@@ -58,17 +60,17 @@ hex
 
 decimal
 
-: debug
-	begin
-		." x: " 0 sample .
-		." y: " 1 sample .
-		." aux1: " 2 sample .
-		." aux2: " 3 sample .
-		lf
-		500 ms
-	again
+
+: touchbug
+	." x: " 0 sample .
+	." y: " 1 sample .
+	." aux1: " 2 sample .
+	." aux2: " 3 sample .
+	." penirq: " pfdata c@ 2 and .
+	lf
 ;
 
+' touchbug forth_vectors 5 cells + !
 
 touch_init
 
