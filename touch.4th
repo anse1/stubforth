@@ -54,12 +54,62 @@ hex
 	spirx 8 <<
 	0 spitx
 	spirx or
-	3 >>
+	4 >>
 	¬touchcs
 ;
 
 decimal
+316 constant touch.xmin
+1492 constant touch.xmax
+540 constant touch.ymin
+1838 constant touch.ymax
 
+
+: .cords
+	2dup
+	." cords: " swap . . lf
+;
+
+\ x y -- x y
+: normalize
+	touch.ymin -
+	swap
+	touch.xmin -
+	swap
+	ydim *
+	touch.ymax touch.ymin - /
+	swap
+	xdim *
+	touch.xmax touch.xmin - /
+	swap
+;
+
+: between \ n1 n2 n3 -- (n2 <= n1)&&(n1 < n3)
+	2 pick
+	\ n1 n2 n3 n1
+	> 0= if 2drop 0 exit then
+	\ n1 n2
+	< if 0 exit then
+	1
+;
+
+\ x y -- t/f
+: valid
+	0 ydim between 0= if 0 exit then
+	0 xdim between 0= if 0 exit then
+	1
+;
+	
+: touchpixel
+	0 sample
+	1 sample
+	normalize
+	2dup
+	valid if setp else
+		." invalid coords: "
+		.cords
+	then
+;	
 
 : touchbug
 	." x: " 0 sample .
@@ -71,6 +121,7 @@ decimal
 ;
 
 ' touchbug forth_vectors 5 cells + !
+' touchpixel forth_vectors 5 cells + !
 
 touch_init
 
