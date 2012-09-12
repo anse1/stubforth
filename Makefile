@@ -133,10 +133,11 @@ bblock.%.bin:
 	mv tmp-$@ $@
 
 chainload.4th:
-	touch $@
+	:
 
 chainload.%:
-	echo $(@:chainload.%=%) fbblock chainload >> $@
+	echo $(@:chainload.%=%) fbblock chainload > $@
+	touch -r chainload.4th $@
 
 bblock.0.bin: user.4th chainload.4th chainload.1
 bblock.1.bin: dragon.4th vivo.4th display.4th chainload.2
