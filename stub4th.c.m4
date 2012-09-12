@@ -777,24 +777,6 @@ LITERAL)
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
 dnl ( -- a )
-secondary(begin,, .immediate=1, HERE)
-dnl ( a -- )
-secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
-
-dnl ( -- a )
-secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
-
-dnl ( a a -- )
-secondary(repeat,, .immediate=1,
- SWAP,
- /* deal with unconditional jump first */
- LIT, BRANCH, COMMA, COMMA,
- /* patch the while jump */
- HERE, SWAP, STORE)
-
-
-dnl ( -- a )
 secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 )
@@ -809,6 +791,23 @@ dnl ( a -- )
 secondary(then,, .immediate=1,
  HERE, SWAP, STORE
 )
+
+dnl ( -- a )
+secondary(begin,, .immediate=1, HERE)
+dnl ( a -- )
+secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
+
+dnl ( -- a )
+secondary(while,, .immediate=1,
+ LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
+
+dnl ( a a -- )
+secondary(repeat,, .immediate=1,
+ SWAP,
+ /* deal with unconditional jump first */
+ LIT, BRANCH, COMMA, COMMA,
+ /* patch the while jump */
+ THEN)
 
 secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
 
