@@ -19,5 +19,5 @@ secondary(abortquote, abort\", .immediate=1, l(
 
 primary(strlen)
   t.s = sp[-1].s;
-  while(*t.s++);
+  while(*++t.s);
   sp[-1].i = t.s - sp[-1].s;
