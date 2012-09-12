@@ -17,3 +17,6 @@ flashload
 boot.4th
 core
 core.*
+bblock.?.fprog
+block.?.fprog
+chainload.?
