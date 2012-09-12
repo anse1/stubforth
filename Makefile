@@ -21,8 +21,8 @@ stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h
 stub4th:  stub4th.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
-%.size: % size
-	./size $<
+%.size: % size.sh
+	. ./size.sh $<
 	strip $<
 	ls -l $<
 
