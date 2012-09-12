@@ -132,6 +132,9 @@ bblock.%.bin:
 	[[ 8192 -ge $$(stat -c %s tmp-$@) ]]
 	mv tmp-$@ $@
 
+chainload.4th:
+	touch $@
+
 chainload.%: Makefile
 	echo $(@:chainload.%=%) fbblock chainload >> $@
 
