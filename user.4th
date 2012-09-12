@@ -112,7 +112,7 @@ or 0= and ;
 repeat drop ;
 
 : see
-  word find 0= if -13 throw then
+  ?word
   ." .code: " dup @ .pretty lf
   ." .immediate: " dup immediatep . lf
   ." .data: "
