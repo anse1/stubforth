@@ -102,21 +102,23 @@ fffd0a constant icemcmr
 fffd08 constant icemccr
 fffd04 constant icemamr
 fffd00 constant icemacr
-1 constant mspi
-2 constant mtmr
-4 constant muart
-8 constant mwdt
-10 constant mrtc
-20 constant mkb
-40 constant mpwm
-80 constant mint0
-100 constant mint1
-200 constant mint2
-400 constant mint3
-800 constant mirq1
-1000 constant mirq2
-2000 constant mirq3
-4000 constant mirq6
-8000 constant mirq5
-10000 constant msam
-20000 constant memiq
+
+decimal
+1 0 << constant mspi
+1 1 << constant mtmr
+1 2 << constant muart
+1 3 << constant mwdt
+1 4 << constant mrtc
+1 6 << constant mkb
+1 7 << constant mpwm
+1 8 << constant mint0
+1 9 << constant mint1
+1 10 << constant mint2
+1 11 << constant mint3
+1 16 << constant mirq1
+1 17 << constant mirq2
+1 18 << constant mirq3
+1 19 << constant mirq6
+1 20 << constant mirq5
+1 22 << constant msam
+1 23 << constant memiq

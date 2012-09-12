@@ -9,6 +9,8 @@
 
 char *redirect;
 
+void **forth_vectors[8];
+
 static void my_puts(const char *);
 
 static int putchar(int c)
@@ -150,16 +152,19 @@ static void uart_interrupt()
   }
 }
 
-void forth_handler(const char *word)
+void forth_handler(int level)
 {
   struct vmstate irqstate = vmstate;
-  struct word *w = find(vmstate.dictionary, word);
-  if (!w) return;
+  void **xt = forth_vectors[level];
+  my_puts("C handler\n");
+  if (!xt) return;
+  my_puts("Forth vector found\n");
   cell ps[100];
   cell rs[100];
   irqstate.rp = rs;
   irqstate.sp = ps;
-  vm(&irqstate, &w->code);
+  vm(&irqstate, xt);
+  my_puts("VM returned\n");
 }
 
 __attribute__((interrupt_handler))
@@ -171,24 +176,24 @@ void ivect_level4 ()
     return;
   }
 
-  forth_handler("int-level4");
+  forth_handler(4);
   return;
 
 }
 
 define(userirq, `
 __attribute__((interrupt_handler))
-void ivect_$1 ()
+void ivect_level$1 ()
 {
-  forth_handler("int-$1");
+  forth_handler($1);
   return;
 } ')
 
-userirq(level1)
-userirq(level2)
-userirq(level3)
-userirq(level5)
-userirq(level6)
+userirq(1)
+userirq(2)
+userirq(3)
+userirq(5)
+userirq(6)
 
 /* Achtung: This table is offset by 2 wrt the manual because the
    linker script already put the reset PC and SP values in this

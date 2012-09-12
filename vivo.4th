@@ -27,7 +27,7 @@ ms
 1 6 << constant s3
 1 7 << constant nlcdon
 
-\ interrupts
+\ interrupts
 
 : s3irq  s3 pdsel clear imr @ mirq3 ~ and imr ! ;
 : penirq  2 pfsel clear imr @ mirq5 ~ and imr ! ;
@@ -43,4 +43,19 @@ ms
 	8 >> 1f and
 	0 0 0
 ;
+
+: handler
+	." yay, this is forth handling an interrupt" lf
+	hex
+	." ISR: " isr ? lf
+	." IPR: " ipr ? lf
+	." SR: " sr@ . lf
+;
+
+' handler forth_vectors 1 cells + !
+' handler forth_vectors 2 cells + !
+' handler forth_vectors 3 cells + !
+' handler forth_vectors 4 cells + !
+' handler forth_vectors 5 cells + !
+' handler forth_vectors 6 cells + !
 

@@ -36,6 +36,7 @@ primary(stop)
 asm("stop #0x2000");
 
 constant(redirect, &redirect)
+constant(forth_vectors, forth_vectors)
 
 dnl override boot
 
