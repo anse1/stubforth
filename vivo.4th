@@ -87,6 +87,11 @@ begin
  >
   until ;
 
+: fstrlen
+dup
+begin dup c@ 1 negate = 0= while 1+ repeat
+swap - ;
+
 hex 
 
 \ power control
@@ -96,11 +101,11 @@ hex
 
 : DUMP flash 400 raw dump ;
 
-: ms ( n --, pause for approx n milliseconds)
+: ms ( n -- )
  [ decimal ]
   27 * begin 1 - dup while repeat drop ;
 
-: honk ( n -- )
+: honk ( ms -- )
 [ hex ]
 1 7 << pbsel clear
 80 pwmc c!
