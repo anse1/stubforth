@@ -185,5 +185,7 @@ set timeout 5
 send "t\n"
 expect -re {abort:.*?The quick brown fox.*}
 
+test {.( moo)} {moo}
+
 send "bye\n"
 interact
