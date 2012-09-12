@@ -120,9 +120,10 @@ decimal
 	lf
 ;
 
-' touchbug forth_vectors 5 cells + !
-' touchpixel forth_vectors 5 cells + !
-
 touch_init
 
-debug
+\ ' touchbug forth_vectors 5 cells + !
+
+' touchpixel forth_vectors 5 cells + !
+
+\ debug
