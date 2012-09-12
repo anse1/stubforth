@@ -132,8 +132,9 @@ bblock.%.bin:
 	[[ 8192 -ge $$(stat -c %s tmp-$@) ]]
 	mv tmp-$@ $@
 
-bblock.0.bin: user.4th dragon.4th vivo.4th
-bblock.1.bin: display.4th mset.4th
+bblock.0.bin: user.4th
+bblock.1.bin: dragon.4th vivo.4th display.4th
+bblock.2.bin: mset.4th
 
 bblock.%.fprog: bblock.%.bin flashload
 	stat -c %s $<
