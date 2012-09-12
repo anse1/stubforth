@@ -21,7 +21,9 @@ dnl $1 - ANS94 error code
 define(`cthrow', `
 do {
   vmstate->errno = $1;
-  vmstate->errstr = ifelse(`$2',`',0,"$2");
+  ifelse(`$2',`', `', `
+    vmstate->errstr = "$2";
+  ')
   return vmstate->errno;
 } while (0)')
 
@@ -209,11 +211,6 @@ int vm(struct vmstate *vmstate, void **xt)
   dp_base = vmstate->dp;
 
 goto start;
-
-primary(abort)
-  vmstate->sp = sp;
-  vmstate->rp = rp;
-  cthrow(-1, abort);
 
 dnl inner interpreter
 enter:
@@ -411,6 +408,12 @@ primary(divmod, /mod)
 dnl control primitives
 
 dnl --
+primary(abort)
+  vmstate->sp = sp;
+  vmstate->rp = rp;
+  cthrow(-1, abort);
+
+dnl --
 primary(branch, , compile_only)
    ip = ip->a;
 
@@ -426,7 +429,7 @@ primary(throw)
 {
    vmstate->sp = sp;
    vmstate->rp = rp;
-   cthrow(sp[-1].i, throw);
+   cthrow(sp[-1].i);
 }
 
 dnl cfa -- i

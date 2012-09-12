@@ -114,7 +114,7 @@ or 0= and ;
   then
 ;
 
-: [char] key literal ; immediate
+: [char] key postpone literal ; immediate
 
 : disas
   begin dup . dup @ .pretty lf eotp 0= while
@@ -134,7 +134,7 @@ repeat drop ;
 : see
   word find 0= if -13 throw then
   ." .code: " dup @ .pretty lf
-  ." .immediate " dup immediatep . lf
+  ." .immediate: " dup immediatep . lf
   ." .data: "
   dup cell +
   over @ case
@@ -192,3 +192,4 @@ again ;
     endcase
   endtry
 ; immediate
+
