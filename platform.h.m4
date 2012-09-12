@@ -156,15 +156,17 @@ void forth_handler(int level)
 {
   struct vmstate irqstate = vmstate;
   void **xt = forth_vectors[level];
-  my_puts("C handler\n");
   if (!xt) return;
-  my_puts("Forth vector found\n");
   cell ps[100];
   cell rs[100];
   irqstate.rp = rs;
   irqstate.sp = ps;
-  vm(&irqstate, xt);
-  my_puts("VM returned\n");
+  if(vm(&irqstate, xt)) {
+    my_puts("\n x_x ");
+    my_puts("exception in Forth interrupt handler level ");
+    putchar('0' + level);
+    my_puts(" x_x ");
+  }
 }
 
 __attribute__((interrupt_handler))
