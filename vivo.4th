@@ -128,5 +128,3 @@ ms
 : suspend 1 3 << pllcr 1+ set max3221off stop max3221on ;
 : rtcirq imr @ mrtc ~ and imr ! ;
 : batirq 1 7 << pdpuen set imr @ mirq6 ~ and imr ! ;
-
-2 fbblock chainload
