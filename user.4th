@@ -47,17 +47,17 @@ lf ;
 
 decimal
 
-word hexchars find drop @ constant &&docon
-word hi find drop @ constant &&enter
+?word hexchars @ constant &&docon
+?word hi @ constant &&enter
 
 : buildsnothing <builds does> ;
 buildsnothing doesnothing
-word doesnothing find drop @
+?word doesnothing @
 forget buildsnothing
 constant &&dodoes
 
 variable somevar
-word somevar find drop @
+?word somevar @
 forget somevar
 constant &&dovar
 
