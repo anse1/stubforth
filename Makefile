@@ -119,8 +119,11 @@ boot:
 user:
 	make user.prog
 	make dragon.prog
+	make flash.prog
+	make chainload.4th
 	make vivo.prog
 	make display.prog
+	make mset.prog
 
 block.0.bin : flash.bin
 	cp flash.bin block.0.bin
