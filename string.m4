@@ -16,3 +16,8 @@ secondary(abortquote, abort\", .immediate=1, l(
   LIT .i=-2 LITERAL
   LIT THROW COMMA
 ))
+
+primary(strlen)
+  t.s = sp[-1].s;
+  while(*t.s++);
+  sp[-1].i = t.s - sp[-1].s;

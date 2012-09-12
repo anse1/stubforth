@@ -53,3 +53,7 @@ dnl pad --
 secondary(endtry,,.immediate=1, l(
   THEN EXIT
 ))
+
+primary(dotparen, `.(', immediate)
+while ((t.i = getchar()) != ')')
+  putchar(t.i);
