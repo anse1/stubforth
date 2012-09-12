@@ -8,8 +8,10 @@
 #include <unistd.h>
 #include <time.h>
 
-/* flags.break_condition can be set in an ISR to interrupt the
-   interpreter. */
+struct vocabulary {
+  cell *dp;
+  word *head;
+};
 
 static void initio()
 {

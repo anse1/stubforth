@@ -42,11 +42,6 @@ struct vmstate {
   const char *errstr;
 };
 
-struct vocabulary {
-  cell *dp;
-  word *head;
-};
-
 #define IS_WORD(c) (c > ' ')
 
 #define offsetof(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
