@@ -97,3 +97,17 @@ fractal tail
 100 -17343002 44280635 3000
 fractal spots
 
+(
+	
+new entire mset save entirefb
+new pretty mset save prettyfb
+new spiral mset save spiralfb
+new deep mset save deepfb
+new bolt mset save boltfb
+new dragon mset save dragonfb
+new horses mset save horsesfb
+new antenna mset save antennafb
+new tail mset save tailfb
+new spots mset save spotsfb
+
+)
