@@ -57,3 +57,9 @@ secondary(endtry,,.immediate=1, l(
 primary(dotparen, `.(', immediate)
 while ((t.i = getchar()) != ')')
   putchar(t.i);
+
+primary(tuck)
+sp[0] = sp[-1];
+sp[-1] = sp[-2];
+sp[-2] = sp[0];
+sp++;
