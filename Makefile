@@ -47,7 +47,7 @@ clean:
 	rm -f *grind.out.* stub4th
 	rm -f .rev.h *.o *.s stub4th.c
 	rm -f *.o *.s *.elf *.srec *.brec *.bin
-	rm -f flashload
+	rm -f flashload chainload.?
 
 init:
 #	stty -F $(TTY) -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
@@ -132,9 +132,15 @@ bblock.%.bin:
 	[[ 8192 -ge $$(stat -c %s tmp-$@) ]]
 	mv tmp-$@ $@
 
-bblock.0.bin: user.4th
-bblock.1.bin: dragon.4th vivo.4th display.4th
+chainload.%: Makefile
+	echo $(@:chainload.%=%) fbblock chainload >> $@
+
+bblock.0.bin: user.4th chainload.4th chainload.1
+bblock.1.bin: dragon.4th vivo.4th display.4th chainload.2
 bblock.2.bin: mset.4th
+
+sourceblocks: bblock.0.fprog bblock.1.fprog bblock.2.fprog
+blocks: block.0.fprog sourceblocks
 
 bblock.%.fprog: bblock.%.bin flashload
 	stat -c %s $<
@@ -143,6 +149,7 @@ bblock.%.fprog: bblock.%.bin flashload
 	echo $(<:bblock.%.bin=%) fbblock dup dup funlock ferase fstrap > $(TTY)
 	./flashload < $(TTY) > $(TTY) $<
 	sendbreak > $(TTY)
+	touch $@
 
 block.%.fprog: block.%.bin flashload
 	stat -c %s $<
@@ -151,6 +158,7 @@ block.%.fprog: block.%.bin flashload
 	echo $(<:block.%.bin=%) fblock dup dup funlock ferase fstrap > $(TTY)
 	./flashload < $(TTY) > $(TTY) $<
 	sendbreak > $(TTY)
+	touch $@
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
