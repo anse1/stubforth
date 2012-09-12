@@ -1,24 +1,7 @@
 \ non-platform-specific forth code
 
-hex
-
-: fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;
-: tuck swap over ;
-: gcd dup if tuck mod recurse else drop then ;
-
-: strlen ( s -- n )
-dup
-begin dup c@ while 1+ repeat
-swap - ;
-
-: fstrlen ( s -- n )
-dup
-begin dup c@ 1 negate = 0= while 1+ repeat
-swap - ;
-
 : forget ( read a word to forget, adjusts dp )
- word find 0= if abort then
- >word dup  >link @ context ! >name @ dp ! ;
+	word? >word dup >link @ context ! >name @ dp ! ;
 
 \ bit flipping
 
@@ -52,13 +35,10 @@ repeat drop ;
 begin dup while
 dumpaddr dump8
 dup 0= if exit then
-."  " dump8 ." 
-" repeat ." 
-" ;
+bl dump8 lf repeat lf ;
 
 : dumpraw ( addr n -- )
 over + swap
-( endaddr addr )
 begin
 dup c@ emit
 1 + 2dup <
