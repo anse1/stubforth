@@ -10,3 +10,10 @@ primary(sync)
   v->dp = vmstate->dp;
 }
 
+primary(epoch)
+{
+ (sp++)->i = time(0);
+}
+
+primary(ms)
+ usleep(1000*sp[-1].i);
