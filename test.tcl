@@ -70,7 +70,6 @@ test "0 ifelsethen" UAU
 send ": fib dup 0= if else dup 1 = if else 1 - dup recurse swap 1 - recurse + then then ;\n"
 test "20 fib ." 6765
 
-send ": tuck swap over ;\n"
 send ": gcd dup if tuck mod recurse else drop then ;\n"
 
 test "decimal 11111 12341 gcd ." {41 $}
