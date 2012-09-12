@@ -7,7 +7,7 @@
 
 #define DASM(x)  do { int p; my_puts(x ": ") ; asm("move.w " x  ", %0" : "=r"(p));   cprint(p); } while (0)
 
-char *redirect;
+unsigned char *redirect;
 
 void **forth_vectors[8];
 
