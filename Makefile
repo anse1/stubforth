@@ -147,7 +147,7 @@ bblock.1.bin: vivo.4th display.4th chainload.2
 bblock.2.bin: mset.4th chainload.3
 bblock.3.bin: touch.4th chainload.4
 
-sourceblocks: bblock.0.fprog bblock.1.fprog bblock.2.fprog
+sourceblocks: bblock.0.fprog bblock.1.fprog bblock.2.fprog bblock.3.fprog
 blocks: block.0.fprog sourceblocks
 
 bblock.%.fprog: bblock.%.bin flashload
