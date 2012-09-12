@@ -6,11 +6,11 @@
 \ bit flipping
 
 : flip ( c a -- ) 
-  swap over c@ xor swap c! ;
+  tuck c@ xor swap c! ;
 : set ( c a -- )
-  swap over c@ or swap c! ;
+  tuck c@ or swap c! ;
 : clear ( c a -- )
-  swap over c@ swap ~ and swap c! ;
+  tuck c@ swap ~ and swap c! ;
 
 hex
 
