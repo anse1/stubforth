@@ -127,7 +127,7 @@ block.0.bin : flash.bin
 
 bblock.%.bin:
 	rm -f $@
-	for f in $+; do echo ".( loading $$f...) lf " ; cat $$f ; done > tmp-$@
+	for f in $+; do echo ".( loading $$f…) lf " ; cat $$f ; done > tmp-$@
 	stat -c %s tmp-$@
 	[[ 8192 -ge $$(stat -c %s tmp-$@) ]]
 	mv tmp-$@ $@
@@ -139,7 +139,7 @@ chainload.%:
 	echo $(@:chainload.%=%) fbblock chainload > $@
 	touch -r chainload.4th $@
 
-bblock.0.bin: user.4th chainload.4th dragon.4th vivo.4th chainload.4th chainload.1
+bblock.0.bin: user.4th dragon.4th vivo.4th chainload.4th chainload.1
 bblock.1.bin: display.4th chainload.2
 bblock.2.bin: mset.4th chainload.3
 
