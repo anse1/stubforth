@@ -4,9 +4,6 @@ hex
 
 : sleep 80 pctlr c! ;
 
-
-: DUMP flash 400 raw dump ;
-
 : ms ( n -- )
  [ decimal ]
   27 * begin 1 - dup while repeat drop ;
