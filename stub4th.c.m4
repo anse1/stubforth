@@ -168,6 +168,7 @@ int main()
     vmstate.rp = return_stack;
 
     result = vm(&vmstate, &find(forth, startword)->code);
+    startword = "quit";
 
     if (!result)
        return 0;
