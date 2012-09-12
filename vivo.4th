@@ -128,3 +128,12 @@ ms
 : suspend 1 3 << pllcr 1+ set max3221off stop max3221on ;
 : rtcirq imr @ mrtc ~ and imr ! ;
 : batirq 1 7 << pdpuen set imr @ mirq6 ~ and imr ! ;
+
+: time&date
+	[ hex ]
+	rtctime @
+	dup 3f and swap
+	10 >> dup 3f and swap
+	8 >> 1f and
+	0 0 0
+;
