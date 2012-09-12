@@ -1,125 +1,122 @@
 hex
-: scr FFF000 ;
-: mrr FFF004 ;
-: csgba FFF100 ;
-: csgbb FFF102 ;
-: csgbc FFF104 ;
-: csgbd FFF106 ;
-: csa FFF110 ;
-: csb FFF112 ;
-: csc FFF114 ;
-: csd FFF116 ;
-: emucs FFF118 ;
-: pllcr FFF200 ;
-: pllfsr FFF202 ;
-: pctlr FFF207 ;
-: ivr FFF300 ;
-: icr FFF302 ;
-: imr FFF304 ;
-: isr FFF30C ;
-: ipr FFF30C ;
-: padir FFF400 ;
-: padata FFF401 ;
-: papuen FFF402 ;
-: pbdir FFF408 ;
-: pbdata FFF409 ;
-: pbpuen FFF40A ;
-: pbsel FFF40B ;
-: pcdir FFF410 ;
-: pcdata FFF411 ;
-: pcpden FFF412 ;
-: pcsel FFF413 ;
-: pddir FFF418 ;
-: pddata FFF419 ;
-: pdpuen FFF41A ;
-: pdsel FFF41B ;
-: pdpol FFF41C ;
-: pdirqen FFF41D ;
-: pdkben FFF41E ;
-: pdiqeg FFF41F ;
-: pedir FFF420 ;
-: pedata FFF421 ;
-: pepuen FFF422 ;
-: pesel FFF423 ;
-: pfdir FFF428 ;
-: pfdata FFF429 ;
-: pfpuen FFF42A ;
-: pfsel FFF42B ;
-: pgdir FFF430 ;
-: pgdata FFF431 ;
-: pgpuen FFF432 ;
-: pgsel FFF433 ;
-: pwmc FFF500 ;
-: pwms FFF502 ;
-: pwmp FFF504 ;
-: pwmcnt FFF505 ;
-: tctl FFF600 ;
-: tprer FFF602 ;
-: tcmp FFF604 ;
-: tcr FFF606 ;
-: tcn FFF608 ;
-: tstat FFF60A ;
-: spimdata FFF800 ;
-: spimcont FFF802 ;
-: ustcnt FFF900 ;
-: ubaud FFF902 ;
-: urx FFF904 ;
-: rxdata FFF905 ;
-: utx FFF906 ;
-: txdata FFF907 ;
-: umisc FFF908 ;
-: nipr FFF90A ;
-: lssa FFFA00 ;
-: lvpw FFFA05 ;
-: lxmax FFFA08 ;
-: lymax FFFA0A ;
-: lcxp FFFA18 ;
-: lcyp FFFA1A ;
-: lcwch FFFA1C ;
-: lblkc FFFA1F ;
-: lpicf FFFA20 ;
-: lpolcf FFFA21 ;
-: lacdrc FFFA23 ;
-: lpxcd FFFA25 ;
-: lckcon FFFA27 ;
-: lrra FFFA29 ;
-: lposr FFFA2D ;
-: lfrcm FFFA31 ;
-: lgpmr FFFA33 ;
-: pwmr FFFA36 ;
-: rtctime FFFB00 ;
-: rtcalrm FFFB04 ;
-: watchdog FFFB0A ;
-: rtcctl FFFB0C ;
-: rtcisr FFFB0E ;
-: rtcienr FFFB10 ;
-: stpwch FFFB12 ;
-: dayr FFFB1A ;
-: dayalarm FFFB1C ;
-: icemcr fffffd0c ;
-: icemsr fffffd0e ;
-: icemcmr fffffd0a ;
-: icemccr fffffd08 ;
-: icemamr fffffd04 ;
-: icemacr fffffd00 ;
-
-decimal
-1 0 << constant mspi
-1 1 << constant mtmr
-1 2 << constant muart
-1 3 << constant mwdt
-1 4 << constant mrtc
-1 6 << constant mkb
-1 7 << constant mpwm
-1 8 << constant mint0
-1 9 << constant mint1
-1 10 << constant mint2
-1 11 << constant mint3
-1 16 << constant mirq1
-1 17 << constant mirq2
-1 18 << constant mirq3
-1 19 << constant mirq6
-1 20 << constant mirq5
-1 22 << constant msam
-1 23 << constant memiq
-hex
+fff000 constant scr
+fff004 constant mrr
+fff100 constant csgba
+fff102 constant csgbb
+fff104 constant csgbc
+fff106 constant csgbd
+fff110 constant csa
+fff112 constant csb
+fff114 constant csc
+fff116 constant csd
+fff118 constant emucs
+fff200 constant pllcr
+fff202 constant pllfsr
+fff207 constant pctlr
+fff300 constant ivr
+fff302 constant icr
+fff304 constant imr
+fff30c constant isr
+fff30c constant ipr
+fff400 constant padir
+fff401 constant padata
+fff402 constant papuen
+fff408 constant pbdir
+fff409 constant pbdata
+fff40a constant pbpuen
+fff40b constant pbsel
+fff410 constant pcdir
+fff411 constant pcdata
+fff412 constant pcpden
+fff413 constant pcsel
+fff418 constant pddir
+fff419 constant pddata
+fff41a constant pdpuen
+fff41b constant pdsel
+fff41c constant pdpol
+fff41d constant pdirqen
+fff41e constant pdkben
+fff41f constant pdiqeg
+fff420 constant pedir
+fff421 constant pedata
+fff422 constant pepuen
+fff423 constant pesel
+fff428 constant pfdir
+fff429 constant pfdata
+fff42a constant pfpuen
+fff42b constant pfsel
+fff430 constant pgdir
+fff431 constant pgdata
+fff432 constant pgpuen
+fff433 constant pgsel
+fff500 constant pwmc
+fff502 constant pwms
+fff504 constant pwmp
+fff505 constant pwmcnt
+fff600 constant tctl
+fff602 constant tprer
+fff604 constant tcmp
+fff606 constant tcr
+fff608 constant tcn
+fff60a constant tstat
+fff800 constant spimdata
+fff802 constant spimcont
+fff900 constant ustcnt
+fff902 constant ubaud
+fff904 constant urx
+fff905 constant rxdata
+fff906 constant utx
+fff907 constant txdata
+fff908 constant umisc
+fff90a constant nipr
+fffa00 constant lssa
+fffa05 constant lvpw
+fffa08 constant lxmax
+fffa0a constant lymax
+fffa18 constant lcxp
+fffa1a constant lcyp
+fffa1c constant lcwch
+fffa1f constant lblkc
+fffa20 constant lpicf
+fffa21 constant lpolcf
+fffa23 constant lacdrc
+fffa25 constant lpxcd
+fffa27 constant lckcon
+fffa29 constant lrra
+fffa2d constant lposr
+fffa31 constant lfrcm
+fffa33 constant lgpmr
+fffa36 constant pwmr
+fffb00 constant rtctime
+fffb04 constant rtcalrm
+fffb0a constant watchdog
+fffb0c constant rtcctl
+fffb0e constant rtcisr
+fffb10 constant rtcienr
+fffb12 constant stpwch
+fffb1a constant dayr
+fffb1c constant dayalarm
+fffd0c constant icemcr
+fffd0e constant icemsr
+fffd0a constant icemcmr
+fffd08 constant icemccr
+fffd04 constant icemamr
+fffd00 constant icemacr
+1 constant mspi
+2 constant mtmr
+4 constant muart
+8 constant mwdt
+10 constant mrtc
+20 constant mkb
+40 constant mpwm
+80 constant mint0
+100 constant mint1
+200 constant mint2
+400 constant mint3
+800 constant mirq1
+1000 constant mirq2
+2000 constant mirq3
+4000 constant mirq6
+8000 constant mirq5
+10000 constant msam
+20000 constant memiq
