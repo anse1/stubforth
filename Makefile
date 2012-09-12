@@ -135,7 +135,7 @@ bblock.%.bin:
 chainload.4th:
 	touch $@
 
-chainload.%: Makefile
+chainload.%:
 	echo $(@:chainload.%=%) fbblock chainload >> $@
 
 bblock.0.bin: user.4th chainload.4th chainload.1
