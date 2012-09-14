@@ -25,11 +25,11 @@ define(div_start, 3);
 dnl $1 - ANS94 error code
 define(`cthrow', `
 do {
-  vmstate->errno = $1;
+  vmstate->errno.i = $1;
   ifelse(`$2',`', `', `
     vmstate->errstr = "$2";
   ')
-  return vmstate->errno;
+  return vmstate->errno.i;
 } while (0)')
 
 define(primary, `
@@ -194,8 +194,7 @@ int main(int argc, char *argv[])
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
-    vmstate.base = 10;
-    vmstate.errno = 0;
+    vmstate.errno.i = 0;
     vmstate.base = 10;
     vmstate.errstr = 0;
     vmstate.sp = param_stack;
@@ -816,24 +815,6 @@ LITERAL)
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
 dnl ( -- a )
-secondary(begin,, .immediate=1, HERE)
-dnl ( a -- )
-secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
-
-dnl ( -- a )
-secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
-
-dnl ( a a -- )
-secondary(repeat,, .immediate=1,
- SWAP,
- /* deal with unconditional jump first */
- LIT, BRANCH, COMMA, COMMA,
- /* patch the while jump */
- HERE, SWAP, STORE)
-
-
-dnl ( -- a )
 secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 )
@@ -848,6 +829,23 @@ dnl ( a -- )
 secondary(then,, .immediate=1,
  HERE, SWAP, STORE
 )
+
+dnl ( -- a )
+secondary(begin,, .immediate=1, HERE)
+dnl ( a -- )
+secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
+
+dnl ( -- a )
+secondary(while,, .immediate=1,
+ LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
+
+dnl ( a a -- )
+secondary(repeat,, .immediate=1,
+ SWAP,
+ /* deal with unconditional jump first */
+ LIT, BRANCH, COMMA, COMMA,
+ /* patch the while jump */
+ THEN)
 
 secondary(hi,,, LIT, .s= FORTHNAME " " REVISION "\n", TYPE)
 

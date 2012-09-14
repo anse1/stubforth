@@ -11,22 +11,22 @@ dnl recurse: substr(`$1',0,decr(len(`$1')))
 
 
 changequote(.[,.])
-define(.[quote.], .[$@.])
-define(.[rest.], .[quote(substr(.[$1.],0,decr(len(.[$1.])))).])
-define(.[char.], .[quote(substr(.[$1.],decr(len(.[$1.])),1)).])
+define(.[hashquote.], .[$@.])
+define(.[hashrest.], .[hashquote(substr(.[$1.],0,decr(len(.[$1.])))).])
+define(.[hashchar.], .[hashquote(substr(.[$1.],decr(len(.[$1.])),1)).])
 define(.[m4hash1.], .[ifelse(len(.[$1.]),0,0,
-	.[eval(m4hash1(rest(.[$1.])) * hash_prime
-              + ord1(255, char(.[$1.]))) .]).])
+	.[eval(m4hash1(hashrest(.[$1.])) * hash_prime
+              + ord1(255, hashchar(.[$1.]))) .]).])
 changequote(`,')
 define(`m4hash', `changequote(.[,.])m4hash1(quote(.[$1.]))resetquote')
 
-cell chash(const char *s)
+vmint chash(const char *s)
 {
-    cell c;
-    c.i = *s++;
+    vmint i;
+    i = *s++;
     while (*s) {
-      c.i = c.i * hash_prime + *s;
+      i = i * hash_prime + *s;
       s++;
     }
-    return c;
+    return i;
 }
