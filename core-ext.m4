@@ -63,3 +63,7 @@ sp[0] = sp[-1];
 sp[-1] = sp[-2];
 sp[-2] = sp[0];
 sp++;
+
+primary(nip)
+sp[-2] = sp[-1];
+sp--;

@@ -173,3 +173,8 @@ again ;
   endtry
 ; immediate
 
+: restart
+	postpone branch
+	context @ >code >body ,
+; immediate
+
