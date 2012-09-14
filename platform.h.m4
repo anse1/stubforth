@@ -240,8 +240,8 @@ static int getchar()
 
   if (redirect) {
     c = *redirect++;
-    if (!c || c == -1)
-      redirect = 0;
+    if (!c || c == 0xff)
+      return redirect = 0, '\n';
     else
       return c;
   }
