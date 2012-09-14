@@ -20,11 +20,11 @@ define(div_start, 3);
 dnl $1 - ANS94 error code
 define(`cthrow', `
 do {
-  vmstate->errno = $1;
+  vmstate->errno.i = $1;
   ifelse(`$2',`', `', `
     vmstate->errstr = "$2";
   ')
-  return vmstate->errno;
+  return vmstate->errno.i;
 } while (0)')
 
 define(primary, `
@@ -161,7 +161,7 @@ int main()
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
-    vmstate.errno = 0;
+    vmstate.errno.i = 0;
     vmstate.base = 10;
     vmstate.errstr = 0;
     vmstate.sp = param_stack;

@@ -29,7 +29,7 @@ struct vmstate {
   cell *sp; /* Invalid during execution of a VM. */
   struct word *dictionary;
   char base; /* This ought to be cell-sized according to standards. */
-  int errno : 14; /* Set when vm() returns because of a THROW */
+  cell errno; /* Set when vm() returns because of a THROW */
 
   int compiling : 1; /* Used by state-aware words INTERPRET and TICK */
 
