@@ -1,6 +1,6 @@
 
 GCC = gcc
-CFLAGS = -O2  -g -Wall -Wcast-align
+CFLAGS= -O2 -ffreestanding -nostdlib -Wl,-emain -static
 SYNC = -s
 
 all: stub4th
