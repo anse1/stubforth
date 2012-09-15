@@ -181,16 +181,6 @@ test {: t 85 emit try 666 throw catch> 1+ . endtry 64 emit ; t } {U667 @$}
 test {: t 125 try 666 1 throw catch> drop endtry 1+ . ; t } {126 $}
 test {: t 125 try 666 catch> drop endtry 1+ . ; t } {667 $}
 
-send {: t abort" The quick brown fox" ; }
-
-set timeout 0
-expect plzflushkthx
-expect *
-set timeout 5
-
-send "t\n"
-expect -re {abort:.*?The quick brown fox.*}
-
 test {.( moo)} {moo}
 
 send "bye\n"

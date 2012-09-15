@@ -16,15 +16,21 @@ define(dict_head, 0);
 define(div_word, 1);
 define(div_init, 2);
 define(div_start, 3);
+define(div_errdb, 4);
+
+dnl $1 - error code
+dnl $2 - error message
+define(`staticerr', `
+  ifdef(`errdb $2',,`
+      	divert(div_errdb)
+	{ {.i=$1}, {.s="$2"} },
+	divert')')
 
 dnl $1 - ANS94 error code
 define(`cthrow', `
 do {
-  vmstate->errno.i = $1;
-  ifelse(`$2',`', `', `
-    vmstate->errstr = "$2";
-  ')
-  return vmstate->errno.i;
+   staticerr($1, `$2')
+   return $1;
 } while (0)')
 
 define(primary, `
@@ -161,28 +167,28 @@ int main()
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
-    vmstate.errno.i = 0;
     vmstate.base = 10;
-    vmstate.errstr = 0;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, &find(forth, startword)->code);
-    startword = "quit";
+    result = vm(&vmstate, &find(vmstate.dictionary, startword)->code);
 
     if (!result)
        return 0;
     else {
-      my_puts("abort: ");
-      vmstate.sp = param_stack;
-      vmstate.rp = return_stack;
-      vmstate.base = 10;
-      (vmstate.sp++)->i = result;
-      vm(&vmstate, &find(forth, ".")->code);
-      if (vmstate.errstr)
-        my_puts(vmstate.errstr);
-      my_puts("\n");
+      word *w = find(vmstate.dictionary, "perror");
+      if (w) {
+            vmstate.sp = param_stack;
+      	    vmstate.rp = return_stack;
+	    vmstate.base = 10;
+	    (vmstate.sp++)->i = result;
+	    result = vm(&vmstate, &w->code);
+      } else {
+      	    my_puts("abort\n");
+      }
     }
+
+    startword = "quit";
   }
 }
 
@@ -430,7 +436,7 @@ primary(throw)
 {
    vmstate->sp = sp;
    vmstate->rp = rp;
-   cthrow(sp[-1].i);
+   return sp[-1].i;
 }
 
 dnl cfa -- i
@@ -537,6 +543,13 @@ primary(linecomment, `\\', immediate)
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
 
+primary(type)
+dnl ( s -- ) send zstring
+{
+  char *s = (--sp)->s;
+  my_puts(s);
+}
+
 dnl dictionary
 
 primary(context)
@@ -555,13 +568,6 @@ primary(comma, `,')
 primary(here)
 dnl ( -- a ) push dictionary pointer onto parameter stack
   (sp++)->a = vmstate->dp;
-
-primary(type)
-dnl ( s -- ) send zstring
-{
-  char *s = (--sp)->s;
-  my_puts(s);
-}
 
 primary(find)
 dnl s -- cfa tf (found) -- s ff (not found)
@@ -697,6 +703,8 @@ secondary(squote, `s\"', .immediate=1,
 secondary(dotquote, `.\"', .immediate=1,
    SQUOTE, LIT, TYPE, COMMA)
 
+constant(errdb, errdb)
+
 dnl compiler
 secondary(literal,, .immediate=1, l(
    LIT LIT COMMA COMMA
@@ -830,6 +838,7 @@ primary(echo)
 primary(quiet)
  vmstate->quiet = 1;
 
+staticerr(-13, undefined word)
 secondary(qword, ?word,,
   l(WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW ))
 
@@ -882,6 +891,11 @@ void stub4th_init ()
    /* Initialize forth with the static list head. */
    vm(0,0);
 }
+
+struct errmsg errdb[] = {
+       undivert(div_errdb)
+       { {.i=0}, {.s=0} }
+};
 
 /*
 Local Variables:
