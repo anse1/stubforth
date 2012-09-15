@@ -15,9 +15,9 @@ static int getchar() {
    volatile register char * buf	asm ("%rsi") = &c;
    volatile register int count	asm ("%rdx") = 1;
    asm("syscall"
-      : "=r" (callno)
+      : "=r" (callno), "=m" (c)
       : "0" (callno), "r"(fd), "r"(buf), "r"(count)
-      : "rcx", "r11", "memory"
+      : "rcx", "r11"
       );
   return (callno != 1) ? callno : c;
 }
@@ -30,8 +30,8 @@ static int putchar(int i) {
   volatile register int count	asm ("%rdx") = 1;
 
     asm("syscall"
-	: "=r" (callno), "=m"(c)
-	: "r" (callno), "r"(fd), "r"(buf), "r"(count)
+	: "=r" (callno)
+	: "r" (callno), "r"(fd), "r"(buf), "r"(count), "m"(c)
 	: "rcx", "r11"
 	);
   return callno;
