@@ -476,6 +476,16 @@ primary(plusstore, +!)
  *(vmint *)sp[-1].a += sp[-2].i;
  sp -= 2;
 
+primary(move)
+{
+ char *s = sp[-3].s;
+ char *d = sp[-2].s;
+ vmint count = sp[-1].i;
+ while (count--)
+   *d++ = *s++;
+ sp -= 3;
+}
+
 dnl I/O
 
 dnl c --
@@ -544,7 +554,7 @@ primary(dp)
 
 primary(allot)
 dnl n -- increase dictionary pointer
-  vmstate->dp += (--sp)->i;
+  vmstate->dp = (void *)((char *)vmstate->dp + (--sp)->i);
 
 primary(comma, `,')
   *vmstate->dp++ = *--sp;

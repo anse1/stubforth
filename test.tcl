@@ -178,5 +178,7 @@ variable buf 100 allot 0 ,
 100 buf fd read
 buf type lf } {:root:.*}
 
+test { " asdf" " moo" over 3 move type } {moof$}
+
 send "bye\n"
 interact
