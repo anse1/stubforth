@@ -167,5 +167,16 @@ test {: t 125 try 666 catch> drop endtry 1+ . ; t } {667 $}
 
 test {.( moo)} {moo}
 
+test {
+: open 2 syscall ;
+: read 0 syscall ;
+: bye 60 syscall ;
+0 0 " /etc/passwd" open
+constant fd
+
+variable buf 100 allot 0 ,
+100 buf fd read
+buf type lf } {:root:.*}
+
 send "bye\n"
 interact
