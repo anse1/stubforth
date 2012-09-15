@@ -176,15 +176,18 @@ int main()
     if (!result)
        return 0;
     else {
+      vmstate.sp = param_stack;
+      vmstate.rp = return_stack;
+      vmstate.base = 10;
+      (vmstate.sp++)->i = result;
       word *w = find(vmstate.dictionary, "perror");
       if (w) {
-            vmstate.sp = param_stack;
-      	    vmstate.rp = return_stack;
-	    vmstate.base = 10;
-	    (vmstate.sp++)->i = result;
-	    result = vm(&vmstate, &w->code);
+	    vm(&vmstate, &w->code);
       } else {
-      	    my_puts("abort\n");
+      	    my_puts("abort: ");
+            w = find(vmstate.dictionary, ".");
+	    vm(&vmstate, &w->code);
+      	    my_puts("\n");
       }
     }
 
