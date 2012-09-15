@@ -33,17 +33,26 @@ zn
 r> 1+ dup >r iterations @ > if 2drop 2drop r> drop 0 exit then
 again ;
 
+\ x y -- r i
+: screen2set
+	ydim 1 >> - zoom @ * roff @ +
+	swap xdim 1 >> - zoom @ * ioff @ +
+;	
+
 : mset
-xdim 1- begin
-." ."
-ydim 1- begin
-2dup
-ydim 1 >> - zoom @ * roff @ +
-swap xdim 1 >> - zoom @ * ioff @ +
-divp
-0= if 2dup setp then
-1- dup 0= until drop
-1- dup 0= until drop
+	xdim 1- begin
+		[char] . emit
+		ydim 1- begin
+			2dup
+			screen2set
+			divp
+			0= if
+				2dup setp
+			else
+				2dup clp
+			then
+		1- dup 0= until drop
+	1- dup 0= until drop
 ;
 
 : cell+ cell + ;
@@ -111,3 +120,68 @@ new tail mset save tailfb
 new spots mset save spotsfb
 
 )
+
+\ copied from gforth's bench directory
+variable seed
+: initiate-seed ( -- )  rtctime @ seed ! ;
+: random  ( -- n )  seed @ 1309 * 13849 + 65535 and dup seed ! ;
+
+\ find random edge
+: edge
+	random xdim 2 - mod 1+
+	random ydim 2 - mod 1+
+	2dup
+	pxaddr c@ and
+	0=
+	>r
+	2dup
+	random 3 mod 1- +
+	swap
+	random 3 mod 1- +
+	swap
+	pxaddr c@ and
+	0=
+	r> = if 2drop restart then
+	\ edge detected
+	.cords
+;
+
+\ draw a cross with center at x y --
+: cross
+	xdim
+	begin
+		?dup while
+			1-
+			over over swap pxaddr set
+	repeat
+	drop
+	ydim
+	begin
+		?dup while
+			1-
+			over over pxaddr set
+	repeat
+	drop
+;
+
+\ zoom by 10 into x y --
+: dozoom
+	screen2set
+	ioff +! roff +!
+	zoom @ 10 / zoom !
+;
+
+: autopilot
+	edge 2dup cross	dozoom mset
+;
+
+: move
+	begin
+		?dup while
+			>r
+			over c@ over c!
+			1+ swap 1+ swap
+			r> 1-
+	repeat
+	2drop
+;
