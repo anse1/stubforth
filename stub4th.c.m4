@@ -109,7 +109,7 @@ void *aligned(void *vp) {
   char *p = vp;
   while ((vmint)p & (__alignof__(cell)-1))
     p++;
-  return (cell *)p;
+  return p;
 }
 
 dnl pop string from stack if it is at the top
@@ -118,7 +118,7 @@ static void try_deallocate(char *s, cell **sp) {
   while(*p++);
   p = aligned(p);
   if (*(char **)sp == p)
-     *sp = (cell *)s;
+     *sp = (void *)s;
 }
 
 static void my_puts(const char *s) {

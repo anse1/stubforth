@@ -161,10 +161,13 @@ void forth_handler(int level)
   cell rs[100];
   irqstate.rp = rs;
   irqstate.sp = ps;
-  if(vm(&irqstate, xt)) {
+  cell result = vm(&irqstate, xt);
+  if(result.s) {
     my_puts("\n x_x ");
     my_puts("exception in Forth interrupt handler level ");
     putchar('0' + level);
+    my_puts(": ");
+    my_puts(result.s);
     my_puts(" x_x ");
   }
 }
