@@ -29,7 +29,6 @@ struct vmstate {
   cell *sp; /* Invalid during execution of a VM. */
   struct word *dictionary;
   char base; /* This ought to be cell-sized according to standards. */
-  cell errno; /* Set when vm() returns because of a THROW */
 
   int compiling : 1; /* Used by state-aware words INTERPRET and TICK */
 
@@ -38,7 +37,6 @@ struct vmstate {
 		   want to process binary data. */
   int quiet : 1; /* Don't echo incoming characters as they are
 		    consumed by the VM. */
-  const char *errstr;
 };
 
 #define IS_WORD(c) (c > ' ')
@@ -56,5 +54,12 @@ extern struct word *forth; /* points to the head of head of the static
 int vm(struct vmstate *vmstate, void **xt);
 void stub4th_init();
 word *find(word *p, const char *key);
+
+struct errmsg {
+  cell errno;
+  cell errstr;
+};
+
+extern struct errmsg errdb[];
 
 #endif
