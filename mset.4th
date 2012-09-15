@@ -173,10 +173,6 @@ variable seed
 	20 iterations +!
 ;
 
-: autopilot
-	edge 2dup cross	dozoom mset
-;
-
 : move
 	begin
 		?dup while
@@ -205,4 +201,3 @@ variable seed
 		edge 2dup cross dozoom mset
 	again
 ;
-
