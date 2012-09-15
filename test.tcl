@@ -167,5 +167,7 @@ test {: t 125 try 666 catch> drop endtry 1+ . ; t } {667 $}
 
 test {.( moo)} {moo}
 
+test { " asdf" " moo" over 3 move type } {moof$}
+
 send "bye\n"
 interact
