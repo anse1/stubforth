@@ -16,21 +16,12 @@ define(dict_head, 0);
 define(div_word, 1);
 define(div_init, 2);
 define(div_start, 3);
-define(div_errdb, 4);
-
-dnl $1 - error code
-dnl $2 - error message
-define(`staticerr', `
-  ifdef(`errdb $2',,`
-      	divert(div_errdb)
-	{ {.i=$1}, {.s="$2"} },
-	divert')')
 
 dnl $1 - ANS94 error code
+dnl $2 - ANS94 error string
 define(`cthrow', `
 do {
-   staticerr($1, `$2')
-   return $1;
+   return (cell)(char *)"$2";
 } while (0)')
 
 define(primary, `
@@ -148,7 +139,7 @@ word *find(word *p, const char *key)
 dnl main
 int main()
 {
-  int result;
+  cell result;
   char *startword;
 
   initio();
@@ -173,22 +164,12 @@ int main()
 
     result = vm(&vmstate, &find(vmstate.dictionary, startword)->code);
 
-    if (!result)
+    if (!result.s)
        return 0;
     else {
-      vmstate.sp = param_stack;
-      vmstate.rp = return_stack;
-      vmstate.base = 10;
-      (vmstate.sp++)->i = result;
-      word *w = find(vmstate.dictionary, "perror");
-      if (w) {
-	    vm(&vmstate, &w->code);
-      } else {
-      	    my_puts("abort: ");
-            w = find(vmstate.dictionary, ".");
-	    vm(&vmstate, &w->code);
-      	    my_puts("\n");
-      }
+       my_puts("abort: ");
+       my_puts(result.s);
+       my_puts("\n");
     }
 
     startword = "quit";
@@ -203,7 +184,7 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-int vm(struct vmstate *vmstate, void **xt)
+cell vm(struct vmstate *vmstate, void **xt)
 {
 
   /* The VM registers */
@@ -243,7 +224,7 @@ primary(exit)
 primary(bye)
   vmstate->sp = sp;
   vmstate->rp = rp;
-  return 0;
+  return (cell)(char *)0;
 
 dnl non-colon secondary words
 
@@ -439,26 +420,26 @@ primary(throw)
 {
    vmstate->sp = sp;
    vmstate->rp = rp;
-   return sp[-1].i;
+   return sp[-1];
 }
 
 dnl cfa -- i
 primary(catch)
 {
   void **xt = sp[-1].a;
-  int result;
+  cell result;
   struct vmstate new = *vmstate;
   sp--;
   new.sp = sp;
   new.rp = rp;
   result = vm(&new, xt);
-  if (!result) {
+  if (!result.s) {
      /* local return, adopt state of the child VM */
      *vmstate = new;
      sp = new.sp;
      rp = new.rp;
   }
-  (sp++)->i = result;
+  *sp++ = result;
 }
 
 dnl MEM
@@ -623,10 +604,10 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    char *s = (char *)vmstate->dp;
    do {
       c = getchar();
-      if (c < 0) return 0;
+      if (c < 0) return (cell)(char *)0;
    } while (!IS_WORD(c));
    do {
-      if (c < 0) return 0;
+      if (c < 0) return (cell)(char *)0;
       *s++ = c;
       c = getchar();
    } while (IS_WORD(c));
@@ -705,8 +686,6 @@ secondary(squote, `s\"', .immediate=1,
 
 secondary(dotquote, `.\"', .immediate=1,
    SQUOTE, LIT, TYPE, COMMA)
-
-constant(errdb, errdb)
 
 dnl compiler
 secondary(literal,, .immediate=1, l(
@@ -841,9 +820,8 @@ primary(echo)
 primary(quiet)
  vmstate->quiet = 1;
 
-staticerr(-13, undefined word)
 secondary(qword, ?word,,
-  l(WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW ))
+  WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .s="undefined word", THROW )
 
 secondary(tick, ',, QWORD)
 
@@ -885,7 +863,7 @@ start:
 init:
   forth = dict_head;
   undivert(div_init)
-  return 0;
+  return (cell)(char *)0;
 }
 
 __attribute__((constructor))
@@ -894,11 +872,6 @@ void stub4th_init ()
    /* Initialize forth with the static list head. */
    vm(0,0);
 }
-
-struct errmsg errdb[] = {
-       undivert(div_errdb)
-       { {.i=0}, {.s=0} }
-};
 
 /*
 Local Variables:

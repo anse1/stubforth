@@ -113,15 +113,6 @@ send ": foo 666 throw ; "
 send {: bar ['] foo catch 666 = if 85 emit else 65 then ; }
 test bar {U$}
 
-send ": foo . ?stack ; "
-send {: bar ['] foo catch . ; }
-test "bar" {-4 $}
-
-send ": foo 85 ; "
-send {: bar ['] foo catch . . ; }
-
-test bar {0 85 $}
-
 test ": foo 99 13 /mod . . ; foo" {7 8 $}
 
 test "create foo 66 ,  foo @ 2 * . ;" {132 $}
