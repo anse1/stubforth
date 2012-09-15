@@ -41,7 +41,7 @@ again ;
 
 : mset
 	xdim 1- begin
-		[char] . emit
+\		[char] . emit
 		ydim 1- begin
 			2dup
 			screen2set
@@ -167,8 +167,10 @@ variable seed
 \ zoom by 10 into x y --
 : dozoom
 	screen2set
-	ioff +! roff +!
+	.cords
+	ioff ! roff !
 	zoom @ 10 / zoom !
+	20 iterations +!
 ;
 
 : autopilot
@@ -185,3 +187,22 @@ variable seed
 	repeat
 	2drop
 ;
+
+: init
+	new
+	entire
+	40 iterations !
+	mset
+	lssa @ variable set !
+	new
+	set lssa @ 4800 move
+;
+
+: demo
+	entire
+	set lssa @ 4800 move
+	begin
+		edge 2dup cross dozoom mset
+	again
+;
+
