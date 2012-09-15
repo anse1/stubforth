@@ -544,7 +544,7 @@ primary(dp)
 
 primary(allot)
 dnl n -- increase dictionary pointer
-  vmstate->dp += (--sp)->i;
+  vmstate->dp = (void *)((char *)vmstate->dp + (--sp)->i);
 
 primary(comma, `,')
   *vmstate->dp++ = *--sp;
