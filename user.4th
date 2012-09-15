@@ -180,21 +180,3 @@ again ;
 ; immediate
 
 : :noname here &&enter , postpone ] ;
-
-: assoc ( {n s}* i -- s )
-	begin
-		over @ while
-			over @ over = if drop 1 cells + @ exit then
-			swap 2 cells + swap
-	repeat
-	2drop
-	0
-;
-
-: perror
-	." abort: "
-	dup .
-	dup errdb swap assoc
-	?dup if [char] ( emit type [char] ) emit then lf
-	drop
-;
