@@ -5,7 +5,7 @@ changecom(/*,*/)
 
 cell return_stack[1000];
 cell param_stack[1000];
-cell dictionary_stack[10000];
+extern cell dictionary_stack[];
 
 struct vmstate vmstate;
 

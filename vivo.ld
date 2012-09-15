@@ -28,4 +28,5 @@ SECTIONS
     __bss_start = .;
     .bss :  { *(.bss) }
     _end = .;
+    dictionary_stack = .;
 }
