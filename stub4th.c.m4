@@ -735,13 +735,6 @@ secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
 secondary(constant,,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
 secondary(variable,,, CREATE, ZERO, COMMA)
 
-dnl start consing a dodoes word
-secondary(builds, <builds,,
-  WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
-
-dnl set the dodoes address to the thread following does>
-secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
-
 dnl (char *) ---
 dnl interpret or compile s
 secondary(interpret,,,
