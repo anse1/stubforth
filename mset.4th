@@ -176,17 +176,6 @@ variable seed
 	20 iterations +!
 ;
 
-: move
-	begin
-		?dup while
-			>r
-			over c@ over c!
-			1+ swap 1+ swap
-			r> 1-
-	repeat
-	2drop
-;
-
 : init
 	new
 	entire
