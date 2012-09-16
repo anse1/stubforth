@@ -1,4 +1,3 @@
-variable radius
 variable iterations
 variable zoom
 variable roff
@@ -7,13 +6,14 @@ variable ioff
 decimal
 : fix 26 << ; : unfix 26 >> ;
 
-4 fix radius !
+4 fix constant radius
 
-: fix* m* 6 << swap 26 >> 1 6 << 1 - and or ;
-: fixsq dup fix* ;
+: fix* m* 6 << swap 26 >>
+	[ 1 6 << 1 - ] literal \ undo sign extension
+	and or ;
 
 : csq ( r i -- r i )
-over fixsq over fixsq - >r
+over dup fix* over dup fix* - >r
 fix* 1 << r> swap ;
 
 : zabs ( r i -- n )
@@ -27,10 +27,10 @@ swap >r + swap r> + swap ;
 csq 2over c+ ;
 
 : divp ( cr ci -- n)
-0 >r 0 0 begin
+iterations @ >r 0 0 begin
 zn
-2dup zabs radius @ > if 2drop 2drop r> exit then
-r> 1+ dup >r iterations @ > if 2drop 2drop r> drop 0 exit then
+2dup zabs radius > if 2drop 2drop r> exit then
+r> 1- dup >r 0= if 2drop 2drop r> drop 0 exit then
 again ;
 
 \ x y -- r i
@@ -54,10 +54,6 @@ again ;
 		dup 0= until drop
 	dup 0= until drop
 ;
-
-: cell+ cell + ;
-: @+dup cell+ dup @ ;
-
 
 \ iterations roff ioff zoom --
 : fractal <builds , , , ,
@@ -128,6 +124,8 @@ new spots mset save spotsfb
 variable seed
 : initiate-seed ( -- )  rtctime @ seed ! ;
 : random  ( -- n )  seed @ 1309 * 13849 + 65535 and dup seed ! ;
+
+initiate-seed
 
 \ find random edge
 : edge
