@@ -299,27 +299,6 @@ primary(depth)
   sp->i = sp - sp_base;
   sp++;
 
-primary(twodup, 2dup)
-  sp[0] = sp[-2];
-  sp[1] = sp[-1];
-  sp += 2;
-
-primary(twodrop, 2drop)
-  sp -= 2;
-
-primary(twoover, 2over)
-  sp[0] = sp[-4];
-  sp[1] = sp[-3];
-  sp += 2;
-
-primary(twoswap, 2swap)
-  t = sp[-1];
-  sp[-1] = sp[-3];
-  sp[-3] = t;
-  t = sp[-2];
-  sp[-2] = sp[-4];
-  sp[-4] = t;
-
 dnl return stack
 
 primary(r)
@@ -386,7 +365,6 @@ primary(plus1, 1+)
 primary(minus1, 1-)
   sp[-1].i--;
 
-dnl dividend divisor -- remainder quotient
 primary(divmod, /mod)
 {
   vmint quot, rem;
@@ -847,6 +825,7 @@ secondary(postpone,, .immediate=1, l(
 dnl convenience
 
 dnl non-core
+include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)

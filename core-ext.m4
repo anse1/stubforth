@@ -58,12 +58,17 @@ primary(dotparen, `.(', immediate)
 while ((t.i = getchar()) != ')')
   putchar(t.i);
 
+dnl ( 1 2 -- 2 1 2 )
 primary(tuck)
 sp[0] = sp[-1];
 sp[-1] = sp[-2];
 sp[-2] = sp[0];
 sp++;
 
+dnl ( 1 2 -- 2 )
 primary(nip)
 sp[-2] = sp[-1];
 sp--;
+
+primary(celladd, cell+)
+sp[-1].a++;
