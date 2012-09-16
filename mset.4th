@@ -14,11 +14,10 @@ decimal
 
 : csq ( r i -- r i )
 over dup fix* over dup fix* - >r
-fix* 1 << r> swap ;
+fix* 2* r> swap ;
 
 : zabs ( r i -- n )
-dup 0 < if negate then swap
-dup 0 < if negate then + ;
+abs swap abs + ;
 
 : c+ ( r i r i -- r i )
 swap >r + swap r> + swap ;
@@ -35,8 +34,8 @@ again ;
 
 \ x y -- r i
 : screen2set
-	ydim 1 >> - zoom @ * roff @ +
-	swap xdim 1 >> - zoom @ * ioff @ +
+	ydim 2/ - zoom @ * roff @ +
+	swap xdim 2/ - zoom @ * ioff @ +
 ;	
 
 : mset
