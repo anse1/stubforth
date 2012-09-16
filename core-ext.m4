@@ -69,3 +69,6 @@ dnl ( 1 2 -- 2 )
 primary(nip)
 sp[-2] = sp[-1];
 sp--;
+
+primary(celladd, cell+)
+sp[-1].a++;
