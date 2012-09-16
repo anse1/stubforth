@@ -176,5 +176,7 @@ test {.( moo)} {moo}
 
 test { " asdf" " moo" over 3 move type } {moof$}
 
+test { :noname 85 emit 65 emit ; execute } {UA$}
+
 send "bye\n"
 interact
