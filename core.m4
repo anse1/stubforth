@@ -1,5 +1,4 @@
-dnl dividend divisor -- remainder quotient
-primary(zeroless, 0<)
+primary(zlt, 0<)
 sp[-1].i = sp[-1].i < 0 ;
 
 primary(twomul, 2*)
