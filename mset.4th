@@ -64,8 +64,6 @@ does>
  dup @ iterations ! cell +
 drop ; 
 
-@+dup zoom
-
 : save <builds
    lssa @ ,
 does> @ lssa ! ;
