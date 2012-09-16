@@ -172,19 +172,19 @@ initiate-seed
 	20 iterations +!
 ;
 
+variable iset
 : init
 	new
 	entire
-	40 iterations !
 	mset
-	lssa @ variable set !
+	lssa @ iset !
 	new
-	set lssa @ 4800 move
+	iset @ lssa @ 4800 move
 ;
 
 : demo
 	entire
-	set lssa @ 4800 move
+	iset @ lssa @ 4800 move
 	begin
 		edge 2dup cross dozoom
 		zoom @ 0= if restart then
