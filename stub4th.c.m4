@@ -365,6 +365,7 @@ primary(plus1, 1+)
 primary(minus1, 1-)
   sp[-1].i--;
 
+dnl dividend divisor -- remainder quotient
 primary(divmod, /mod)
 {
   vmint quot, rem;
