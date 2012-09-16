@@ -94,3 +94,7 @@ primary(tworto, 2r>)
 primary(tworload, 2r@)
 *sp++ = rp[-2];
 *sp++ = rp[-1];
+
+secondary(noname, :noname,, l(
+  HERE LIT &&enter COMMA RESUME
+))

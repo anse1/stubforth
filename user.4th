@@ -180,5 +180,3 @@ again ;
 	postpone branch
 	context @ >code >body ,
 ; immediate
-
-: :noname here &&enter , postpone ] ;
