@@ -168,13 +168,15 @@ initiate-seed
 	.cords
 	ioff ! roff !
 	zoom @ 10 / zoom !
-	16 iterations +!
+	10 iterations +!
 ;
 
 variable iset
+
 : init
 	new
 	entire
+	30 iterations !
 	mset
 	lssa @ iset !
 	new
@@ -185,6 +187,7 @@ variable iset
 	entire
 	iset @ lssa @ 4800 move
 	begin
+		10 honk
 		edge 2dup cross dozoom
 		zoom @ 0= if restart then
 		mset
