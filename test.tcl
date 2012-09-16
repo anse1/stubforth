@@ -133,7 +133,7 @@ send ": w2345678 ;\n"
 test "here word w2345678 find drop drop here = ." {1 $}
 
 test {" fox" " quick brown " type type} {quick brown fox$}
-test {: t s" lazy dog" s" jumps over the " type type ; t} {jumps over the lazy dog$}
+test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy dog$}
 
 test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
