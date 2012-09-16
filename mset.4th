@@ -40,9 +40,9 @@ again ;
 ;	
 
 : mset
-	xdim 1- begin
+	xdim begin 1-
 \		[char] . emit
-		ydim 1- begin
+		ydim begin 1-
 			2dup
 			screen2set
 			divp
@@ -51,8 +51,8 @@ again ;
 			else
 				2dup clp
 			then
-		1- dup 0= until drop
-	1- dup 0= until drop
+		dup 0= until drop
+	dup 0= until drop
 ;
 
 : cell+ cell + ;
@@ -105,6 +105,9 @@ fractal tail
 
 100 -17343002 44280635 3000
 fractal spots
+
+64 10695398 42580524 100
+fractal shallow
 
 (
 	
@@ -198,6 +201,8 @@ variable seed
 	entire
 	set lssa @ 4800 move
 	begin
-		edge 2dup cross dozoom mset
+		edge 2dup cross dozoom
+		zoom @ 0= if restart then
+		mset
 	again
 ;
