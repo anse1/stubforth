@@ -89,7 +89,7 @@ or 0= and ;
       &&docon of ." &&docon" endof
       &&dodoes of ." &&dodoes" endof
       &&dovar of ." &&dovar" endof
-      ." .i = " r .
+      ." .i = " r@ .
     endcase
   then
 ;
@@ -130,10 +130,10 @@ repeat drop ;
 : skip[if] ( -- )
  begin
    word
-   dup s" [if]" compare 0= if
+   dup ," [if]" compare 0= if
      drop" recurse 1
    else
-     dup s" [then]" compare swap drop"
+     dup ," [then]" compare swap drop"
    then
    while
  repeat
@@ -144,18 +144,20 @@ repeat drop ;
 : skip[block] ( -- t/f )
  begin
    word
-   dup s" [if]" compare 0= if
+   dup ," [if]" compare 0= if
      drop" skip[if]
    else
-     dup s" [then]" compare 0= if drop" 1 exit then
-     dup s" [else]" compare 0= if drop" 0 exit then
+     dup ," [then]" compare 0= if drop" 1 exit then
+     dup ," [else]" compare 0= if drop" 0 exit then
      drop"
    then
 again ;
 
+" dangling else" constant err[else]
+" dangling then" constant err[then]
 
-: [else] -512 throw ; immediate
-: [then] -513 throw ; immediate
+: [else] err[else] throw ; immediate
+: [then] err[then] throw ; immediate
 
 : [if]
   0= if skip[block] if exit then then
@@ -166,11 +168,18 @@ again ;
     again
   catch>
     case
-      -512 of skip[if] endof
-      -513 of endof
-      r throw
+      err[else] of skip[if] endof
+      err[then] of endof
+      r@ throw
     endcase
     exit
   endtry
 ; immediate
 
+: restart
+	postpone branch
+	context @ >code >body ,
+; immediate
+
+: octal 8 base c! ;
+: binary 2 base c! ;

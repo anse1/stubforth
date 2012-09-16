@@ -23,13 +23,10 @@ define(div_init, 2);
 define(div_start, 3);
 
 dnl $1 - ANS94 error code
+dnl $2 - ANS94 error string
 define(`cthrow', `
 do {
-  vmstate->errno.i = $1;
-  ifelse(`$2',`', `', `
-    vmstate->errstr = "$2";
-  ')
-  return vmstate->errno.i;
+   return (cell)(char *)"$2";
 } while (0)')
 
 define(primary, `
@@ -147,8 +144,9 @@ word *find(word *p, const char *key)
 dnl main
 int main(int argc, char *argv[])
 {
-  int result;
+  cell result;
   static int fd, flags;
+
   char *startword;
 
   initio();
@@ -194,32 +192,23 @@ int main(int argc, char *argv[])
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
-    vmstate.errno.i = 0;
     vmstate.base = 10;
-    vmstate.errstr = 0;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
-    result = vm(&vmstate, &find(forth, startword)->code);
+    result = vm(&vmstate, &find(vmstate.dictionary, startword)->code);
 
-    if (!result) {
-       v->dp = vmstate.dp;
-       v->head = vmstate.dictionary;
+    if (!result.s)
        return 0;
-    }
     else {
-      my_puts("abort: ");
-      vmstate.sp = param_stack;
-      vmstate.rp = return_stack;
-      vmstate.base = 10;
-      (vmstate.sp++)->i = result;
-      vm(&vmstate, &find(forth, ".")->code);
-      if (vmstate.errstr)
-        my_puts(vmstate.errstr);
-      my_puts("\n");
-      if (ftell(stdin) != -1)
-        printf("ftell(stdin): %lu\n", ftell(stdin));
+       my_puts("abort: ");
+       my_puts(result.s);
+       my_puts("\n");
+       if (ftell(stdin) != -1)
+           printf("ftell(stdin): %lu\n", ftell(stdin));
     }
+
+    startword = "quit";
   }
 }
 
@@ -231,7 +220,7 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-int vm(struct vmstate *vmstate, void **xt)
+cell vm(struct vmstate *vmstate, void **xt)
 {
 
   /* The VM registers */
@@ -271,7 +260,7 @@ primary(exit)
 primary(bye)
   vmstate->sp = sp;
   vmstate->rp = rp;
-  return 0;
+  return (cell)(char *)0;
 
 dnl non-colon secondary words
 
@@ -346,30 +335,9 @@ primary(depth)
   sp->i = sp - sp_base;
   sp++;
 
-primary(twodup, 2dup)
-  sp[0] = sp[-2];
-  sp[1] = sp[-1];
-  sp += 2;
-
-primary(twodrop, 2drop)
-  sp -= 2;
-
-primary(twoover, 2over)
-  sp[0] = sp[-4];
-  sp[1] = sp[-3];
-  sp += 2;
-
-primary(twoswap, 2swap)
-  t = sp[-1];
-  sp[-1] = sp[-3];
-  sp[-3] = t;
-  t = sp[-2];
-  sp[-2] = sp[-4];
-  sp[-4] = t;
-
 dnl return stack
 
-primary(r)
+primary(rload, r@)
   *sp++ = rp[-1];
 
 primary(rfrom, r>)
@@ -467,26 +435,26 @@ primary(throw)
 {
    vmstate->sp = sp;
    vmstate->rp = rp;
-   cthrow(sp[-1].i);
+   return sp[-1];
 }
 
 dnl cfa -- i
 primary(catch)
 {
   void **xt = sp[-1].a;
-  int result;
+  cell result;
   struct vmstate new = *vmstate;
   sp--;
   new.sp = sp;
   new.rp = rp;
   result = vm(&new, xt);
-  if (!result) {
+  if (!result.s) {
      /* local return, adopt state of the child VM */
      *vmstate = new;
      sp = new.sp;
      rp = new.rp;
   }
-  (sp++)->i = result;
+  *sp++ = result;
 }
 
 dnl MEM
@@ -522,6 +490,16 @@ dnl ( n|u a-addr -- )
 primary(plusstore, +!)
  *(vmint *)sp[-1].a += sp[-2].i;
  sp -= 2;
+
+primary(move)
+{
+ char *s = sp[-3].s;
+ char *d = sp[-2].s;
+ vmint count = sp[-1].i;
+ while (count--)
+   *d++ = *s++;
+ sp -= 3;
+}
 
 dnl I/O
 
@@ -574,6 +552,13 @@ primary(linecomment, `\\', immediate)
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
 
+primary(type)
+dnl ( s -- ) send zstring
+{
+  char *s = (--sp)->s;
+  my_puts(s);
+}
+
 dnl dictionary
 
 primary(context)
@@ -584,7 +569,7 @@ primary(dp)
 
 primary(allot)
 dnl n -- increase dictionary pointer
-  vmstate->dp += (--sp)->i;
+  vmstate->dp = (void *)((char *)vmstate->dp + (--sp)->i);
 
 primary(comma, `,')
   *vmstate->dp++ = *--sp;
@@ -592,13 +577,6 @@ primary(comma, `,')
 primary(here)
 dnl ( -- a ) push dictionary pointer onto parameter stack
   (sp++)->a = vmstate->dp;
-
-primary(type)
-dnl ( s -- ) send zstring
-{
-  char *s = (--sp)->s;
-  my_puts(s);
-}
 
 primary(find)
 dnl s -- cfa tf (found) -- s ff (not found)
@@ -651,10 +629,10 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    char *s = (char *)vmstate->dp;
    do {
       c = getchar();
-      if (c < 0) return 0;
+      if (c < 0) return (cell)(char *)0;
    } while (!IS_WORD(c));
    do {
-      if (c < 0) return 0;
+      if (c < 0) return (cell)(char *)0;
       *s++ = c;
       c = getchar();
    } while (IS_WORD(c));
@@ -728,11 +706,11 @@ secondary(quote, `\"',,
   KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
   DROP, ZERO, CCOMMA, ALIGN)
 
-secondary(squote, `s\"', .immediate=1,
+secondary(commaquote, ``,\"'', .immediate=1,
    LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
 secondary(dotquote, `.\"', .immediate=1,
-   SQUOTE, LIT, TYPE, COMMA)
+   COMMAQUOTE, LIT, TYPE, COMMA)
 
 dnl compiler
 secondary(literal,, .immediate=1, l(
@@ -792,13 +770,6 @@ secondary(create,,, WORD, CONS, LIT, &&dovar, COMMA, SMUDGE, SUSPEND)
 secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
 secondary(constant,,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
 secondary(variable,,, CREATE, ZERO, COMMA)
-
-dnl start consing a dodoes word
-secondary(builds, <builds,,
-  WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
-
-dnl set the dodoes address to the thread following does>
-secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
 
 dnl (char *) ---
 dnl interpret or compile s
@@ -868,7 +839,7 @@ primary(quiet)
  vmstate->quiet = 1;
 
 secondary(qword, ?word,,
-  l(WORD FIND NULLP ZBRANCH self[8] LIT .i=-13 THROW ))
+  WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .s="undefined word", THROW )
 
 secondary(tick, ',, QWORD)
 
@@ -884,6 +855,7 @@ secondary(postpone,, .immediate=1, l(
 dnl convenience
 
 dnl non-core
+include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
@@ -910,7 +882,7 @@ start:
 init:
   forth = dict_head;
   undivert(div_init)
-  return 0;
+  return (cell)(char *)0;
 }
 
 __attribute__((constructor))

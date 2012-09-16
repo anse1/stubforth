@@ -113,15 +113,6 @@ send ": foo 666 throw ; "
 send {: bar ['] foo catch 666 = if 85 emit else 65 then ; }
 test bar {U$}
 
-send ": foo . ?stack ; "
-send {: bar ['] foo catch . ; }
-test "bar" {-4 $}
-
-send ": foo 85 ; "
-send {: bar ['] foo catch . . ; }
-
-test bar {0 85 $}
-
 test ": foo 99 13 /mod . . ; foo" {7 8 $}
 
 test "create foo 66 ,  foo @ 2 * . ;" {132 $}
@@ -142,7 +133,7 @@ send ": w2345678 ;\n"
 test "here word w2345678 find drop drop here = ." {1 $}
 
 test {" fox" " quick brown " type type} {quick brown fox$}
-test {: t s" lazy dog" s" jumps over the " type type ; t} {jumps over the lazy dog$}
+test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy dog$}
 
 test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
@@ -174,17 +165,11 @@ test {: t 85 emit try 666 throw catch> 1+ . endtry 64 emit ; t } {U667 @$}
 test {: t 125 try 666 1 throw catch> drop endtry 1+ . ; t } {126 $}
 test {: t 125 try 666 catch> drop endtry 1+ . ; t } {667 $}
 
-send {: t abort" The quick brown fox" ; }
-
-set timeout 0
-expect plzflushkthx
-expect *
-set timeout 5
-
-send "t\n"
-expect -re {abort:.*?The quick brown fox.*}
-
 test {.( moo)} {moo}
+
+test { " asdf" " moo" over 3 move type } {moof$}
+
+test { :noname 85 emit 65 emit ; execute } {UA$}
 
 send "bye\n"
 interact

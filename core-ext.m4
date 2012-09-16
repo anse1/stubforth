@@ -11,7 +11,7 @@ secondary(case,, .immediate=1,
 dnl n -- ofpad n+1
 secondary(of,, .immediate=1, l(
  PLUS1
- LIT R COMMA LIT EQ COMMA
+ LIT RLOAD COMMA LIT EQ COMMA
  IF  SWAP
 ))
 
@@ -58,8 +58,43 @@ primary(dotparen, `.(', immediate)
 while ((t.i = getchar()) != ')')
   putchar(t.i);
 
+dnl ( 1 2 -- 2 1 2 )
 primary(tuck)
 sp[0] = sp[-1];
 sp[-1] = sp[-2];
 sp[-2] = sp[0];
 sp++;
+
+dnl ( 1 2 -- 2 )
+primary(nip)
+sp[-2] = sp[-1];
+sp--;
+
+primary(celladd, cell+)
+sp[-1].a++;
+
+primary(zne, 0<>)
+sp[-1].i = sp[-1].i != 0 ;
+
+primary(ne, <>)
+sp[-1].i = sp[-1].i != sp[-2].i ;
+sp--;
+
+primary(zgt, 0>)
+sp[-1].i = sp[-1].i > 0 ;
+
+primary(twotor, 2>r)
+*rp++ = *--sp;
+*rp++ = *--sp;
+
+primary(tworto, 2r>)
+*sp++ = *--rp;
+*sp++ = *--rp;
+
+primary(tworload, 2r@)
+*sp++ = rp[-2];
+*sp++ = rp[-1];
+
+secondary(noname, :noname,, l(
+  HERE LIT &&enter COMMA RESUME
+))
