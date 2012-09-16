@@ -168,7 +168,7 @@ initiate-seed
 	.cords
 	ioff ! roff !
 	zoom @ 10 / zoom !
-	20 iterations +!
+	16 iterations +!
 ;
 
 variable iset
