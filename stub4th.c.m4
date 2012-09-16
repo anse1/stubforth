@@ -301,7 +301,7 @@ primary(depth)
 
 dnl return stack
 
-primary(r)
+primary(rload, r@)
   *sp++ = rp[-1];
 
 primary(rfrom, r>)

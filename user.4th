@@ -89,7 +89,7 @@ or 0= and ;
       &&docon of ." &&docon" endof
       &&dodoes of ." &&dodoes" endof
       &&dovar of ." &&dovar" endof
-      ." .i = " r .
+      ." .i = " r@ .
     endcase
   then
 ;
@@ -170,7 +170,7 @@ again ;
     case
       err[else] of skip[if] endof
       err[then] of endof
-      r throw
+      r@ throw
     endcase
     exit
   endtry
