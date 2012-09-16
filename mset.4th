@@ -167,7 +167,7 @@ initiate-seed
 	screen2set
 	.cords
 	ioff ! roff !
-	zoom @ 10 / zoom !
+	zoom @ 9 / zoom !
 	10 iterations +!
 ;
 
