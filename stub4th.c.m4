@@ -386,16 +386,6 @@ primary(plus1, 1+)
 primary(minus1, 1-)
   sp[-1].i--;
 
-dnl dividend divisor -- remainder quotient
-primary(divmod, /mod)
-{
-  vmint quot, rem;
-  quot = sp[-2].i / sp[-1].i;
-  rem = sp[-2].i % sp[-1].i;
-  sp[-2].i = rem;
-  sp[-1].i = quot;
-}
-
 dnl control primitives
 
 dnl --
@@ -847,6 +837,7 @@ secondary(postpone,, .immediate=1, l(
 dnl convenience
 
 dnl non-core
+include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
