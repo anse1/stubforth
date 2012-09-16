@@ -670,11 +670,11 @@ secondary(quote, `\"',,
   KEY, DUP, LIT, .i=34, SUB, ZBRANCH, self[11], CCOMMA, BRANCH, self[1],
   DROP, ZERO, CCOMMA, ALIGN)
 
-secondary(squote, `s\"', .immediate=1,
+secondary(commaquote, ``,\"'', .immediate=1,
    LIT, DOSTR, COMMA, QUOTE, DROP, ALIGN)
 
 secondary(dotquote, `.\"', .immediate=1,
-   SQUOTE, LIT, TYPE, COMMA)
+   COMMAQUOTE, LIT, TYPE, COMMA)
 
 dnl compiler
 secondary(literal,, .immediate=1, l(

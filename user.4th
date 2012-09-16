@@ -130,10 +130,10 @@ repeat drop ;
 : skip[if] ( -- )
  begin
    word
-   dup s" [if]" compare 0= if
+   dup ," [if]" compare 0= if
      drop" recurse 1
    else
-     dup s" [then]" compare swap drop"
+     dup ," [then]" compare swap drop"
    then
    while
  repeat
@@ -144,11 +144,11 @@ repeat drop ;
 : skip[block] ( -- t/f )
  begin
    word
-   dup s" [if]" compare 0= if
+   dup ," [if]" compare 0= if
      drop" skip[if]
    else
-     dup s" [then]" compare 0= if drop" 1 exit then
-     dup s" [else]" compare 0= if drop" 0 exit then
+     dup ," [then]" compare 0= if drop" 1 exit then
+     dup ," [else]" compare 0= if drop" 0 exit then
      drop"
    then
 again ;
@@ -180,3 +180,6 @@ again ;
 	postpone branch
 	context @ >code >body ,
 ; immediate
+
+: octal 8 base c! ;
+: binary 2 base c! ;
