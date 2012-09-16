@@ -299,30 +299,9 @@ primary(depth)
   sp->i = sp - sp_base;
   sp++;
 
-primary(twodup, 2dup)
-  sp[0] = sp[-2];
-  sp[1] = sp[-1];
-  sp += 2;
-
-primary(twodrop, 2drop)
-  sp -= 2;
-
-primary(twoover, 2over)
-  sp[0] = sp[-4];
-  sp[1] = sp[-3];
-  sp += 2;
-
-primary(twoswap, 2swap)
-  t = sp[-1];
-  sp[-1] = sp[-3];
-  sp[-3] = t;
-  t = sp[-2];
-  sp[-2] = sp[-4];
-  sp[-4] = t;
-
 dnl return stack
 
-primary(r)
+primary(rload, r@)
   *sp++ = rp[-1];
 
 primary(rfrom, r>)
@@ -756,13 +735,6 @@ secondary(colon, :,, WORD, CONS, LIT, &&enter, COMMA)
 secondary(constant,,, WORD, CONS, LIT, &&docon, COMMA, COMMA, SMUDGE, SUSPEND)
 secondary(variable,,, CREATE, ZERO, COMMA)
 
-dnl start consing a dodoes word
-secondary(builds, <builds,,
-  WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
-
-dnl set the dodoes address to the thread following does>
-secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
-
 dnl (char *) ---
 dnl interpret or compile s
 secondary(interpret,,,
@@ -847,6 +819,7 @@ secondary(postpone,, .immediate=1, l(
 dnl convenience
 
 dnl non-core
+include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
