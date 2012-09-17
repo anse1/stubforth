@@ -853,7 +853,7 @@ init:
 __attribute__((constructor))
 void stub4th_init ()
 {
-   /* Initialize forth with the static list head. */
+   /* Make the static static word list head globally available. */
    vm(0,0);
 }
 
