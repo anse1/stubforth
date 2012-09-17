@@ -1,3 +1,4 @@
+decimal
 : pid 39 syscall ;
 : brk 12 syscall ;
 
@@ -68,7 +69,8 @@ decimal
 	>r 0 0 r> open
 	dup 0< if ," open failed" throw then
 	>r
-	0 r> MAP_SHARED PROT_WRITE
+	( off fd flags prot len addr -- addr )
+	0 r> MAP_SHARED PROT_READ
 	1 20 << \ size
 	0
 	mmap
