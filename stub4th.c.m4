@@ -845,16 +845,14 @@ start:
     goto execute;
 
 init:
-  forth = dict_head;
-  undivert(div_init)
-  return (cell)(char *)0;
+  return (cell)(void *)dict_head;
 }
 
 __attribute__((constructor))
 void stub4th_init ()
 {
    /* Make the static static word list head globally available. */
-   vm(0,0);
+   forth = vm(0,0).a;
 }
 
 /*
