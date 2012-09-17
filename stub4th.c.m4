@@ -143,7 +143,7 @@ int main()
   char *startword;
 
   initio();
-  stub4th_init();
+  forth = vm(0,0).a;
 
   if(!vmstate.dp) {
       vmstate.dp = dictionary_stack;
@@ -846,13 +846,6 @@ start:
 
 init:
   return (cell)(void *)dict_head;
-}
-
-__attribute__((constructor))
-void stub4th_init ()
-{
-   /* Make the static static word list head globally available. */
-   forth = vm(0,0).a;
 }
 
 /*
