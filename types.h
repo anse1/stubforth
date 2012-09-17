@@ -30,7 +30,7 @@ struct vmstate {
   struct word *dictionary;
   char base; /* This ought to be cell-sized according to standards. */
 
-  int compiling : 1; /* Used by state-aware words INTERPRET and TICK */
+  int compiling : 1; /* Used by state-aware word INTERPRET */
 
   /* I/O configuration */
   int raw : 1;  /* Avoid translating lf to crlf, etc.  Set this if you

@@ -140,7 +140,7 @@ test "here word w2345678 find drop drop here = ." {1 $}
 test "here 10 allot here swap - ." {10 $}
 
 test {" fox" " quick brown " type type} {quick brown fox$}
-test {: t s" lazy dog" s" jumps over the " type type ; t} {jumps over the lazy dog$}
+test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy dog$}
 
 test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
@@ -177,6 +177,8 @@ test {.( moo)} {moo}
 test { " asdf" " moo" over 3 move type } {moof$}
 
 test { :noname 85 emit 65 emit ; execute } {UA$}
+
+test { 64 1 putchar call 85 1 putchar call } {@U$}
 
 send "bye\n"
 interact
