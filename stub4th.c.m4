@@ -835,17 +835,17 @@ undivert(div_word)
 dnl startup
 
 start:
-    if (!vmstate->dictionary) {
-	vmstate->dictionary = dict_head;
-    }
+{
     thread(top, BYE)
     ip = TOP;
     (sp++)->a = xt;
     undivert(div_start)
     goto execute;
+}
 
 init:
-  return (cell)(void *)dict_head;
+    undivert(div_init)
+    return (cell)(void *)dict_head;
 }
 
 /*
