@@ -143,7 +143,7 @@ int main()
   char *startword;
 
   initio();
-  stub4th_init();
+  forth = vm(0,0).a;
 
   if(!vmstate.dp) {
       vmstate.dp = dictionary_stack;
@@ -823,6 +823,7 @@ include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
+include(ffi.m4)
 dnl include(floating.m4)
 
 dnl platform
@@ -844,16 +845,7 @@ start:
     goto execute;
 
 init:
-  forth = dict_head;
-  undivert(div_init)
-  return (cell)(char *)0;
-}
-
-__attribute__((constructor))
-void stub4th_init ()
-{
-   /* Initialize forth with the static list head. */
-   vm(0,0);
+  return (cell)(void *)dict_head;
 }
 
 /*
