@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
   char *startword;
 
   initio();
-  stub4th_init();
+  forth = vm(0,0).a;
 
   if (argc > 1) {
      fd = open(argv[1], O_RDWR);
@@ -859,6 +859,7 @@ include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
+include(ffi.m4)
 dnl include(floating.m4)
 
 dnl platform
@@ -870,26 +871,17 @@ undivert(div_word)
 dnl startup
 
 start:
-    if (!vmstate->dictionary) {
-	vmstate->dictionary = dict_head;
-    }
+{
     thread(top, BYE)
     ip = TOP;
     (sp++)->a = xt;
     undivert(div_start)
     goto execute;
-
-init:
-  forth = dict_head;
-  undivert(div_init)
-  return (cell)(char *)0;
 }
 
-__attribute__((constructor))
-void stub4th_init ()
-{
-   /* Initialize forth with the static list head. */
-   vm(0,0);
+init:
+    undivert(div_init)
+    return (cell)(void *)dict_head;
 }
 
 /*
