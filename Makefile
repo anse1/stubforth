@@ -3,7 +3,7 @@ GCC = gcc
 CFLAGS = -O2  -g -Wall -Wcast-align
 SYNC = -s
 
-all: stub4th
+all: stubforth
 
 config.h: .rev.h
 
@@ -12,13 +12,13 @@ config.h: .rev.h
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@
 
-stub4th.o:  stub4th.c  *.h Makefile *.m4 config.h
+stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
 
-stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h
+stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
-stub4th:  stub4th.o
+stubforth:  stubforth.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
 %.size: % size.sh
@@ -29,12 +29,12 @@ stub4th:  stub4th.o
 %.c: %.c.m4 Makefile *.m4
 	m4 $(SYNC) $< > $@
 
-check: stub4th
+check: stubforth
 	expect test.tcl
 
 clean:
-	rm -f *grind.out.* stub4th
-	rm -f .rev.h *.o *.s stub4th.c
+	rm -f *grind.out.* stubforth
+	rm -f .rev.h *.o *.s stubforth.c
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \

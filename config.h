@@ -3,6 +3,6 @@
 
 #include ".rev.h"
 
-#define FORTHNAME "stub4th"
+#define FORTHNAME "stubforth"
 
 #endif

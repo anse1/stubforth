@@ -2,13 +2,13 @@ TAGS
 cachegrind.*
 gmon.out
 platform.h
-stub4th.c
+stubforth.c
 .rev.h
 *.log
 words.*
 *.s
 *.o
-stub4th
+stubforth
 *.bin
 *.srec
 *.brec
