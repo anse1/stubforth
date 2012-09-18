@@ -1,6 +1,6 @@
 #!/usr/bin/expect
 
-spawn ./stub4th
+spawn ./stubforth
 
 sleep 0.1
 set timeout 0
@@ -24,7 +24,7 @@ proc test {tx rx} {
 
 set true {-1 $}
 set false {\s0 $}
-set name {stub4th [0-9a-f]+}
+set name {stubforth [0-9a-f]+}
 
 test "hi\n" $name
 
