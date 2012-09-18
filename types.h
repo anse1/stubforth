@@ -53,7 +53,7 @@ extern struct word *forth; /* points to the head of head of the static
                               dictionary.  */
 
 cell vm(struct vmstate *vmstate, void **xt);
-void stub4th_init();
+void stubforth_init();
 word *find(word *p, const char *key);
 
 #endif

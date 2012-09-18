@@ -11,7 +11,7 @@ TTY = /dev/ttyUSB0
 VPATH = $(HOME)/src/c/vivo/:$(HOME)/ext/linux-2.6/arch/m68k/lib/
 SYNC = -s
 
-all: stub4th
+all: stubforth
 
 config.h: .rev.h
 
@@ -20,13 +20,13 @@ config.h: .rev.h
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@
 
-stub4th.o:  stub4th.c  *.h Makefile *.m4 config.h platform.h
+stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
 
-stub4th.s:  stub4th.c  *.h Makefile *.m4 config.h platform.h
+stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
-stub4th:  stub4th.o
+stubforth:  stubforth.o
 	$(GCC) $(CFLAGS) -o $@ $<
 
 %.size: % size.sh
@@ -40,12 +40,12 @@ stub4th:  stub4th.o
 %.h: %.h.m4
 	m4 -s $< > $@
 
-check: stub4th.elf
+check: stubforth.elf
 	./test.tcl $(TTY)
 
 clean:
-	rm -f *grind.out.* stub4th
-	rm -f .rev.h *.o *.s stub4th.c
+	rm -f *grind.out.* stubforth
+	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.o *.s *.elf *.srec *.brec *.bin
 	rm -f flashload chainload.? bblock.?.fprog block.?.fprog
 
@@ -93,10 +93,10 @@ init:
 # LIBGCC = modsi3.o mulsi3.o divsi3.o udivsi3.o umodsi3.o
 LIBGCC = /usr/local/lib/gcc/m68k-elf/4.7.2/m68000/libgcc.a
 
-stub4th.elf : stub4th.o start.o $(LIBGCC)
+stubforth.elf : stubforth.o start.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
 
-flash.elf : flash.o stub4th.o $(LIBGCC)
+flash.elf : flash.o stubforth.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
 
 dummy.elf : flash.o dummy.o $(LIBGCC)
@@ -113,7 +113,7 @@ dummy.prog : dummy.bin flashload
 
 boot:
 	make init
-	make stub4th.prog
+	make stubforth.prog
 	make user
 
 user:

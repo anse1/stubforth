@@ -7,7 +7,7 @@ set tty [lindex $argv 0]
 spawn -open [set port [open $tty "r+"]]
 
 send "hi\n"
-expect -re "stub4th .*"
+expect -re "stubforth .*"
 
 set lines [split [read stdin] \n]
 
