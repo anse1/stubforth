@@ -169,6 +169,7 @@ initiate-seed
 	ioff ! roff !
 	zoom @ 9 / zoom !
 	10 iterations +!
+	." zoom: " zoom @ . lf
 ;
 
 variable iset
