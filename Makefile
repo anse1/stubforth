@@ -52,3 +52,5 @@ dict: user.4th platform.4th $(HOME)/.stubforth stubforth
 run: $(HOME)/.stubforth
 	./stubforth
 
+install: stubforth
+	cp $< $(HOME)/bin/
