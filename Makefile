@@ -44,12 +44,12 @@ TAGS: .
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
-dict: user.4th stub4th
+dict: user.4th stubforth
 	dd if=/dev/zero of=$@ bs=1k count=128
-	./stub4th dict < $<
+	./stubforth dict < $<
 
 run: dict
-	./stub4th dict
+	./stubforth dict
 
-wordlist: stub4th user.4th
-	(cat user.4th ; echo words)|./stub4th|sort|(while read x; do echo -n "$$x ";done; echo)| fold -s > $@
+wordlist: stubforth user.4th
+	(cat user.4th ; echo words)|./stubforth|sort|(while read x; do echo -n "$$x ";done; echo)| fold -s > $@
