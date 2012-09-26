@@ -55,7 +55,7 @@ secondary(endtry,,.immediate=1, l(
 ))
 
 primary(dotparen, `.(', immediate)
-while ((t.i = getchar()) != ')')
+while ((t.i = my_getchar()) != ')')
   putchar(t.i);
 
 dnl ( 1 2 -- 2 1 2 )

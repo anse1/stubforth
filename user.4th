@@ -183,3 +183,16 @@ again ;
 
 : octal 8 base c! ;
 : binary 2 base c! ;
+
+variable erreof
+: x ," " redirect ! ['] quit catch ;
+x erreof !
+forget x
+	
+: evaluate ( s -- )
+	redirect @ >r
+	redirect !
+	['] quit catch
+	dup [ erreof @ ] literal = 0= if throw then
+	r> redirect !
+;
