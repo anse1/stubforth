@@ -10,6 +10,9 @@ cell dictionary_stack[1000];
 struct vmstate vmstate;
 
 word *forth;
+
+unsigned char *redirect;
+
 dnl m4 definitions
 
 define(dict_head, 0);
@@ -98,6 +101,19 @@ undefine(`self')
 ')
 
 dnl C helpers
+static int my_getchar() {
+  int c;
+
+  if (redirect) {
+    c = *redirect++;
+    if (!c)
+      return redirect = 0, '\n';
+    else
+      return c;
+  }
+  return getchar();
+}
+
 static int strcmp(const char *a, const char *b) {
   while (*a && *a == *b)
      a++, b++;
@@ -468,6 +484,7 @@ primary(move)
 }
 
 dnl I/O
+constant(redirect,, &redirect);
 
 dnl c --
 primary(emit)
@@ -492,7 +509,7 @@ primary(base)
 
 dnl -- c
 primary(key)
-  (sp++)->i = getchar();
+  (sp++)->i = my_getchar();
 
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
@@ -510,10 +527,10 @@ secondary(dot, .,,
  DOT1, BL)
 
 primary(blockcomment, `(', immediate)
-  while(getchar() != ')');
+  while(my_getchar() != ')');
 
 primary(linecomment, `\\', immediate)
-  while(getchar() != '\n');
+  while(my_getchar() != '\n');
 
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
@@ -594,13 +611,13 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    int c;
    char *s = (char *)vmstate->dp;
    do {
-      c = getchar();
+      c = my_getchar();
       if (c < 0) return (cell)(char *)0;
    } while (!IS_WORD(c));
    do {
       if (c < 0) return (cell)(char *)0;
       *s++ = c;
-      c = getchar();
+      c = my_getchar();
    } while (IS_WORD(c));
   *s++ = 0;
   (sp++)->s = (char *)vmstate->dp;
