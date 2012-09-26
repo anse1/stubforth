@@ -1,0 +1,19 @@
+#! /home/andreas/src/c/stubforth/stubforth
+
+" /usr/lib/libpq.so.5" dlopen constant libpq
+
+libpq " PQconnectdb"	1	cbind pqconnectdb
+libpq " PQerrorMessage" 1	cbind pqerrormessage
+libpq " PQexec"			2	cbind pqexec
+libpq " PQstatus"		1	cbind pqstatus
+libpq " PQgetvalue"		3	cbind pqgetvalue
+
+" " pqconnectdb constant pgconn
+
+pgconn pqstatus [if]
+	pgconn pqerrormessage type
+[else]
+	" select version();" pgconn pqexec
+    0 0 2 pick pqgetvalue type lf
+[then]
+bye
