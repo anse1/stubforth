@@ -167,25 +167,22 @@ int main(int argc, char *argv[])
   initio();
   forth = vm(0,0).a;
 
-  if (argc > 1) {
-     fd = open(argv[1], O_RDWR);
-     if (fd < 0) {
-       perror("opening dataspace read-write");
-       fd = open(argv[1], O_RDONLY);
-       if (fd < 0) {
-         perror("opening dataspace read-only");
-         flags = MAP_ANONYMOUS;
-       }
-       flags |= MAP_PRIVATE;
-     } else {
-       flags = MAP_SHARED;
-     }
-  } else {
-    flags = MAP_ANONYMOUS | MAP_PRIVATE;
-    fd = -1;
+  {
+    int oldpwd = open(".", O_RDONLY);
+    if (!getenv("HOME")) {
+      perror("opening dataspace read-write");
+      return -1;
+    }
+    chdir(getenv("HOME"));
+    fd = open(".stubforth", O_RDWR);
+    if (fd < 0) {
+        perror("opening dataspace read-write");
+    	return -2;
+    }
+    fchdir(oldpwd);
   }
 
-  v = mmap((void *)0x100000000ULL, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|flags, fd, 0);
+  v = mmap((void *)0x100000000ULL, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_SHARED, fd, 0);
   if (v == MAP_FAILED) {
     perror("mmap");
     return -1;
