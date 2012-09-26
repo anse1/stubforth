@@ -42,3 +42,4 @@ dnl i fileid -- ior
 primary(reposition_file)
 sp[-2].i = lseek(sp[-1].i, sp[-2].i, SEEK_SET);
 sp--;
+sp[-1].i = (sp[-1].i == -1) ? errno : 0;
