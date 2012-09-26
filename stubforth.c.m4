@@ -235,9 +235,6 @@ int main(int argc, char *argv[])
     }
     redirect = 0;
     startword = "quit";
-
-    if (argc > 1)
-       return 0;
   }
 }
 
