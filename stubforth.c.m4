@@ -23,7 +23,9 @@ dnl $1 - ANS94 error code
 dnl $2 - ANS94 error string
 define(`cthrow', `
 do {
-   return (cell)(char *)"$2";
+   ifelse($#, 2,
+     `return (cell)(char *)"$2";',
+     `return (cell)(vmint)"$1";')
 } while (0)')
 
 define(primary, `
