@@ -34,7 +34,7 @@ $1:
 divert(div_word)
   goto next;
   static word w_$1 = {
-    .name = "ifelse(`$2',`',`$1',`$2')",
+    .name = "ifelse(`$2',`',`translit(`$1',_,-)',`$2')",
     .link = dict_head,
     .code = &&$1
     dnl optional flags
@@ -63,7 +63,7 @@ undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
 static word w_$1 = {
-  .name = "ifelse($2,`',$1,$2)",
+  .name = "ifelse($2,`',`translit($1,_,-)',$2)",
   .link = dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
@@ -77,7 +77,7 @@ dnl Cons a constant
 define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
 static word w_$1 = {
-  .name = "ifelse($2,`',$1,$2)",
+  .name = "ifelse($2,`',`translit($1,_,-)',$2)",
   .link = dict_head,
   .code = &&docon,
   .data = { init_union(shift(shift($@))) }
