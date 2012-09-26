@@ -25,7 +25,7 @@ define(`cthrow', `
 do {
    ifelse($#, 2,
      `return (cell)(char *)"$2";',
-     `return (cell)(vmint)"$1";')
+     `return (cell)(vmint)$1;')
 } while (0)')
 
 define(primary, `
