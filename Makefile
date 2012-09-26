@@ -46,7 +46,7 @@ TAGS: .
 
 dict: user.4th $(HOME)/.stubforth stubforth
 	dd if=/dev/zero of=$(HOME)/.stubforth bs=1k count=128
-	( cat $< ; echo bye ) | ./stubforth
+	( cat $< ; echo sync bye ) | ./stubforth
 
 run: $(HOME)/.stubforth
 	./stubforth
