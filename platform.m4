@@ -4,6 +4,8 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
+constant(dataspace_fd,, &dataspace_fd)
+
 primary(sync)
 {
   v->head = vmstate->dictionary;

@@ -7,7 +7,6 @@ changecom(/*,*/)
 
 cell return_stack[1000];
 cell param_stack[1000];
-
 struct vmstate vmstate;
 
 word *forth;
@@ -160,7 +159,6 @@ word *find(word *p, const char *key)
 int main(int argc, char *argv[])
 {
   cell result;
-  static int fd, flags;
 
   char *startword;
 
@@ -174,21 +172,20 @@ int main(int argc, char *argv[])
       return -1;
     }
     chdir(getenv("HOME"));
-    fd = open(".stubforth", O_RDWR);
-    if (fd < 0) {
+    dataspace_fd = open(".stubforth", O_RDWR);
+    if (dataspace_fd < 0) {
         perror("opening dataspace read-write");
     	return -2;
     }
     fchdir(oldpwd);
   }
 
-  v = mmap((void *)0x100000000ULL, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_SHARED, fd, 0);
+  v = mmap((void *)0x100000000ULL, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_SHARED, dataspace_fd, 0);
   if (v == MAP_FAILED) {
     perror("mmap");
     return -1;
   } else {
-    printf("dataspace mapped %s.\n",
-     (flags&MAP_SHARED) ? "read-write" : "copy-on-write");
+    printf("dataspace mmapped.\n");
   }
 
   vmstate.dp = v->dp ? v->dp :(cell *) (v + 1);
