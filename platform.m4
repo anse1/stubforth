@@ -12,3 +12,9 @@ dnl s -- ior
 primary(chdir)
 sp[-1].i = chdir(sp[-1].s);
 sp[-1].i = (sp[-1].i == -1) ? errno : 0;
+
+dnl fileid -- ior
+primary(fchdir);
+sp[-1].i = fchdir(sp[-1].i);
+sp[-1].i = (sp[-1].i == -1) ? errno : 0;
+
