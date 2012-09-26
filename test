@@ -3,7 +3,7 @@ decimal
 .( well, it seems we're alive...) lf
 .( this is ) hi
 .( mmaped dataspace used: )
-here ?word forget - . lf
+here ?word forget - . .( bytes) lf
 
 .( testing dlopen... ) lf
 
