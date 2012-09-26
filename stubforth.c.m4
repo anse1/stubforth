@@ -10,7 +10,6 @@ cell dictionary_stack[1000];
 struct vmstate vmstate;
 
 word *forth;
-
 unsigned char *redirect;
 
 dnl m4 definitions
@@ -107,7 +106,7 @@ static int my_getchar() {
   if (redirect) {
     c = *redirect++;
     if (!c)
-      return redirect = 0, '\n';
+      return (redirect = 0), -1;
     else
       return c;
   }
@@ -171,6 +170,7 @@ int main()
 
 
   while(1) {
+    redirect = 0;
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
@@ -484,8 +484,6 @@ primary(move)
 }
 
 dnl I/O
-constant(redirect,, &redirect);
-
 dnl c --
 primary(emit)
   putchar((--sp)->i);
@@ -509,7 +507,11 @@ primary(base)
 
 dnl -- c
 primary(key)
-  (sp++)->i = my_getchar();
+{
+  t.i = my_getchar();
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+  *sp++ = t;
+}
 
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
@@ -527,10 +529,14 @@ secondary(dot, .,,
  DOT1, BL)
 
 primary(blockcomment, `(', immediate)
-  while(my_getchar() != ')');
+while((t.i = my_getchar()) != ')') {
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+}
 
 primary(linecomment, `\\', immediate)
-  while(my_getchar() != '\n');
+while((t.i = my_getchar()) != '\n') {
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+}
 
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
@@ -612,12 +618,12 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    char *s = (char *)vmstate->dp;
    do {
       c = my_getchar();
-      if (c < 0) return (cell)(char *)0;
+      if (c < 0) cthrow(-39, unexpected end of file);
    } while (!IS_WORD(c));
    do {
-      if (c < 0) return (cell)(char *)0;
       *s++ = c;
       c = my_getchar();
+      if (c < 0) cthrow(-39, unexpected end of file);
    } while (IS_WORD(c));
   *s++ = 0;
   (sp++)->s = (char *)vmstate->dp;
@@ -767,6 +773,8 @@ STATE, NULLP, ZBRANCH, self[19], EXIT,
 LITERAL)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
+
+constant(redirect,, &redirect);
 
 dnl ( -- a )
 secondary(if,, .immediate=1,
