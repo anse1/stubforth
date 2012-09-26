@@ -584,8 +584,6 @@ dnl ( s -- ) send zstring
 }
 
 dnl dictionary
-constant(forth,, forth);
-
 primary(context)
    (sp++)->a = &vmstate->dictionary;
 
