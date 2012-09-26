@@ -54,3 +54,9 @@ dnl fileid -- ior
 primary(flush_file)
 sp[-1].i = fdatasync(sp[-1].i);
 sp[-1].i = (sp[-1].i == -1) ? errno : 0;
+
+dnl s1 s2 -- ior
+primary(rename_file)
+sp[-2].i = rename(sp[-2].s, sp[-1].s);
+sp[-2].i = (sp[-2].i == -1) ? errno : 0;
+sp--;
