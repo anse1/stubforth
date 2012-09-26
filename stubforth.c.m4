@@ -186,8 +186,6 @@ int main(int argc, char *argv[])
   if (v == MAP_FAILED) {
     perror("mmap");
     return -1;
-  } else {
-    printf("dataspace mmapped.\n");
   }
 
   vmstate.dp = v->dp ? v->dp :(cell *) (v + 1);
@@ -199,8 +197,22 @@ int main(int argc, char *argv[])
 
   startword = "boot";
 
+  if (argc == 2) {
+     startword = "quit";
+     int fd =  open(argv[1], O_RDONLY);
+     if (fd < 0) {
+       perror("redirecting");
+       return -1;
+     }
+     redirect = mmap(0, 1 << 20, PROT_READ, MAP_SHARED, fd, 0);
+
+    if (redirect == MAP_FAILED) {
+      perror("mmap");
+      return -1;
+    }
+  }
+
   while(1) {
-    redirect = 0;
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
@@ -221,7 +233,7 @@ int main(int argc, char *argv[])
          my_puts("\n");
        }
     }
-
+    redirect = 0;
     startword = "quit";
   }
 }

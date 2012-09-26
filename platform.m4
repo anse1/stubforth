@@ -12,6 +12,8 @@ primary(sync)
   v->dp = vmstate->dp;
 }
 
+secondary(shebang, #!,, LINECOMMENT)
+
 dnl s -- s
 primary(getenv)
 sp[-1].s = getenv(sp[-1].s);
