@@ -1,5 +1,6 @@
 constant(ro, r/o, .i=O_RDONLY)
 constant(rw, r/w, .i=O_RDWR)
+constant(wo, w/o, .i=O_WRONLY)
 
 dnl fileid -- ior
 primary(close_file)
@@ -36,9 +37,16 @@ dnl c-addr u1 fileid -- u2 ior
 primary(read_file)
 sp[-3].i = read(sp[-1].i, sp[-3].s, sp[-2].i);
 sp[-2].i = (sp[-3].i == -1) ? errno : 0;
+
 sp--;
 
 dnl i fileid -- ior
 primary(reposition_file)
 sp[-2].i = lseek(sp[-1].i, sp[-2].i, SEEK_SET);
 sp--;
+
+dnl c-addr u fileid -- ior
+primary(write_file)
+sp[-3].i = write(sp[-1].i, sp[-3].s, sp[-2].i);
+sp[-3].i = (sp[-3].i == -1) ? errno : 0;
+
