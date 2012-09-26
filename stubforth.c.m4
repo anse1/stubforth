@@ -167,12 +167,13 @@ int main()
     if (!result.s)
        return 0;
     else {
-       my_puts("abort: ");
        if (result.s < 4096)
          perror("errno");
-       else
+       else {
+         my_puts("abort: ");
 	 my_puts(result.s);
-       my_puts("\n");
+         my_puts("\n");
+       }
     }
 
     startword = "quit";
