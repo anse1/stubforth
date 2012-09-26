@@ -404,6 +404,8 @@ if (sp[-1].a) {
    vmstate->sp = sp;
    vmstate->rp = rp;
    return sp[-1];
+} else {
+  sp--;
 }
 
 dnl cfa -- i
