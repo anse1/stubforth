@@ -11,12 +11,16 @@ sp[-1].s = getenv(sp[-1].s);
 dnl s -- ior
 primary(chdir)
 sp[-1].i = chdir(sp[-1].s);
-sp[-1].i = (sp[-1].i == -1) ? errno : 0;
+if (sp[-1].i == -1)
+   cthrow(errno);
+sp--;
 
 dnl fileid -- ior
 primary(fchdir);
 sp[-1].i = fchdir(sp[-1].i);
-sp[-1].i = (sp[-1].i == -1) ? errno : 0;
+if (sp[-1].i == -1)
+   cthrow(errno);
+sp--;
 
 dnl -- i
 primary(epoch)
