@@ -167,7 +167,7 @@ int main()
     if (!result.s)
        return 0;
     else {
-       if (result.s < 4096)
+       if (result.i < 4096 && result.i > 0)
          perror("errno");
        else {
          my_puts("abort: ");
