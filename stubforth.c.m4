@@ -396,7 +396,7 @@ primary(zbranch, 0branch, compile_only)
 
 dnl i --
 primary(throw)
-{
+if (sp[-1].a) {
    vmstate->sp = sp;
    vmstate->rp = rp;
    return sp[-1];
