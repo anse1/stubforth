@@ -17,10 +17,10 @@ proc test {tx rx} {
 
     expect \
 	timeout { error timeout } \
-	-re abort { error abort } \
 	-re $rx
     send_user " \[OK\]\n"
 }
+# 	-re abort { error abort } \
 
 set true {-1 $}
 set false {\s0 $}
@@ -173,19 +173,18 @@ test { :noname 85 emit 65 emit ; execute } {UA$}
 
 test { 64 1 putchar call 85 1 putchar call } {@U$}
 
-test { " /etc/passwd" r/w open-file throw } {Permission denied}
-test { " /etc/passwd" r/o open-file throw constant fd 64 emit } {@$}
+test { " /etc/passwd" r/w open-file } {Permission denied}
+test { " /etc/passwd" r/o open-file constant fd 64 emit } {@$}
 
 test {
     variable buf 6 allot
     buf 5 fd read-file
-    throw
     0 buf 5 + c!
     buf
     type
 } {root:$}
 
-test { 0 fd reposition-file buf 5 fd read-file throw buf type } {root:$}
+test { 0 fd reposition-file buf 5 fd read-file buf type } {root:$}
 
 test { " the quick" 9 1 write-file 64 emit } {the quick@$}
 
