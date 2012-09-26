@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#include <dlfcn.h>
+
 struct vocabulary {
   cell *dp;
   word *head;

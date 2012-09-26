@@ -4,6 +4,27 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
+dnl s -- handle
+primary(dlopen)
+{
+  sp[-1].a = dlopen(sp[-1].s, RTLD_LAZY);
+  if (! sp[-1].a)
+     cthrow(dlerror());
+}
+
+dnl handle s -- (void *)
+primary(dlsym)
+{
+  dlerror();
+  sp[-2].a = dlsym(sp[-2].a, sp[-1].s);
+  sp--;
+  t.s = dlerror();
+  if (t.s)
+    cthrow(t.s);
+}
+
+void *dlopen(const char *filename, int flag);
+
 constant(dataspace_fd,, &dataspace_fd)
 
 primary(sync)

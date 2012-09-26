@@ -1,6 +1,7 @@
 
 GCC = gcc
 CFLAGS = -O2  -g -Wall -Wcast-align
+LDFLAGS = -ldl
 SYNC = -s
 
 all: stubforth
@@ -19,7 +20,7 @@ stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
 stubforth:  stubforth.o
-	$(GCC) $(CFLAGS) -o $@ $<
+	$(GCC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 %.size: % size.sh
 	. ./size.sh $<
@@ -44,12 +45,10 @@ TAGS: .
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
-dict: user.4th $(HOME)/.stubforth stubforth
+dict: user.4th platform.4th $(HOME)/.stubforth stubforth
 	dd if=/dev/zero of=$(HOME)/.stubforth bs=1k count=128
-	( cat $< ; echo sync bye ) | ./stubforth
+	( cat user.4th platform.4th; echo sync bye ) | ./stubforth
 
 run: $(HOME)/.stubforth
 	./stubforth
 
-wordlist: stubforth user.4th
-	(cat user.4th ; echo words)|./stubforth|sort|(while read x; do echo -n "$$x ";done; echo)| fold -s > $@
