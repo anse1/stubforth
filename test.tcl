@@ -173,5 +173,8 @@ test { :noname 85 emit 65 emit ; execute } {UA$}
 
 test { 64 1 putchar call 85 1 putchar call } {@U$}
 
+test { " /etc/passwd" r/w open-file throw 64 emit } {Permission denied}
+test { " /etc/passwd" r/o open-file throw 64 emit } {@$}
+
 send "bye\n"
 interact
