@@ -1,0 +1,23 @@
+#! /home/andreas/src/c/stubforth/stubforth
+decimal
+.( well, it seems we're alive...) lf
+.( this is ) hi
+.( mmaped dataspace size: )
+here ?word forget - . lf
+
+.( testing dlopen... ) lf
+
+" /lib/libc.so.6" dlopen constant libc
+
+libc " printf" 0 cbind printf
+libc " getpid" 0 cbind getpid
+libc " system" 1 cbind system
+libc " puts" 1 cbind puts
+libc " getchar" 0 cbind getchar
+libc " kill" 2 cbind kill
+
+.( getpid => ) getpid . lf
+
+
+0 redirect !
+
