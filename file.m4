@@ -50,3 +50,7 @@ primary(write_file)
 sp[-3].i = write(sp[-1].i, sp[-3].s, sp[-2].i);
 sp[-3].i = (sp[-3].i == -1) ? errno : 0;
 
+dnl fileid -- ior
+primary(flush_file)
+sp[-1].i = fdatasync(sp[-1].i);
+sp[-1].i = (sp[-1].i == -1) ? errno : 0;
