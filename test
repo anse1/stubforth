@@ -2,7 +2,7 @@
 decimal
 .( well, it seems we're alive...) lf
 .( this is ) hi
-.( mmaped dataspace size: )
+.( mmaped dataspace used: )
 here ?word forget - . lf
 
 .( testing dlopen... ) lf
