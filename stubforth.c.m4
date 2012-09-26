@@ -825,6 +825,7 @@ include(tools.m4)
 include(string.m4)
 include(ffi.m4)
 dnl include(floating.m4)
+include(file.m4)
 
 dnl platform
 
