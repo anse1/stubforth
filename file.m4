@@ -1,10 +1,8 @@
-#include <fcntl.h>
-
-constant(r/o, O_RDONLY)
-constant(r/w, O_RDWR)
+constant(ro, r/o, .i=O_RDONLY)
+constant(rw, r/w, .i=O_RDWR)
 
 primary(close_file, close-file)
-sp[-1] = close(sp[-1]);
+sp[-1].i = close(sp[-1].i);
 
 primary(create_file, create-file)
 sp[-2].i = creat(sp[-2].s, sp[-1].i);
