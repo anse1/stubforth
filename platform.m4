@@ -4,6 +4,11 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
+dnl s -- s
 primary(getenv)
 sp[-1].s = getenv(sp[-1].s);
 
+dnl s -- ior
+primary(chdir)
+sp[-1].i = chdir(sp[-1].s);
+sp[-1].i = (sp[-1].i == -1) ? errno : 0;
