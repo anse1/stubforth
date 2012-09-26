@@ -187,5 +187,7 @@ test {
 
 test { 0 fd reposition-file buf 5 fd read-file throw buf type } {root:$}
 
+test { " the quick" 9 1 write-file 64 emit } {the quick@$}
+
 send "bye\n"
 interact
