@@ -77,10 +77,10 @@ dnl Cons a constant
 define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
 static word w_$1 = {
-  .name = "$1",
+  .name = "ifelse($2,`',$1,$2)",
   .link = dict_head,
   .code = &&docon,
-  .data = { init_union(shift($@)) }
+  .data = { init_union(shift(shift($@))) }
 };
 
   define(`dict_head', &w_$1)
@@ -445,7 +445,7 @@ primary(fill)
     t.s[n] = c;
 }
 
-constant(cell, .i=sizeof(cell))
+constant(cell,, .i=sizeof(cell))
 
 primary(cells)
   sp[-1].i *= sizeof(sp[0]);
@@ -495,7 +495,7 @@ primary(key)
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
 
-constant(hexchars, .s="0123456789abcdefghijklmnopqrstuvwxyz")
+constant(hexchars,, .s="0123456789abcdefghijklmnopqrstuvwxyz")
 
 thread(dot1,
  &&enter, BASE, CLOAD, DIVMOD,
