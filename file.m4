@@ -38,3 +38,7 @@ sp[-3].i = read(sp[-1].i, sp[-3].s, sp[-2].i);
 sp[-2].i = (sp[-3].i == -1) ? errno : 0;
 sp--;
 
+dnl i fileid -- ior
+primary(reposition_file)
+sp[-2].i = lseek(sp[-1].i, sp[-2].i, SEEK_SET);
+sp--;
