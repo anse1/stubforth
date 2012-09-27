@@ -4,6 +4,9 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
+constant(static_argv, argv)
+constant(static_argc, argc)
+
 dnl s -- s
 primary(getenv)
 sp[-1].s = getenv(sp[-1].s);
