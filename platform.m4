@@ -35,8 +35,8 @@ primary(sync)
 
 secondary(shebang, #!,, LINECOMMENT)
 
-constant(static_argv, argv)
-constant(static_argc, argc)
+constant(static_argv, argv, &static_argv)
+constant(static_argc, argc, &static_argc)
 
 dnl s -- s
 primary(getenv)
