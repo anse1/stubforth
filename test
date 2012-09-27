@@ -2,9 +2,19 @@
 .( this is ) hi
 .( mmaped dataspace used: )
 here ?word forget - . .( bytes) lf
-.( cell size of your build: ) cell . lf
-.( cell alignment of your build: ) 1 aligned . lf
-.( argc: ) argc ? lf
+.( cell size of your build: ) cell . .( bytes) lf
+.( cell alignment of your build: ) 1 aligned . .( bytes) lf
+.( argc: ) 	argc ? lf
+
+: dumpargs
+	dup if
+		dup 1- recurse
+	then
+	." argv + " dup . ." : "
+	cells argv @ + @ type lf
+;
+
+argc @ 1- dumpargs
 
 .( testing dlopen... ) 
 
@@ -19,6 +29,8 @@ libc " kill" 2 cbind kill
 
 .( getpid => ) getpid . lf
 
+.( mmaped dataspace used: )
+here ?word forget - . .( bytes) lf
 
 0 redirect !
 
