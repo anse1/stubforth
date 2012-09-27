@@ -4,6 +4,7 @@
 here ?word forget - . .( bytes) lf
 .( cell size of your build: ) cell . lf
 .( cell alignment of your build: ) 1 aligned . lf
+.( argc: ) argc ? lf
 
 .( testing dlopen... ) 
 
