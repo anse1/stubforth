@@ -1,11 +1,11 @@
 #! /home/andreas/src/c/stubforth/stubforth
-decimal
-.( well, it seems we're alive...) lf
 .( this is ) hi
 .( mmaped dataspace used: )
 here ?word forget - . .( bytes) lf
+.( cell size of your build: ) cell . lf
+.( cell alignment of your build: ) 1 aligned . lf
 
-.( testing dlopen... ) lf
+.( testing dlopen... ) 
 
 " /lib/libc.so.6" dlopen constant libc
 
