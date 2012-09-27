@@ -157,12 +157,18 @@ word *find(word *p, const char *key)
    return p;
 }
 
+int static_argc;
+char **static_argv;
+
 dnl main
 int main(int argc, char *argv[])
 {
   cell result;
 
   char *startword;
+
+  static_argc = argc;
+  static_argv = argv;
 
   initio();
   forth = vm(0,0).a;
