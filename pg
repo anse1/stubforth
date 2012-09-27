@@ -8,12 +8,26 @@ libpq " PQexec"			2	cbind pqexec
 libpq " PQstatus"		1	cbind pqstatus
 libpq " PQgetvalue"		3	cbind pqgetvalue
 
-" " pqconnectdb constant pgconn
+variable pgconn
 
-pgconn pqstatus [if]
-	pgconn pqerrormessage type
-[else]
-	" select version();" pgconn pqexec
-    0 0 2 pick pqgetvalue type lf
-[then]
-bye
+: ?pqstatus
+	pgconn @ pqstatus
+	if
+		pgconn @ pqerrormessage throw
+	then
+;
+
+: connect
+	," " pqconnectdb pgconn ! ?pqstatus ;
+
+: version
+	," select version();" pgconn @ pqexec
+	?pqstatus
+	0 0 2 pick pqgetvalue type lf
+	?pqstatus
+;
+
+connect
+version
+0 redirect !
+
