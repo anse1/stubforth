@@ -40,8 +40,15 @@ primary(frot)
 }
 
 primary(fdup)
-fp[0] = fp[-1]
+fp[0] = fp[-1];
 fp++;
+
+primary(fdepth)
+sp[0].i = fp - float_stack;
+sp++;
+
+primary(fdrop)
+fp--;
 
 dnl ops
 define(fbinop, `
