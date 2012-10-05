@@ -30,8 +30,14 @@ primary(fswap)
   fp[-2] = f;
 }
 
-fp[0] = fp[-2];
-fp++;
+primary(frot)
+{
+  vmfloat f;
+  f = fp[-3];
+  fp[-3] = fp[-2];
+  fp[-2] = fp[-1];
+  fp[-1] = f;
+}
 
 dnl ops
 define(fbinop, `
