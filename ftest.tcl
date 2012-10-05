@@ -28,4 +28,7 @@ set name {stubforth [0-9a-f]+}
 
 test "hi\n" $name
 
-test "66 i>f 44 i>f 2 i>f f* f- f>i . " {22 $}
+test "66 i>f 44 i>f 2 i>f f* f- f>i . " {-22 $}
+test "66 i>f 44 i>f 2 i>f f* f- f0< . " {1 $}
+
+test "77 i>f 33 i>f fdup frot fswap f* fnegate f>i ." {-2541 $}

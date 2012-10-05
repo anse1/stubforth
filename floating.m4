@@ -70,5 +70,5 @@ primary(fzlt, f0<)
 sp->i = fp[-1] < 0;
 sp++, fp--;
 
-primary(fnegagte)
+primary(fnegate)
 fp[-1] = -fp[-1];
