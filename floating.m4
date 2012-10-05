@@ -1,6 +1,8 @@
 
-float float_stack[30];
-float *fp;
+typedef float vmfloat;
+
+vmfloat float_stack[30];
+vmfloat *fp;
 
 divert(div_start)
 fp = float_stack;
@@ -14,6 +16,22 @@ sp--;
 primary(ftoi, f>i)
 sp->i = *--fp;
 sp++;
+
+dnl stack manipulation
+primary(fover)
+fp[0] = fp[-2];
+fp++;
+
+primary(fswap)
+{
+  vmfloat f;
+  f = fp[-1];
+  fp[-1] = fp[-2];
+  fp[-2] = f;
+}
+
+fp[0] = fp[-2];
+fp++;
 
 dnl ops
 define(fbinop, `
@@ -29,8 +47,11 @@ fbinop(fdiv, f/, /)
 
 fbinop(flt, f<, <)
 fbinop(fgt, f>, >)
+fbinop(feq, f=, =)
 
-primary(f_zero_less_than, f0<)
+primary(fzlt, f0<)
 sp->i = fp[-1] < 0;
 sp++, fp--;
 
+primary(fnegagte)
+fp[-1] = -fp[-1];
