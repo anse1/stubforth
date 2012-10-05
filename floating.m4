@@ -39,6 +39,10 @@ primary(frot)
   fp[-1] = f;
 }
 
+primary(fdup)
+fp[0] = fp[-1]
+fp++;
+
 dnl ops
 define(fbinop, `
 primary(`$1',`$2')
