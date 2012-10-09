@@ -51,7 +51,7 @@ extern struct vmstate vmstate;
 extern struct word *forth; /* points to the head of head of the static
                               dictionary.  */
 cell vm(struct vmstate *vmstate, void **xt);
-void stubforth_init();
+void stubforth_init(void);
 word *find(word *p, const char *key);
 
 #endif

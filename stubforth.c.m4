@@ -18,18 +18,18 @@ unsigned char *redirect;
 
 dnl m4 definitions
 
-define(dict_head, 0);
-define(div_word, 1);
-define(div_init, 2);
-define(div_start, 3);
+define(dict_head, 0)
+define(div_word, 1)
+define(div_init, 2)
+define(div_start, 3)
 
 dnl $1 - ANS94 error code
 dnl $2 - ANS94 error string
 define(`cthrow', `
 do {
    ifelse($#, 2,
-     `return (cell)(char *)"$2";',
-     `return (cell)(vmint)$1;')
+     `return t.s="$2", t;',
+     `return t.i=$1, t;')
 } while (0)')
 
 define(primary, `
@@ -286,7 +286,7 @@ next:
 
 primary(execute)
   w = (--sp)->a;
-  goto *(w->aa);
+  goto *(w->a);
 
 primary(exit)
   ip = (--rp)->a;
@@ -295,7 +295,7 @@ primary(exit)
 primary(bye)
   vmstate->sp = sp;
   vmstate->rp = rp;
-  return (cell)(char *)0;
+  return t.a = 0, t;
 
 dnl non-colon secondary words
 
@@ -905,8 +905,8 @@ include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
 include(ffi.m4)
-dnl include(floating.m4)
 include(file.m4)
+include(floating.m4)
 
 dnl platform
 
@@ -927,7 +927,7 @@ start:
 
 init:
     undivert(div_init)
-    return (cell)(void *)dict_head;
+    return t.a=dict_head, t;
 }
 
 /*
