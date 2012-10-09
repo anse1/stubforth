@@ -6,13 +6,13 @@
 
 primary(syscall)
 {
-  volatile register vmint callno asm ("%rax") = sp[-1].i;
-  volatile register vmint arg0	 asm ("%rdi") = sp[-2].i;
-  volatile register vmint arg1	 asm ("%rsi") = sp[-3].i;
-  volatile register vmint arg2	 asm ("%rdx") = sp[-4].i;
-  volatile register vmint arg3	 asm ("%r10") = sp[-5].i;
-  volatile register vmint arg4	 asm ("%r8") = sp[-6].i;
-  volatile register vmint arg5	 asm ("%r9") = sp[-7].i;
+  volatile register long callno asm ("%rax") = sp[-1].i;
+  volatile register long arg0	 asm ("%rdi") = sp[-2].i;
+  volatile register long arg1	 asm ("%rsi") = sp[-3].i;
+  volatile register long arg2	 asm ("%rdx") = sp[-4].i;
+  volatile register long arg3	 asm ("%r10") = sp[-5].i;
+  volatile register long arg4	 asm ("%r8") = sp[-6].i;
+  volatile register long arg5	 asm ("%r9") = sp[-7].i;
 
     asm("syscall"
 	: "=r" (callno)
