@@ -34,5 +34,5 @@ libc " getopt" 3 cbind getopt
 .( mmaped dataspace used: )
 here ?word forget - . .( bytes) lf
 
-\ 0 redirect !
+0 redirect !
 

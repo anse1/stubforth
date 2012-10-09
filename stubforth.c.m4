@@ -189,10 +189,10 @@ int main(int argc, char *argv[])
          }
        }
        break;
-dnl    default: /* '?' */
-dnl      fprintf(stderr, "Usage: %s [-w startword] [-m dataspace] [script]\n",
-dnl		argv[0]);
-dnl      return -3;
+    default: /* '?' */
+      fprintf(stderr, "Usage: %s [-w startword] [-m dataspace] [script]\n",
+		argv[0]);
+      return -3;
     }
   }
 
