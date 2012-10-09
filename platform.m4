@@ -37,6 +37,8 @@ secondary(shebang, #!,, LINECOMMENT)
 
 constant(static_argv, argv, &static_argv)
 constant(static_argc, argc, &static_argc)
+constant(optind,, &optind)
+constant(optarg,, &optarg)
 
 dnl s -- s
 primary(getenv)

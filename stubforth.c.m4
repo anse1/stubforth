@@ -164,8 +164,8 @@ char **static_argv;
 int main(int argc, char *argv[])
 {
   cell result;
-
-  char *startword;
+  char *startword = 0;
+  int opt;
 
   static_argc = argc;
   static_argv = argv;
@@ -173,10 +173,34 @@ int main(int argc, char *argv[])
   initio();
   forth = vm(0,0).a;
 
+
+  while ((opt = getopt(argc, argv, "w:m:")) != -1) {
+    switch (opt) {
+    case 'w':
+      startword = optarg;
+      break;
+    case 'm':
+       dataspace_fd = open(optarg, O_RDWR);
+       if (dataspace_fd < 0) {
+         dataspace_fd = open(optarg, O_RDONLY);
+         if (dataspace_fd < 0) {
+           perror("opening dataspace");
+	   return -4;
+         }
+       }
+       break;
+dnl    default: /* '?' */
+dnl      fprintf(stderr, "Usage: %s [-w startword] [-m dataspace] [script]\n",
+dnl		argv[0]);
+dnl      return -3;
+    }
+  }
+
+  if (!dataspace_fd)
   {
     int oldpwd = open(".", O_RDONLY);
     if (!getenv("HOME")) {
-      perror("opening dataspace read-write");
+      perror("locating ~/.stubforth");
       return -1;
     }
     chdir(getenv("HOME"));
@@ -201,11 +225,13 @@ int main(int argc, char *argv[])
 
   vmstate.dictionary = v->head;
 
+  if (!startword)
   startword = "boot";
 
-  if (argc > 1) {
-     startword = "quit";
-     int fd =  open(argv[1], O_RDONLY);
+  if (optind < argc) {
+     if (startword == "boot")
+        startword = "quit";
+     int fd =  open(argv[optind], O_RDONLY);
      if (fd < 0) {
        perror("redirecting");
        return -1;
