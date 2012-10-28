@@ -71,7 +71,7 @@ sp[-2] = sp[-1];
 sp--;
 
 primary(celladd, cell+)
-sp[-1].a++;
+sp[-1].aa++;
 
 primary(zne, 0<>)
 sp[-1].i = sp[-1].i != 0 ;
