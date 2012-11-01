@@ -1,6 +1,7 @@
 
-GCC = gcc
-CFLAGS = -O2  -g -Wall -Wcast-align
+CC = arm-none-eabi-gcc
+CFLAGS = -O2  -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb -Wl,--section-start=.init=0x20000000
+
 SYNC = -s
 
 all: stubforth
@@ -13,13 +14,13 @@ config.h: .rev.h
 	echo -n '"' >> $@
 
 stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
-	$(GCC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
-	$(GCC) $(CFLAGS) -o $@ -S $<
+	$(CC) $(CFLAGS) -o $@ -S $<
 
-stubforth:  stubforth.o
-	$(GCC) $(CFLAGS) -o $@ $<
+stubforth.elf:  stubforth.o
+	$(CC) $(CFLAGS) -o $@ $<
 
 %.size: % size.sh
 	. ./size.sh $<
