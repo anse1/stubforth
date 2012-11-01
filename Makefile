@@ -1,6 +1,6 @@
 
 CC = arm-none-eabi-gcc
-CFLAGS = -O2  -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb -Wl,--section-start=.init=0x20000000
+CFLAGS = -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb -Wl,--section-start=.init=0x20000000
 
 SYNC = -s
 
@@ -24,7 +24,6 @@ stubforth.elf:  stubforth.o
 
 %.size: % size.sh
 	. ./size.sh $<
-	strip $<
 	ls -l $<
 
 %.c: %.c.m4 Makefile *.m4
