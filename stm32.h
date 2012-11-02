@@ -152,4 +152,25 @@
 #define usart2_cr3  ( (USART2_BASE + 5))
 #define usart2_gtpr  ( (USART2_BASE + 6))
 
+/* System control block (SCB) */
+#define ACTLR	(volatile int *)0xe000e008
+#define CPUID	(volatile int *)0xe000ed00
+#define ICSR	(volatile int *)0xe000ed04
+#define VTOR	(volatile int *)0xe000ed08
+#define AIRCR	(volatile int *)0xe000ed0c
+#define SCR	(volatile int *)0xe000ed10
+#define CCR	(volatile int *)0xe000ed14
+#define SHPR1	(volatile int *)0xe000ed18
+#define SHPR2	(volatile int *)0xe000ed1c
+#define SHPR3	(volatile int *)0xe000ed20
+#define SHCRS	(volatile int *)0xe000ed24
+#define CFSR	(volatile int *)0xe000ed28
+#define MMSR	(volatile int *)0xe000ed28
+#define BFSR	(volatile int *)0xe000ed29
+#define UFSR	(volatile int *)0xe000ed2a
+#define HFSR	(volatile int *)0xe000ed2c
+#define MMAR	(volatile int *)0xe000ed34
+#define BFAR	(volatile int *)0xe000ed38
+#define AFSR	(volatile int *)0xe000ed3c
+
 #endif
