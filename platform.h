@@ -8,8 +8,37 @@
 /* flags.break_condition can be set in an ISR to interrupt the
    interpreter. */
 
+static void putchar(int c);
+
+__attribute__((interrupt))
+void default_handler(void)
+{
+  char * s = "default handler fired\n";
+  while (*s)
+    putchar(*s++);
+}
+
+int main();
+
+void *vectors[128] __attribute__((aligned(128))) = {
+  [0] = 0x20000000,
+  [1] = main,
+  [2] = default_handler,
+  [3] = default_handler,
+  [4] = default_handler,
+  [5] = default_handler,
+  [6] = default_handler,
+  [7] = default_handler,
+  [8] = default_handler,
+  [9] = default_handler,
+  [10] = default_handler,
+  [11] = default_handler,
+  [54] = default_handler,
+};
+
 static void initio()
 {
+  *VTOR=vectors;
   *rcc_apb1enr |= 1<<17;
   *rcc_apb1lpenr |= 1<<17;
   *usart2_cr1 |= 1<<13;

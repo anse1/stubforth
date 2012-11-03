@@ -173,4 +173,6 @@
 #define BFAR	(volatile int *)0xe000ed38
 #define AFSR	(volatile int *)0xe000ed3c
 
+#define NVIC_BASE (volatile int *)0xE000E100
+
 #endif
