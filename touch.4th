@@ -42,8 +42,8 @@ hex
 	case
 		0 of 0010000 endof \ x
 		1 of 1010000 endof \ y
-		10 of 0100000 endof \ aux1
-		11 of 1100000 endof \ aux 2
+		10 of 0100100 endof \ aux1
+		11 of 1100100 endof \ aux 2
 	endcase
 \	10000011  \ always-on, penirq off
 	10000000  \ power-down, penirq enabled
@@ -126,4 +126,4 @@ touch_init
 
 ' touchpixel forth_vectors 5 cells + !
 
-\ debug
+: touchaux begin 2 sample . 3 sample . lf 500 ms again ;
