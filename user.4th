@@ -171,11 +171,6 @@ again ;
   endtry
 ; immediate
 
-: restart
-	postpone branch
-	context @ >code >body ,
-; immediate
-
 : octal 8 base c! ;
 : binary 2 base c! ;
 

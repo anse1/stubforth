@@ -9,3 +9,8 @@ secondary(forget,,, l(
  TOLINK LOAD CONTEXT STORE
  TONAME LOAD DP STORE
 ))
+
+secondary(restart,, .immediate=1, l(
+  LIT BRANCH COMMA
+  CONTEXT LOAD TOCODE TOBODY COMMA
+))
