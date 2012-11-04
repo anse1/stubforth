@@ -124,6 +124,7 @@ user:
 	make chainload.4th
 	make vivo.prog
 	make display.prog
+	make touch.prog
 	make mset.prog
 
 block.0.bin : flash.bin
