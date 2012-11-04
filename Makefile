@@ -46,6 +46,7 @@ check: stubforth.elf
 clean:
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
+	rm -f *.vcg
 	rm -f *.o *.s *.elf *.srec *.brec *.bin
 	rm -f flashload chainload.? bblock.?.fprog block.?.fprog
 

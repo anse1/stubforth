@@ -13,14 +13,21 @@ union cell {
 };
 typedef union cell cell;
 
+/* GCC supports static initialization of flexible arrays, but we work
+   around it for portability's sake and because it produces bogus
+   sizes in the ELF meta-info. */
+
+#define staticword(len)				\
+  const char *name;				\
+  int compile_only : 1;				\
+  int immediate : 1;				\
+  int smudge : 1;				\
+  struct word *link;				\
+  void *code;					\
+  cell data[len];				\
+
 struct word {
-  const char *name;
-  int compile_only : 1; /* Not verified */
-  int immediate : 1;
-  int smudge : 1;
-  struct word *link;
-  void *code;
-  cell data[];
+  staticword(0)
 };
 
 struct vmstate {
@@ -53,7 +60,7 @@ extern struct word *forth; /* points to the head of head of the static
                               dictionary.  */
 
 cell vm(struct vmstate *vmstate, void **xt);
-void stubforth_init();
+void stubforth_init(void);
 word *find(word *p, const char *key);
 
 #endif

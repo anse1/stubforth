@@ -55,7 +55,7 @@ secondary(endtry,,.immediate=1, l(
 ))
 
 primary(dotparen, `.(', immediate)
-while ((t.i = getchar()) != ')')
+while ((t.i = my_getchar()) != ')')
   putchar(t.i);
 
 dnl ( 1 2 -- 2 1 2 )
@@ -71,7 +71,7 @@ sp[-2] = sp[-1];
 sp--;
 
 primary(celladd, cell+)
-sp[-1].a++;
+sp[-1].aa++;
 
 primary(zne, 0<>)
 sp[-1].i = sp[-1].i != 0 ;

@@ -10,18 +10,22 @@ extern cell dictionary_stack[];
 struct vmstate vmstate;
 
 word *forth;
+unsigned char *redirect;
+
 dnl m4 definitions
 
-define(dict_head, 0);
-define(div_word, 1);
-define(div_init, 2);
-define(div_start, 3);
+define(dict_head, 0)
+define(div_word, 1)
+define(div_init, 2)
+define(div_start, 3)
 
 dnl $1 - ANS94 error code
 dnl $2 - ANS94 error string
 define(`cthrow', `
 do {
-   return (cell)(char *)"$2";
+   ifelse($#, 2,
+     `return t.s="$2", t;',
+     `return t.i=$1, t;')
 } while (0)')
 
 define(primary, `
@@ -34,8 +38,8 @@ $1:
 divert(div_word)
   goto next;
   static word w_$1 = {
-    .name = "ifelse(`$2',`',`$1',`$2')",
-    .link = dict_head,
+    .name = "ifelse(`$2',`',`translit(`$1',_,-)',`$2')",
+    .link = (word *) dict_head,
     .code = &&$1
     dnl optional flags
     ifelse(`$3',`',`',`, .$3=1')
@@ -62,9 +66,9 @@ define(secondary, `
 undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
-static word w_$1 = {
-  .name = "ifelse($2,`',$1,$2)",
-  .link = dict_head,
+static struct { staticword(eval($#-2)) } w_$1 = {
+  .name = "ifelse($2,`',`translit($1,_,-)',$2)",
+  .link = (word *)dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
   .data = { init_union(shift(shift(shift($@)))) , {EXIT}}
@@ -76,11 +80,11 @@ static word w_$1 = {
 dnl Cons a constant
 define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
-static word w_$1 = {
-  .name = "$1",
-  .link = dict_head,
+static struct { staticword(1) } w_$1 = {
+  .name = "ifelse($2,`',`translit($1,_,-)',$2)",
+  .link = (word *)dict_head,
   .code = &&docon,
-  .data = { init_union(shift($@)) }
+  .data = { init_union(shift(shift($@))) }
 };
 
   define(`dict_head', &w_$1)
@@ -93,11 +97,24 @@ dnl $2... - cell data
 define(thread, `
 define(`self', `&t_$1')
 define(translit($1,a-z,A-Z), t_$1)
-static cell t_$1[] = { init_union(shift($@)) };
+static cell t_$1[eval($#-1)] = { init_union(shift($@)) };
 undefine(`self')
 ')
 
 dnl C helpers
+static int my_getchar() {
+  int c;
+
+  if (redirect) {
+    c = *redirect++;
+    if (!c)
+      return (redirect = 0), -1;
+    else
+      return c;
+  }
+  return getchar();
+}
+
 static int strcmp(const char *a, const char *b) {
   while (*a && *a == *b)
      a++, b++;
@@ -155,6 +172,7 @@ int main()
 
 
   while(1) {
+    redirect = 0;
     vmstate.compiling = 0;
     vmstate.raw = 0;
     vmstate.quiet = 0;
@@ -215,7 +233,7 @@ next:
 
 primary(execute)
   w = (--sp)->a;
-  goto *(w->aa);
+  goto *(w->a);
 
 primary(exit)
   ip = (--rp)->a;
@@ -224,7 +242,7 @@ primary(exit)
 primary(bye)
   vmstate->sp = sp;
   vmstate->rp = rp;
-  return (cell)(char *)0;
+  return t.a = 0, t;
 
 dnl non-colon secondary words
 
@@ -396,10 +414,12 @@ primary(zbranch, 0branch, compile_only)
 
 dnl i --
 primary(throw)
-{
+if (sp[-1].a) {
    vmstate->sp = sp;
    vmstate->rp = rp;
    return sp[-1];
+} else {
+  sp--;
 }
 
 dnl cfa -- i
@@ -445,7 +465,7 @@ primary(fill)
     t.s[n] = c;
 }
 
-constant(cell, .i=sizeof(cell))
+constant(cell,, .i=sizeof(cell))
 
 primary(cells)
   sp[-1].i *= sizeof(sp[0]);
@@ -466,7 +486,6 @@ primary(move)
 }
 
 dnl I/O
-
 dnl c --
 primary(emit)
   putchar((--sp)->i);
@@ -490,12 +509,16 @@ primary(base)
 
 dnl -- c
 primary(key)
-  (sp++)->i = getchar();
+{
+  t.i = my_getchar();
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+  *sp++ = t;
+}
 
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
 
-constant(hexchars, .s="0123456789abcdefghijklmnopqrstuvwxyz")
+constant(hexchars,, .s="0123456789abcdefghijklmnopqrstuvwxyz")
 
 thread(dot1,
  &&enter, BASE, CLOAD, DIVMOD,
@@ -508,10 +531,14 @@ secondary(dot, .,,
  DOT1, BL)
 
 primary(blockcomment, `(', immediate)
-  while(getchar() != ')');
+while((t.i = my_getchar()) != ')') {
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+}
 
 primary(linecomment, `\\', immediate)
-  while(getchar() != '\n');
+while((t.i = my_getchar()) != '\n') {
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+}
 
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
@@ -524,7 +551,6 @@ dnl ( s -- ) send zstring
 }
 
 dnl dictionary
-
 primary(context)
    (sp++)->a = &vmstate->dictionary;
 
@@ -592,13 +618,13 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    int c;
    char *s = (char *)vmstate->dp;
    do {
-      c = getchar();
-      if (c < 0) return (cell)(char *)0;
+      c = my_getchar();
+      if (c < 0) cthrow(-39, unexpected end of file);
    } while (!IS_WORD(c));
    do {
-      if (c < 0) return (cell)(char *)0;
       *s++ = c;
-      c = getchar();
+      c = my_getchar();
+      if (c < 0) cthrow(-39, unexpected end of file);
    } while (IS_WORD(c));
   *s++ = 0;
   (sp++)->s = (char *)vmstate->dp;
@@ -749,6 +775,8 @@ LITERAL)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
 
+constant(redirect,, &redirect);
+
 dnl ( -- a )
 secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
@@ -824,7 +852,7 @@ include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
 include(ffi.m4)
-dnl include(floating.m4)
+include(floating.m4)
 
 dnl platform
 
@@ -845,7 +873,7 @@ start:
 
 init:
     undivert(div_init)
-    return (cell)(void *)dict_head;
+    return t.a=(word *)dict_head, t;
 }
 
 /*
