@@ -180,5 +180,8 @@ test { :noname 85 emit 65 emit ; execute } {UA$}
 
 test { 64 1 putchar call 85 1 putchar call } {@U$}
 
+test { " 667 1 + 0 redirect ! " redirect ! . } {668 $}
+test { " 668 1 + . " evaluate } {669 $}
+
 send "bye\n"
 interact

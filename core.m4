@@ -53,3 +53,15 @@ primary(twoswap, 2swap)
 primary(abs)
   if (sp[-1].i < 0)
      sp[-1].i = -sp[-1].i;
+
+constant(erreof,, .s="unexpected end of file")
+
+secondary(evaluate,,, l(
+ REDIRECT LOAD RTO
+ REDIRECT STORE
+ LIT QUIT CATCH
+ DUP ERREOF EQ NULLP
+ ZBRANCH self[15]
+ THROW
+ RFROM REDIRECT STORE
+))
