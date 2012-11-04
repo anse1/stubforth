@@ -3,3 +3,9 @@ thread(dumpstack,
 
 secondary(dots, .s,,
  QSTACK, LIT, .i=35, EMIT, DEPTH, DOT, DUMPSTACK, LF)
+
+secondary(forget,,, l(
+ QWORD TOWORD DUP
+ TOLINK LOAD CONTEXT STORE
+ TONAME LOAD DP STORE
+))

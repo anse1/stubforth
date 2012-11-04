@@ -176,5 +176,6 @@ test { 64 1 putchar call 85 1 putchar call } {@U$}
 test { " 667 1 + 0 redirect ! " redirect ! . } {668 $}
 test { " 668 1 + . " evaluate } {669 $}
 
-send "bye\n"
+send "forget testsuite-marker bye\n"
+
 interact

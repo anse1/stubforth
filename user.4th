@@ -1,8 +1,3 @@
-\ non-platform-specific forth code
-
-: forget ( read a word to forget, adjusts dp )
-	?word >word dup >link @ context ! >name @ dp ! ;
-
 \ bit flipping
 
 : flip ( c a -- ) 
