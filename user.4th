@@ -184,15 +184,18 @@ again ;
 : octal 8 base c! ;
 : binary 2 base c! ;
 
-variable erreof
-: x ," " redirect ! ['] quit catch ;
-x erreof !
+: x
+	redirect @
+	," " redirect ! ['] quit catch
+	swap redirect ! ;
+x
 forget x
-	
+constant erreof
+
 : evaluate ( s -- )
 	redirect @ >r
 	redirect !
 	['] quit catch
-	dup [ erreof @ ] literal = 0= if throw then
+	dup erreof = 0= if throw then
 	r> redirect !
 ;
