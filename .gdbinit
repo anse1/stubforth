@@ -270,6 +270,5 @@ end
 target extended :4242
 load
 set $pc=main
-set $sp=0x20010000
+set $sp=0x10010000
 set vmstate.dp=0
-
