@@ -840,10 +840,11 @@ secondary(brackettick, ['], .immediate=1, l(
 ))
 
 secondary(postpone,, .immediate=1, l(
-   QWORD,
+   QWORD
    IMMEDIATEP ZBRANCH self[6] COMMA EXIT
    LITERAL LIT COMMA COMMA
 ))
+
 dnl convenience
 
 dnl non-core
