@@ -275,7 +275,7 @@ define uint
 end
 
 #target extended :4242
-load
+#load
 
 define init
   set $pc=main
