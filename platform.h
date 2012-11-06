@@ -159,7 +159,7 @@ static int getchar()
 {
   unsigned char c;
   while (ring.in == ring.out)
-    ;
+    asm("wfi");
   c = ring.buf[ring.out];
   ring.out = (ring.out + 1) % sizeof(ring.buf);
   if (c=='\r')
