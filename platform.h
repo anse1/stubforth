@@ -39,6 +39,8 @@ void default_handler(void)
   asm ("mrs %0, xpsr": "=r" (xpsr)) ;
   dumphex(xpsr);
   putchar('\n');
+  while(1)
+    ;
 }
 
 volatile struct {
