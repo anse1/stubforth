@@ -4,3 +4,10 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
+primary(xpsr)
+{
+  register int xpsr;
+  asm ("mrs %0, xpsr": "=r" (xpsr)) ;
+  sp[0].i = xpsr;
+  sp++;
+}
