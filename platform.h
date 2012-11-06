@@ -61,6 +61,8 @@ void uart_handler(void)
   if (status & (1<<8)) {
     my_puts(" <BREAK>\n");
     *usart2_sr &= ~(1<<8);
+/*     asm("msr cpsr_c, #0x1F"); legal according to arm docs, gas disagrees */
+    asm("b main");
   }
 }
 
