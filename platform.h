@@ -61,8 +61,7 @@ void uart_handler(void)
   if (status & (1<<8)) {
     my_puts(" <BREAK>\n");
     *usart2_sr &= ~(1<<8);
-/*     asm("msr cpsr_c, #0x1F"); legal according to arm docs, gas disagrees */
-    asm("b main");
+    /* TODO: restart C runtime without restarting forth runtime */
   }
 }
 
@@ -155,6 +154,8 @@ static void initio()
   *usart2_cr1 |= (1<<5);
   *usart2_cr2 |= (1<<6);
   *(volatile int *)0xE000E104 = 0x40;
+
+  asm volatile ("cpsie i");
 }
 
 static void putchar(int c)
