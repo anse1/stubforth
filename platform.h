@@ -52,13 +52,21 @@ volatile struct {
 __attribute__((interrupt))
 void uart_handler(void)
 {
-  ring.buf[ring.in] = *usart2_dr;
-  ring.in = (ring.in + 1) % sizeof(ring.buf);
+  int status = *usart2_sr;
+
+  if (status & (1<<5)) {
+    ring.buf[ring.in] = *usart2_dr;
+    ring.in = (ring.in + 1) % sizeof(ring.buf);
+  }
+  if (status & (1<<8)) {
+    my_puts(" <BREAK>\n");
+    *usart2_sr &= ~(1<<8);
+  }
 }
 
 int main();
 
-void *vectors[128] __attribute__((aligned(128))) = {
+void *vectors[128] __attribute__((aligned(256))) = {
    [0] = 0x20000000,
    [1] = main,
    [2] = default_handler,
@@ -140,20 +148,15 @@ static void initio()
   *rcc_cfgr = 5;
 /* # 8MHz/16/4.3125 = 0.115942028986MHz */
   *usart2_brr = 0x45;
-  *usart2_sr=0;
-  {
-    volatile int c = *usart2_dr;
-    (void) c;
-  }
 }
 
 static void putchar(int c)
 {
+  if (c=='\n')
+    putchar('\r');
   while (! (*usart2_sr & 1<<7))
     ;
   *usart2_dr = c;
-  if (c=='\n')
-    putchar('\r');
 }
 
 
@@ -161,7 +164,7 @@ static int getchar()
 {
   unsigned char c;
   while (ring.in == ring.out)
-    asm("wfi");
+    asm("nop");
   c = ring.buf[ring.out];
   ring.out = (ring.out + 1) % sizeof(ring.buf);
   if (c=='\r')

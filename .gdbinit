@@ -228,9 +228,9 @@ set $usart2_cr2 = $USART2_BASE + 4
 set $usart2_cr3 = $USART2_BASE + 5
 set $usart2_gtpr = $USART2_BASE + 6
 
-define init
-  set *$rcc_apb1enr |= 1<<17
-  set *$rcc_apb1lpenr |= 1<<17
+define uinit
+ set *$rcc_apb1enr |= 1<<17
+ set *$rcc_apb1lpenr |= 1<<17
   set *$usart2_cr1 |= 1<<13
   set *$usart2_cr1 |= 1<<3
   set *$usart2_cr1 |= 1<<2
@@ -249,9 +249,9 @@ define init
   set *$gpioa_afrl |= 7 << 2*4 
 
 # HSE=AHB1=AHB2: 8MHz
-  set *$rcc_cfgr = 5
+   set *$rcc_cfgr = 5
 # 8MHz/16/4.3125 = 0.115942028986MHz
-  set *$usart2_brr = 0x45
+   set *$usart2_brr = 0x45
 
 
 
@@ -259,27 +259,24 @@ end
 
 define u2sr
   set $t = *$usart2_sr
-  echo "txe: "
-  p $t & (1<<7) 
-  echo "tc: "
-  p $t & (1<<6) 
-  echo "rxne: "
-  p $t & (1<<5) 
+  printf "txe: %d tc: %d rxne: %d lbe: %d \n", $t&(1<<7) , $t & (1<<6) , $t & (1<<5) , $t & (1<<8) 
 end
 
 define uint
 #  set *0xE000E104 |= 1 << 22
   set *0xE000E104 =  0x40
   set *$usart2_cr1 |= (1<<5)
-#  set *$usart2_cr1 &= ~(1<<5)
+  set *$usart2_cr1 |= (1<<6)
 end
 
 #target extended :4242
 #load
 
 define init
-  set $pc=main
+  uinit
   set $sp=0x10010000
+  set $pc=main
+  set *(volatile int *)0xe000ed08 = vectors
   set vmstate.dp=0
   set ring.in = 0
   set ring.out = 0
