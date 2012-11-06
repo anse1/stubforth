@@ -267,8 +267,21 @@ define u2sr
   p $t & (1<<5) 
 end
 
-target extended :4242
+define uint
+#  set *0xE000E104 |= 1 << 22
+  set *0xE000E104 =  0x40
+  set *$usart2_cr1 |= (1<<5)
+#  set *$usart2_cr1 &= ~(1<<5)
+end
+
+#target extended :4242
 load
-set $pc=main
-set $sp=0x10010000
-set vmstate.dp=0
+
+define init
+  set $pc=main
+  set $sp=0x10010000
+  set vmstate.dp=0
+  set ring.in = 0
+  set ring.out = 0
+  set tick=0
+end

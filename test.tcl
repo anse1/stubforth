@@ -1,6 +1,8 @@
 #!/usr/bin/expect
 
-spawn ./stubforth
+#spawn ./stubforth
+set tty [lindex $argv 0]
+spawn -open [set port [open $tty "r+"]]
 
 sleep 0.1
 set timeout 0
@@ -23,7 +25,7 @@ proc test {tx rx} {
 }
 
 set true {-1 $}
-set false {\s0 $}
+set false {0 $}
 set name {stubforth [0-9a-f]+}
 
 test "hi\n" $name
@@ -54,6 +56,8 @@ test "1 2 3 4 5 6 7 8 9 swap mod + * xor or swap - hex ." {32 $}
 test "1 2 3 4 5 6 7 8 9 << >> << swap / ." {99 $}
 
 test "1234 2345 max 9999 min 11 + ." {2356 $}
+
+send "quiet "
 
 test "55 emit 1234 2345 dup = 30 + emit = 30 + emit " {U10$}
 test "55 emit 1234 2345 swap dup < 30 + emit < 30 + emit " {U01$}
@@ -127,6 +131,8 @@ test ": t 1 2 3 4 2swap . . . . ; t" {2 1 4 3 $}
 send "abort\n" ;
 expect -re abort.*
 
+send "quiet "
+
 test "depth 1 2 3 666 5 .s" {#6 0 1 2 3 666 5}
 
 send ": w2345678 ;\n"
@@ -171,12 +177,12 @@ test { " asdf" " moo" over 3 move type } {moof$}
 
 test { :noname 85 emit 65 emit ; execute } {UA$}
 
-test { 64 1 putchar call 85 1 putchar call } {@U$}
-
 test { " 667 1 + 0 redirect ! " redirect ! . } {668 $}
 test { " 668 1 + . " evaluate } {669 $}
 
 test { : x ?dup if 65 emit 1- restart then ; 666 4 64 emit x 85 emit . } {@AAAAU666 $}
+
+test { 64 1 putchar call 85 1 putchar call } {@U$}
 
 send "forget testsuite-marker bye\n"
 

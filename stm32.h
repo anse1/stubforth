@@ -153,6 +153,7 @@
 #define usart2_gtpr  ( (USART2_BASE + 6))
 
 /* System control block (SCB) */
+#define ICTR	(volatile int *)0xe000e004
 #define ACTLR	(volatile int *)0xe000e008
 #define CPUID	(volatile int *)0xe000ed00
 #define ICSR	(volatile int *)0xe000ed04
@@ -173,6 +174,14 @@
 #define BFAR	(volatile int *)0xe000ed38
 #define AFSR	(volatile int *)0xe000ed3c
 
-#define NVIC_BASE (volatile int *)0xE000E100
+#define NVIC_ISER (volatile int *)0xE000E100
+#define NVIC_ICER (volatile int *)0xE000E180
+
+#define NVIC_ISPR (volatile int *)0xE000E200
+#define NVIC_ICPR (volatile int *)0xE000E280
+
+#define NVIC_IAPR (volatile int *)0xE000E300
+
+#define NVIC_IPR (volatile int *)0xE000E400
 
 #endif
