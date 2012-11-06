@@ -11,3 +11,10 @@ primary(xpsr)
   sp[0].i = xpsr;
   sp++;
 }
+
+primary(wfi)
+asm("wfi");
+
+primary(wfe)
+asm("wfe");
+
