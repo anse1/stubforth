@@ -144,10 +144,15 @@ static void initio()
   *gpioa_afrl |= 7 << 3*4 ;
   *gpioa_afrl |= 7 << 2*4 ;
 
+
 /* # HSE=AHB1=AHB2: 8MHz */
   *rcc_cfgr = 5;
 /* # 8MHz/16/4.3125 = 0.115942028986MHz */
   *usart2_brr = 0x45;
+
+  *usart2_cr1 |= (1<<5);
+  *usart2_cr2 |= (1<<6);
+  *(volatile int *)0xE000E104 = 0x40;
 }
 
 static void putchar(int c)

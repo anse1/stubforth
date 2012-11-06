@@ -266,7 +266,7 @@ define uint
 #  set *0xE000E104 |= 1 << 22
   set *0xE000E104 =  0x40
   set *$usart2_cr1 |= (1<<5)
-  set *$usart2_cr1 |= (1<<6)
+  set *$usart2_cr2 |= (1<<6)
 end
 
 #target extended :4242
