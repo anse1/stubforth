@@ -61,15 +61,21 @@ void uart_handler(void)
   if (status & (1<<8)) {
     my_puts(" <BREAK>\n");
     *usart2_sr &= ~(1<<8);
-    /* TODO: restart C runtime without restarting forth runtime */
+    /* Patch stack frame to return to _cstart instead. */
+    asm("mov r2, sp");
+    asm("add r2, #(8*4)");
+    asm("movw r3, #:lower16:_cstart");
+    asm("movt r3, #:upper16:_cstart");
+    asm("str r3, [r2]");
+    return;
   }
 }
 
-int main();
+extern void _start;
 
 void *vectors[128] __attribute__((aligned(256))) = {
    [0] = 0x20000000,
-   [1] = main,
+   [1] = &_start,
    [2] = default_handler,
    [3] = default_handler,
    [4] = default_handler,
@@ -122,7 +128,7 @@ void *vectors[128] __attribute__((aligned(256))) = {
    [51] = default_handler,
    [52] = default_handler,
    [53] = default_handler,
-   [54] = uart_handler,
+   [38+16] = uart_handler,
    [55] = default_handler,
    [56] = default_handler,
    [57] = default_handler,
