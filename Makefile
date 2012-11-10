@@ -1,8 +1,9 @@
 
 CC = arm-none-eabi-gcc
-CFLAGS = -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb -Wl,--section-start=.init=0x20000000
-CFLAGS =  -ffreestanding -nostdlib  -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb -Wl,-Tcortexm.ld -Wl,-emain
+CFLAGS =    -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb 
 SYNC = -s
+LIBGCC = $(shell $(CC) -print-libgcc-file-name)
+LDFLAGS= -Wl,-Tcortexm.ld -nostdlib $(LIBGCC)
 
 all: stubforth
 
@@ -20,7 +21,7 @@ stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(CC) $(CFLAGS) -o $@ -S $<
 
 stubforth.elf:  stubforth.o
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< 
 
 %.size: % size.sh
 	. ./size.sh $<
