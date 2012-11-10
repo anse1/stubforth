@@ -1,5 +1,5 @@
-#ifndef STM32_H
-#define STM32_H
+#ifndef STM32F4_H
+#define STM32F4_H
 
 
 #define RCC_BASE ((volatile int *) 0x40023800)
