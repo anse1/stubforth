@@ -1,7 +1,7 @@
 
 CC = arm-none-eabi-gcc
 CFLAGS = -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb -Wl,--section-start=.init=0x20000000
-
+CFLAGS =  -ffreestanding -nostdlib  -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb -Wl,-Tcortexm.ld -Wl,-emain
 SYNC = -s
 
 all: stubforth
