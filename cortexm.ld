@@ -8,8 +8,11 @@
 
 SECTIONS
 {
+  _stack_base = 0x10010000;
   . = 0x20000000;
   .text : { *(.text) }
   .data : { *(.data) }
+  _bss_start = . ;
   .bss : { *(.bss) }
+  _end = .;
 }

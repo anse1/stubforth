@@ -20,8 +20,11 @@ stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(CC) $(CFLAGS) -o $@ -S $<
 
-stubforth.elf:  stubforth.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< 
+start.o: start.S
+	$(CC) $(CFLAGS) -c $< -o $@
+
+stubforth.elf:  start.o stubforth.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 %.size: % size.sh
 	. ./size.sh $<
@@ -45,4 +48,3 @@ TAGS: .
 	--regex-forth='/(primary|secondary|constant|master)\(([a-z0-9_]+)/\2/' \
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
-
