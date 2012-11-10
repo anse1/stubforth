@@ -98,3 +98,14 @@ primary(tworload, 2r@)
 secondary(noname, :noname,, l(
   HERE LIT &&enter COMMA RESUME
 ))
+
+primary(within)
+{
+  int n1 = sp[-3].i;
+  int n2 = sp[-2].i;
+  int n3 = sp[-1].i;
+
+  sp[-3].i = (n1<n3 && n2<=n1 && n1<n3)
+  	 || (n2>n3 && (n2<=n1||n1<n3));
+  sp-=2;
+}
