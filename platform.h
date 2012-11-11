@@ -57,17 +57,19 @@ void uart_handler(void)
 
   while (! (*UARTFR & (1<<4) /* RXFE */ )) {
     int data = *UARTDR;
+    if (data == 3) goto force_break;
     ring.buf[ring.in] = data;
     ring.in = (ring.in + 1) % sizeof(ring.buf);
   }
 
   status = *UARTRSR;
   if (status & (1<<2) /* BE */ ) {
+  force_break:
     *UARTRSR = 0;
     my_puts(" <BREAK>\n");
     /* Patch stack frame to return to _cstart instead. */
     asm("mov r2, sp");
-    asm("add r2, #(8*4)");
+    asm("add r2, #(10*4)");
     asm("movw r3, #:lower16:_cstart");
     asm("movt r3, #:upper16:_cstart");
     asm("str r3, [r2]");
