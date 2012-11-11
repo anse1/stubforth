@@ -77,7 +77,7 @@ void uart_handler(void)
 
 extern void _start;
 
-void *vectors[128] __attribute__((aligned(256))) = {
+void *vectors[64] __attribute__((aligned(256))) = {
    [0] = 0x20000000,
    [1] = &_start,
    [2] = default_handler,
