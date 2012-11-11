@@ -45,7 +45,7 @@ void default_handler(void)
 }
 
 volatile struct {
-  char buf[1024];
+  char buf[2048];
   int in;
   int out;
 } ring;
