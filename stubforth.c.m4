@@ -799,8 +799,7 @@ dnl ( a -- )
 secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
-secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
+secondary(while,, .immediate=1, IF)
 
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
