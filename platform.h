@@ -146,6 +146,7 @@ void *vectors[64] __attribute__((aligned(256))) = {
 
 static void initio()
 {
+  ring.in = ring.out;
   *VTOR=vectors;
 
 
