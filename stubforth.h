@@ -1,5 +1,5 @@
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef STUBFORTH_H
+#define STUBFORTH_H
 
 #include <stdint.h>
 

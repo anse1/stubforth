@@ -1,6 +1,6 @@
 changecom(/*,*/)
 #include "platform.h"
-#include "types.h"
+#include "stubforth.h"
 #include "config.h"
 
 cell return_stack[1000];
