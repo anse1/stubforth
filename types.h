@@ -39,12 +39,15 @@ struct vmstate {
 
   int compiling : 1; /* Used by state-aware word INTERPRET */
 
-  /* I/O configuration */
+};
+
+struct terminal {
   int raw : 1;  /* Avoid translating lf to crlf, etc.  Set this if you
 		   want to process binary data. */
   int quiet : 1; /* Don't echo incoming characters as they are
 		    consumed by the VM. */
 };
+extern struct terminal terminal;
 
 #define IS_WORD(c) (c > ' ')
 

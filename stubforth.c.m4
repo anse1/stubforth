@@ -11,6 +11,7 @@ struct vmstate vmstate;
 
 word *forth;
 unsigned char *redirect;
+struct terminal terminal;
 
 dnl m4 definitions
 
@@ -174,8 +175,6 @@ int main()
   while(1) {
     redirect = 0;
     vmstate.compiling = 0;
-    vmstate.raw = 0;
-    vmstate.quiet = 0;
     vmstate.base = 10;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
@@ -818,16 +817,16 @@ primary(cold)
   goto start;
 
 primary(raw)
- vmstate->raw = 1;
+ terminal.raw = 1;
 
 primary(cooked)
- vmstate->raw = 0;
+ terminal.raw = 0;
 
 primary(echo)
- vmstate->quiet = 0;
+ terminal.quiet = 0;
 
 primary(quiet)
- vmstate->quiet = 1;
+ terminal.quiet = 1;
 
 secondary(qword, ?word,,
   WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .s="undefined word", THROW )
