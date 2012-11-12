@@ -1,6 +1,6 @@
 changecom(/*,*/)
 #include "platform.h"
-#include "types.h"
+#include "stubforth.h"
 #include "config.h"
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -15,6 +15,7 @@ int dataspace_fd;
 struct vocabulary *v;
 
 unsigned char *redirect;
+struct terminal terminal;
 
 dnl m4 definitions
 
@@ -43,7 +44,7 @@ divert(div_word)
   goto next;
   static word w_$1 = {
     .name = "ifelse(`$2',`',`translit(`$1',_,-)',`$2')",
-    .link = dict_head,
+    .link = (word *) dict_head,
     .code = &&$1
     dnl optional flags
     ifelse(`$3',`',`',`, .$3=1')
@@ -70,9 +71,9 @@ define(secondary, `
 undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
-static word w_$1 = {
+static struct { staticword(eval($#-2)) } w_$1 = {
   .name = "ifelse($2,`',`translit($1,_,-)',$2)",
-  .link = dict_head,
+  .link = (word *)dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
   .data = { init_union(shift(shift(shift($@)))) , {EXIT}}
@@ -84,9 +85,9 @@ static word w_$1 = {
 dnl Cons a constant
 define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
-static word w_$1 = {
+static struct { staticword(1) } w_$1 = {
   .name = "ifelse($2,`',`translit($1,_,-)',$2)",
-  .link = dict_head,
+  .link = (word *)dict_head,
   .code = &&docon,
   .data = { init_union(shift(shift($@))) }
 };
@@ -101,7 +102,7 @@ dnl $2... - cell data
 define(thread, `
 define(`self', `&t_$1')
 define(translit($1,a-z,A-Z), t_$1)
-static cell t_$1[] = { init_union(shift($@)) };
+static cell t_$1[eval($#-1)] = { init_union(shift($@)) };
 undefine(`self')
 ')
 
@@ -142,7 +143,7 @@ static void try_deallocate(char *s, cell **sp) {
      *sp = (cell *)s;
 }
 
-static void my_puts(const char *s) {
+void my_puts(const char *s) {
   while (*s)
     putchar(*s++);
 }
@@ -246,8 +247,6 @@ int main(int argc, char *argv[])
 
   while(1) {
     vmstate.compiling = 0;
-    vmstate.raw = 0;
-    vmstate.quiet = 0;
     vmstate.base = 10;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
@@ -878,8 +877,7 @@ dnl ( a -- )
 secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
-secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
+secondary(while,, .immediate=1, IF)
 
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
@@ -898,16 +896,16 @@ primary(cold)
   goto start;
 
 primary(raw)
- vmstate->raw = 1;
+ terminal.raw = 1;
 
 primary(cooked)
- vmstate->raw = 0;
+ terminal.raw = 0;
 
 primary(echo)
- vmstate->quiet = 0;
+ terminal.quiet = 0;
 
 primary(quiet)
- vmstate->quiet = 1;
+ terminal.quiet = 1;
 
 secondary(qword, ?word,,
   WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .s="undefined word", THROW )
@@ -919,10 +917,11 @@ secondary(brackettick, ['], .immediate=1, l(
 ))
 
 secondary(postpone,, .immediate=1, l(
-   QWORD,
+   QWORD
    IMMEDIATEP ZBRANCH self[6] COMMA EXIT
    LITERAL LIT COMMA COMMA
 ))
+
 dnl convenience
 
 dnl non-core
@@ -953,7 +952,7 @@ start:
 
 init:
     undivert(div_init)
-    return t.a=dict_head, t;
+    return t.a=(word *)dict_head, t;
 }
 
 /*

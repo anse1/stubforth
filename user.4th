@@ -1,8 +1,3 @@
-\ non-platform-specific forth code
-
-: forget ( read a word to forget, adjusts dp )
-	?word >word dup >link @ context ! >name @ dp ! ;
-
 \ bit flipping
 
 : flip ( c a -- ) 
@@ -176,23 +171,6 @@ again ;
   endtry
 ; immediate
 
-: restart
-	postpone branch
-	context @ >code >body ,
-; immediate
-
 : octal 8 base c! ;
 : binary 2 base c! ;
 
-variable erreof
-: x ," " redirect ! ['] quit catch ;
-x erreof !
-forget x
-	
-: evaluate ( s -- )
-	redirect @ >r
-	redirect !
-	['] quit catch
-	dup [ erreof @ ] literal = 0= if throw then
-	r> redirect !
-;
