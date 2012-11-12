@@ -178,9 +178,6 @@ test { " 668 1 + . " evaluate } {669 $}
 
 test { : x ?dup if 65 emit 1- restart then ; 666 4 64 emit x 85 emit . } {@AAAAU666 $}
 
-send "forget testsuite-marker bye\n"
-
-
 test { " /etc/passwd" r/w open-file } {Permission denied}
 test { " /etc/passwd" r/o open-file constant fd 64 emit } {@$}
 
@@ -195,7 +192,5 @@ test {
 test { 0 fd reposition-file buf 5 fd read-file buf type } {root:$}
 
 test { " the quick" 9 1 write-file 64 emit } {the quick@$}
-
-send "bye\n"
 
 interact

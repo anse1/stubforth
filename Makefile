@@ -46,7 +46,7 @@ TAGS: .
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
-dict: user.4th platform.4th $(HOME)/.stubforth stubforth
+dict: user.4th platform.4th stubforth
 	dd if=/dev/zero of=$(HOME)/.stubforth bs=1k count=128
 	( cat user.4th platform.4th; echo sync bye ) | ./stubforth
 
