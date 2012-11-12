@@ -1,5 +1,5 @@
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef STUBFORTH_H
+#define STUBFORTH_H
 
 #include <stdint.h>
 
@@ -64,5 +64,6 @@ extern struct word *forth; /* points to the head of head of the static
 cell vm(struct vmstate *vmstate, void **xt);
 void stubforth_init(void);
 word *find(word *p, const char *key);
+void my_puts(const char *s);
 
 #endif

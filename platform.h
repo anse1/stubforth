@@ -1,16 +1,17 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#include "types.h"
+#include "stubforth.h"
 #include "cortexm.h"
 #include "lm4f120.h"
+
 /* The platform needs to provide my_getchar() and putchar() */
 
 /* flags.break_condition can be set in an ISR to interrupt the
    interpreter. */
 
 static void putchar(int c);
-static void my_puts(const char *s);
+void my_puts(const char *s);
 
 static void dumphex(int c) {
   int nibble=32;

@@ -1,6 +1,6 @@
 changecom(/*,*/)
 #include "platform.h"
-#include "types.h"
+#include "stubforth.h"
 #include "config.h"
 
 cell return_stack[1000];
@@ -139,7 +139,7 @@ static void try_deallocate(char *s, cell **sp) {
      *sp = (cell *)s;
 }
 
-static void my_puts(const char *s) {
+void my_puts(const char *s) {
   while (*s)
     putchar(*s++);
 }
