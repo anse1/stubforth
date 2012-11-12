@@ -163,7 +163,7 @@ static void putchar(int c)
 {
   int status;
 
-  if (c=='\n')
+  if (!terminal.raw && c=='\n')
     putchar('\r');
 
   do {
@@ -181,9 +181,9 @@ static int getchar()
     asm("nop");
   c = ring.buf[ring.out];
   ring.out = (ring.out + 1) % sizeof(ring.buf);
-  if (c=='\r')
+  if (!terminal.raw && c=='\r')
     c = '\n';
-  if (!vmstate.quiet)
+  if (!terminal.quiet)
     putchar(c);
   return c;
 }
