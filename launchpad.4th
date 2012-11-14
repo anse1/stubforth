@@ -60,4 +60,4 @@ e000e018 constant syst_cvr
 e000e01c constant syst_calib
 
 decimal
-: ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> ;
+: ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> 2drop ;
