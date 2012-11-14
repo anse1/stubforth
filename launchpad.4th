@@ -51,8 +51,23 @@ fc0 constant tmpp
 	ff and blue
 ;
 
+\ rcc
+\ sample = 24e0540
+\ default = 7803ad1
+\ 00000010010011100000010101000000
+\ rrrr|   ||rrrrrrrr|r|    | |rr|^moscdis
+\     ^ACG|usesysdiv| |    | |  ^-ioscdis
+\         ^-sysdiv  | |    | ^-oscsrc = MOSC
+\            => /5  | |    ^-xtal = 16MHz
+\                   | ^--pll bypass
+\                   ^--pll pwrdn
+
 hex
-: sleep 300000 col wfi 101006 col ;
+400fe000 constant rcc_base
+7c rcc_base + constant moscctl
+60 rcc_base + constant rcc
+70 rcc_base + constant rcc2
+10 rcc_base + constant dc1
 
 e000e010 constant syst_csr
 e000e014 constant syst_rvr
@@ -60,4 +75,6 @@ e000e018 constant syst_cvr
 e000e01c constant syst_calib
 
 decimal
+400000 syst_rvr !
 : ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> 2drop ;
+
