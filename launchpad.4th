@@ -51,6 +51,13 @@ fc0 constant tmpp
 	ff and blue
 ;
 
-\ crash: 1 tmtamatchr timer2 + !
-\ crash:  1 tmtbmatchr timer2 + !
+hex
+: sleep 300000 col wfi 101006 col ;
 
+e000e010 constant syst_csr
+e000e014 constant syst_rvr
+e000e018 constant syst_cvr
+e000e01c constant syst_calib
+
+decimal
+: ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> ;
