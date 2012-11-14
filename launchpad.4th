@@ -77,4 +77,4 @@ e000e01c constant syst_calib
 decimal
 400000 syst_rvr !
 : ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> 2drop ;
-
+: heartbeat begin 900 ms [ hex ] 300000 col [ decimal ] 100 ms [ hex ] 000000 col again ;
