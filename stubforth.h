@@ -61,9 +61,9 @@ typedef struct word word;
 
 extern struct word *forth; /* points to the head of head of the static
                               dictionary.  */
-cell vm(struct vmstate *vmstate, void **xt);
+cell vm(struct vmstate *vmstate, void *const*xt);
 void stubforth_init(void);
-word *find(word *p, const char *key);
+const word *find(const word *p, const char *key);
 void my_puts(const char *s);
 
 #endif
