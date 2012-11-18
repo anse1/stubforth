@@ -74,6 +74,8 @@ e000e014 constant syst_rvr
 e000e018 constant syst_cvr
 e000e01c constant syst_calib
 
+e000ed14 constant ccr
+
 decimal
 400000 syst_rvr !
 : ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> 2drop ;
