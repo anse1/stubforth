@@ -4,11 +4,13 @@
 #include <stdint.h>
 
 typedef intptr_t vmint;
+typedef uintptr_t uvmint;
 
 union cell {
   void *a;
   void **aa;
   vmint i;
+  uvmint u;
   char *s;
 };
 typedef union cell cell;

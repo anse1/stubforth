@@ -613,11 +613,6 @@ while((t.i = my_getchar()) != ')') {
   if (t.i < 0) cthrow(-39, unexpected end of file);
 }
 
-primary(linecomment, `\\', immediate)
-while((t.i = my_getchar()) != '\n') {
-  if (t.i < 0) cthrow(-39, unexpected end of file);
-}
-
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
 

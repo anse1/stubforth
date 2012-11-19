@@ -193,4 +193,21 @@ test { 0 fd reposition-file buf 5 fd read-file buf type } {root:$}
 
 test { " the quick" 9 1 write-file 64 emit } {the quick@$}
 
+# send " : within ( n1|u1 n2|u2 n3|u3 -- flag )  over - >r - r> u< ; "
+
+test {  0  0  0  within . } {0 $}
+test {  2  6  5  within . } {1 $}
+test {  2  6  2  within . } {0 $}
+test {  2  6  6  within . } {0 $}
+test { -6 -2 -4  within . } {1 $}
+test { -2 -6 -4  within . } {0 $}
+test { -6 -2 -2  within . } {0 $}
+test { -6 -2 -6  within . } {0 $}
+test { -1  2  1  within . } {1 $}
+test { -1  2  2  within . } {0 $}
+test { -1  2 -1  within . } {0 $}
+test {  0 -1  1  within . } {1 $}
+
+send "forget testsuite-marker bye\n"
+
 interact

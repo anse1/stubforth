@@ -33,7 +33,7 @@ primary(sync)
   v->dp = vmstate->dp;
 }
 
-secondary(shebang, #!,, LINECOMMENT)
+secondary(shebang, #!,, BACKSLASH)
 
 constant(static_argv, argv, &static_argv)
 constant(static_argc, argc, &static_argc)
