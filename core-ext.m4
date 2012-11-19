@@ -90,10 +90,6 @@ primary(tworload, 2r@)
 *sp++ = rp[-2];
 *sp++ = rp[-1];
 
-secondary(noname, :noname,, l(
-  HERE LIT &&enter COMMA RESUME
-))
-
 primary(within)
 {
   uvmint u1 = sp[-3].u;
