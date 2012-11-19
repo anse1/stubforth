@@ -9,7 +9,7 @@ primary(dlopen)
 {
   sp[-1].a = dlopen(sp[-1].s, RTLD_LAZY);
   if (! sp[-1].a)
-     cthrow(dlerror());
+     cthrow(,dlerror());
 }
 
 dnl handle s -- (void *)
@@ -20,7 +20,7 @@ primary(dlsym)
   sp--;
   t.s = dlerror();
   if (t.s)
-    cthrow(t.s);
+    cthrow(,t.s);
 }
 
 void *dlopen(const char *filename, int flag);
