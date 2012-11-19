@@ -109,3 +109,7 @@ primary(within)
   	 || (n2>n3 && (n2<=n1||n1<n3));
   sp-=2;
 }
+
+ubinop(ugt, >, u>)
+
+constant(true,,.i=-1)
