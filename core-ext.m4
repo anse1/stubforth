@@ -112,3 +112,4 @@ primary(within)
 ubinop(ugt, >, u>)
 
 constant(true,,.i=-1)
+constant(false,,.i=0)
