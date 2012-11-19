@@ -80,3 +80,23 @@ decimal
 400000 syst_rvr !
 : ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> 2drop ;
 : heartbeat begin 900 ms [ hex ] 300000 col [ decimal ] 100 ms [ hex ] 000000 col again ;
+
+decimal
+: bboffset ( bit# a bb-start alias-start - alias-a )
+	>r - 32 * swap 4 * + r> + ;
+
+hex
+: bb2a ( bit# a -- alias-a )
+ 	dup 20000000 20008000 within if
+		20000000 22000000 bboffset
+		exit then
+	dup 40000000 40100000 within if
+		40000000 42000000 bboffset
+		exit then
+	," invalid bit-band" throw
+;
+
+\ bit a -- ; compile code to set/clear/flip bit using bit-banding
+: ,set bb2a postpone 1 postpone literal postpone ! ;
+: ,clear bb2a postpone 0 postpone literal postpone ! ;
+: ,flip postpone 1 bb2a postpone literal postpone +! ;
