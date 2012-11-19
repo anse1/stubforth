@@ -34,3 +34,16 @@
 #define NVIC_IPR (volatile int *)0xE000E400
 
 #endif
+
+struct exception_frame {
+  int r0;
+  int r1;
+  int r2;
+  int r3;
+  int r12;
+  void *lr;
+  void *ra;
+  int xpsr;
+};
+
+extern void *_cstart;
