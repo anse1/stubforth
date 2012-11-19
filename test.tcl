@@ -184,6 +184,10 @@ test { : x ?dup if 65 emit 1- restart then ; 666 4 64 emit x 85 emit . } {@AAAAU
 
 test { 64 1 putchar call 85 1 putchar call } {@U$}
 
+test { -2 666 u< . } {0 $}
+test { -2 666 < . } {1 $}
+test { -2 666 u> -1 666 > <> 0<> . } {1 $}
+
 # send " : within ( n1|u1 n2|u2 n3|u3 -- flag )  over - >r - r> u< ; "
 
 test {  0  0  0  within . } {0 $}
