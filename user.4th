@@ -119,7 +119,7 @@ repeat drop ;
     &&dodoes of ." does>" lf @ disas endof
     drop lf
   endcase
-  drop
+  2drop
 ; 
 
 : skip[if] ( -- )
