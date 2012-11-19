@@ -53,6 +53,8 @@ fc0 constant tmpp
 	ff and blue
 ;
 
+
+\ Vendor independent stuff
 \ rcc
 \ sample = 24e0540
 \ default = 7803ad1
