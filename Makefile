@@ -31,6 +31,7 @@ stubforth.elf:  start.o stubforth.o
 	. ./size.sh $<
 	arm-none-eabi-size $<
 	ls -l $<
+	size $<
 
 %.c: %.c.m4 Makefile *.m4
 	m4 $(SYNC) $< > $@
