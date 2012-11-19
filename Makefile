@@ -24,12 +24,13 @@ stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 start.o: start.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
+size: stubforth.elf.size
+
 stubforth.elf:  start.o stubforth.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 %.size: % size.sh
 	. ./size.sh $<
-	arm-none-eabi-size $<
 	ls -l $<
 	size $<
 
