@@ -25,13 +25,11 @@ static void dumphex(int c) {
 
 volatile long tick;
 
-__attribute__((interrupt))
 void sys_tick(void)
 {
   tick++;
 }
 
-__attribute__((interrupt))
 void default_handler(void)
 {
   int xpsr;
@@ -51,7 +49,6 @@ volatile struct {
   int out;
 } ring;
 
-__attribute__((interrupt))
 void uart_handler(void)
 {
   int status;
@@ -68,9 +65,10 @@ void uart_handler(void)
   force_break:
     *UARTRSR = 0;
     my_puts(" <BREAK>\n");
-    /* Patch stack frame to return to _cstart instead. */
+    /* Patch ReturnAddress in exception frame to return to _cstart
+       instead. */
     asm("mov r2, sp");
-    asm("add r2, #(10*4)");
+    asm("add r2, #(8*4)");
     asm("movw r3, #:lower16:_cstart");
     asm("movt r3, #:upper16:_cstart");
     asm("str r3, [r2]");
