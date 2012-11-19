@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
   startword = "boot";
 
   if (optind < argc) {
-     if (startword == "boot")
+     if (startword == (char *)"boot")
         startword = "quit";
      int fd =  open(argv[optind], O_RDONLY);
      if (fd < 0) {
