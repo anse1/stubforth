@@ -25,6 +25,7 @@ stubforth:  stubforth.o
 	. ./size.sh $<
 	strip $<
 	ls -l $<
+	size $<
 
 %.c: %.c.m4 Makefile *.m4
 	m4 $(SYNC) $< > $@

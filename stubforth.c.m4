@@ -776,15 +776,19 @@ secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 )
 
-dnl ( a -- a )
-secondary(else,, .immediate=1,
- LIT, BRANCH, COMMA, HERE, ZERO, COMMA,
- SWAP, HERE, SWAP, STORE
-)
-
 dnl ( a -- )
 secondary(then,, .immediate=1,
  HERE, SWAP, STORE
+)
+
+dnl -- pad
+secondary(ahead,, .immediate=1, l(
+ LIT BRANCH COMMA HERE ZERO COMMA
+))
+
+dnl ( a -- a )
+secondary(else,, .immediate=1,
+ AHEAD, SWAP, THEN
 )
 
 dnl ( -- a )

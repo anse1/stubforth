@@ -29,11 +29,6 @@ secondary(endcase,, .immediate=1, l(
  LIT RFROM COMMA LIT DROP COMMA
 ))
 
-dnl -- pad
-secondary(ahead,, .immediate=1, l(
- LIT BRANCH COMMA HERE ZERO COMMA
-))
-
 dnl -- pad xt
 secondary(try,, .immediate=1, l(
   AHEAD HERE
