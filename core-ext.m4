@@ -112,3 +112,9 @@ primary(within)
 ubinop(ugt, >, u>)
 
 constant(true,,.i=-1)
+constant(false,,.i=0)
+
+primary(backslash, `\\', immediate)
+while((t.i = my_getchar()) != '\n') {
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+}
