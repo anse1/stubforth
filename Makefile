@@ -1,3 +1,4 @@
+TTY=/dev/ttyACM0
 
 CC = arm-none-eabi-gcc
 CFLAGS =    -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb 
@@ -33,8 +34,8 @@ stubforth.elf:  start.o stubforth.o
 %.c: %.c.m4 Makefile *.m4
 	m4 $(SYNC) $< > $@
 
-check: stubforth
-	expect test.tcl
+check: stubforth.elf
+	expect test.tcl $(TTY)
 
 clean:
 	rm -f *grind.out.* stubforth
