@@ -178,6 +178,21 @@ test { " 668 1 + . " evaluate } {669 $}
 
 test { : x ?dup if 65 emit 1- restart then ; 666 4 64 emit x 85 emit . } {@AAAAU666 $}
 
+# send " : within ( n1|u1 n2|u2 n3|u3 -- flag )  over - >r - r> u< ; "
+
+test {  0  0  0  within . } {0 $}
+test {  2  6  5  within . } {1 $}
+test {  2  6  2  within . } {0 $}
+test {  2  6  6  within . } {0 $}
+test { -6 -2 -4  within . } {1 $}
+test { -2 -6 -4  within . } {0 $}
+test { -6 -2 -2  within . } {0 $}
+test { -6 -2 -6  within . } {0 $}
+test { -1  2  1  within . } {1 $}
+test { -1  2  2  within . } {0 $}
+test { -1  2 -1  within . } {0 $}
+test {  0 -1  1  within . } {1 $}
+
 send "forget testsuite-marker bye\n"
 
 interact

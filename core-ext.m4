@@ -101,12 +101,11 @@ secondary(noname, :noname,, l(
 
 primary(within)
 {
-  int n1 = sp[-3].i;
-  int n2 = sp[-2].i;
-  int n3 = sp[-1].i;
+  uvmint u1 = sp[-3].u;
+  uvmint u2 = sp[-2].u;
+  uvmint u3 = sp[-1].u;
 
-  sp[-3].i = (n1<n3 && n2<=n1 && n1<n3)
-  	 || (n2>n3 && (n2<=n1||n1<n3));
+  sp[-3].u =  (u1-u2) < (u3-u2);
   sp-=2;
 }
 
