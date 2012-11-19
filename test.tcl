@@ -193,6 +193,10 @@ test { 0 fd reposition-file buf 5 fd read-file buf type } {root:$}
 
 test { " the quick" 9 1 write-file 64 emit } {the quick@$}
 
+test { -2 666 u< . } {0 $}
+test { -2 666 < . } {1 $}
+test { -2 666 u> -1 666 > <> 0<> . } {1 $}
+
 # send " : within ( n1|u1 n2|u2 n3|u3 -- flag )  over - >r - r> u< ; "
 
 test {  0  0  0  within . } {0 $}
