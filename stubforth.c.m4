@@ -148,7 +148,7 @@ void my_puts(const char *s) {
     putchar(*s++);
 }
 
-word *find(word *p, const char *key)
+const word *find(const word *p, const char *key)
 {
    while(p) {
       if(! p->smudge && (0 == strcmp(p->name, key)))
@@ -280,7 +280,7 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-cell vm(struct vmstate *vmstate, void **xt)
+cell vm(struct vmstate *vmstate, void *const*xt)
 {
 
   /* The VM registers */
@@ -651,12 +651,12 @@ dnl s -- cfa tf (found) -- s ff (not found)
 dnl s is deallocated when found
 {
    char *key = sp[-1].s;
-   word *p = find(vmstate->dictionary, key);
+   const word *p = find(vmstate->dictionary, key);
    if (p)
    {
      sp--;
      try_deallocate(sp[0].a, &vmstate->dp);
-     (sp++)->a = &p->code;
+     (sp++)->a = (void *)&p->code;
      (sp++)->i = 1;
    }
    else (sp++)->i = 0;
@@ -945,7 +945,7 @@ start:
 {
     thread(top, BYE)
     ip = TOP;
-    (sp++)->a = xt;
+    (sp++)->a = (void *)xt;
     undivert(div_start)
     goto execute;
 }
