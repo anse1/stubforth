@@ -1,9 +1,10 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#include "types.h"
 #include "cortexm.h"
 #include "stm32f4.h"
+#include "stubforth.h"
+
 /* The platform needs to provide my_getchar() and putchar() */
 
 /* flags.break_condition can be set in an ISR to interrupt the

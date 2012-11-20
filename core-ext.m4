@@ -29,11 +29,6 @@ secondary(endcase,, .immediate=1, l(
  LIT RFROM COMMA LIT DROP COMMA
 ))
 
-dnl -- pad
-secondary(ahead,, .immediate=1, l(
- LIT BRANCH COMMA HERE ZERO COMMA
-))
-
 dnl -- pad xt
 secondary(try,, .immediate=1, l(
   AHEAD HERE
@@ -95,17 +90,22 @@ primary(tworload, 2r@)
 *sp++ = rp[-2];
 *sp++ = rp[-1];
 
-secondary(noname, :noname,, l(
-  HERE LIT &&enter COMMA RESUME
-))
-
 primary(within)
 {
-  int n1 = sp[-3].i;
-  int n2 = sp[-2].i;
-  int n3 = sp[-1].i;
+  uvmint u1 = sp[-3].u;
+  uvmint u2 = sp[-2].u;
+  uvmint u3 = sp[-1].u;
 
-  sp[-3].i = (n1<n3 && n2<=n1 && n1<n3)
-  	 || (n2>n3 && (n2<=n1||n1<n3));
+  sp[-3].u =  (u1-u2) < (u3-u2);
   sp-=2;
+}
+
+ubinop(ugt, >, u>)
+
+constant(true,,.i=-1)
+constant(false,,.i=0)
+
+primary(backslash, `\\', immediate)
+while((t.i = my_getchar()) != '\n') {
+  if (t.i < 0) cthrow(-39, unexpected end of file);
 }
