@@ -18,4 +18,4 @@ asm("wfi");
 primary(wfe)
 asm("wfe");
 
-constant(f_tick,tick,&tick)
+constant(f_tick,tick,.a=(int *)&tick)

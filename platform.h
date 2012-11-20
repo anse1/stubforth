@@ -88,9 +88,10 @@ void uart_handler(void)
 }
 
 extern void *_start;
+extern void *_stack_base;
 
 void *vectors[64] __attribute__((aligned(256))) = {
-   [0] = 0x20000000,
+   [0] = &_stack_base,
    [1] = &_start,
    [2] = default_handler,
    [3] = default_handler,
