@@ -57,6 +57,13 @@ volatile struct {
   int out;
 } ring;
 
+__attribute__((naked))
+void uart_handler(void)
+{
+  asm("mov r0, sp");
+  asm("b uart_handler_1");
+}
+
 void uart_handler_1(struct exception_frame *frame)
 {
   int status;
@@ -78,13 +85,6 @@ void uart_handler_1(struct exception_frame *frame)
     frame->ra = &_cstart;
     return;
   }
-}
-
-__attribute__((naked))
-void uart_handler(void)
-{
-  asm("mov r0, sp");
-  asm("b uart_handler_1");
 }
 
 extern void *_start;
