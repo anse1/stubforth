@@ -1,7 +1,7 @@
 TTY=/dev/ttyACM0
 
 CC = arm-none-eabi-gcc
-CFLAGS =    -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb 
+CFLAGS =    -O2 -g -Wall -mcpu=cortex-m4 -mthumb 
 SYNC = -s
 LIBGCC = $(shell $(CC) -print-libgcc-file-name)
 LDFLAGS= -Wl,-Tcortexm.ld lm4f120.ld -nostdlib $(LIBGCC)
