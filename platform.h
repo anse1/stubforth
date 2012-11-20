@@ -30,15 +30,23 @@ void sys_tick(void)
   tick++;
 }
 
+__attribute__((naked))
 void default_handler(void)
 {
+  asm("mov r0, sp");
+  asm("b default_handler_1");
+}
+
+void default_handler_1(struct exception_frame *frame)
+{
   int xpsr;
-  my_puts("x_x default handler x_x\n");
+  my_puts("\nx_x default handler x_x\n");
 
   my_puts("  xpsr: ");
   asm ("mrs %0, xpsr": "=r" (xpsr)) ;
   dumphex(xpsr);
-  putchar('\n');
+  my_puts("\n    pc: ");
+  dumphex((int)frame->ra);
   while(1)
     ;
 }
@@ -49,7 +57,7 @@ volatile struct {
   int out;
 } ring;
 
-void uart_handler(void)
+void uart_handler_1(struct exception_frame *frame)
 {
   int status;
 
@@ -67,16 +75,19 @@ void uart_handler(void)
     my_puts(" <BREAK>\n");
     /* Patch ReturnAddress in exception frame to return to _cstart
        instead. */
-    asm("mov r2, sp");
-    asm("add r2, #(8*4)");
-    asm("movw r3, #:lower16:_cstart");
-    asm("movt r3, #:upper16:_cstart");
-    asm("str r3, [r2]");
+    frame->ra = &_cstart;
     return;
   }
 }
 
-extern void _start;
+__attribute__((naked))
+void uart_handler(void)
+{
+  asm("mov r0, sp");
+  asm("b uart_handler_1");
+}
+
+extern void *_start;
 
 void *vectors[64] __attribute__((aligned(256))) = {
    [0] = 0x20000000,
