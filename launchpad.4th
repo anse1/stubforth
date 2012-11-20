@@ -104,3 +104,27 @@ hex
 : ,set bb2a postpone 1 postpone literal postpone ! ;
 : ,clear bb2a postpone 0 postpone literal postpone ! ;
 : ,flip postpone 1 bb2a postpone literal postpone +! ;
+
+
+\ NVIC
+hex
+e000e100 constant nvic_iser
+e000e180 constant nvic_icer
+e000e200 constant nvic_ispr
+e000e280 constant nvic_icpr
+e000e300 constant nvic_iabr
+e000e400 constant nvic_ipr
+e000e004 constant ictr
+
+decimal
+
+
+: isecer ( int# -- mask reg_offset ) 32 /mod cells swap 1 swap << swap ;
+
+: ise@ ( int# -- ; get status ) isecer nvic_iser + @ and ;
+: ise! ( int# -- ; enable ) isecer nvic_iser + ! ;
+: ice! ( int# -- ; disable ) isecer nvic_icer + ! ;
+
+: isp@ ( int# -- ; get pending ) isecer nvic_ispr + @ and ;
+: isp! ( int# -- ; set pending ) isecer nvic_ispr + ! ;
+: icp! ( int# -- ; clear pending ) isecer nvic_icpr + ! ;
