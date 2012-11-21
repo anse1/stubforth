@@ -1,14 +1,16 @@
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef STUBFORTH_H
+#define STUBFORTH_H
 
 #include <stdint.h>
 
 typedef intptr_t vmint;
+typedef uintptr_t uvmint;
 
 union cell {
   void *a;
   void **aa;
   vmint i;
+  uvmint u;
   char *s;
 };
 typedef union cell cell;
@@ -39,12 +41,15 @@ struct vmstate {
 
   int compiling : 1; /* Used by state-aware word INTERPRET */
 
-  /* I/O configuration */
+};
+
+struct terminal {
   int raw : 1;  /* Avoid translating lf to crlf, etc.  Set this if you
 		   want to process binary data. */
   int quiet : 1; /* Don't echo incoming characters as they are
 		    consumed by the VM. */
 };
+extern struct terminal terminal;
 
 #define IS_WORD(c) (c > ' ')
 
@@ -58,9 +63,10 @@ typedef struct word word;
 
 extern struct word *forth; /* points to the head of head of the static
                               dictionary.  */
+cell vm(struct vmstate *vmstate, void *const*xt);
 
-cell vm(struct vmstate *vmstate, void **xt);
 void stubforth_init(void);
-word *find(word *p, const char *key);
+const word *find(const word *p, const char *key);
+void my_puts(const char *s);
 
 #endif

@@ -8,6 +8,14 @@ secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
 primary(zlt, 0<)
 sp[-1].i = sp[-1].i < 0 ;
 
+define(ubinop, `
+primary(`$1', ifelse(`$3',`',`$2',`$3'))
+    t = *--sp;
+    sp[-1].u = sp[-1].u $2 t.u;
+')
+
+ubinop(ult, <, u<)
+
 primary(twomul, 2*)
 sp[-1].i <<= 1;
 

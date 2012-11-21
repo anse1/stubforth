@@ -1,6 +1,6 @@
 changecom(/*,*/)
 #include "platform.h"
-#include "types.h"
+#include "stubforth.h"
 #include "config.h"
 
 cell return_stack[1000];
@@ -11,6 +11,7 @@ struct vmstate vmstate;
 
 word *forth;
 unsigned char *redirect;
+struct terminal terminal;
 
 dnl m4 definitions
 
@@ -138,12 +139,12 @@ static void try_deallocate(char *s, cell **sp) {
      *sp = (void *)s;
 }
 
-static void my_puts(const char *s) {
+void my_puts(const char *s) {
   while (*s)
     putchar(*s++);
 }
 
-word *find(word *p, const char *key)
+const word *find(const word *p, const char *key)
 {
    while(p) {
       if(! p->smudge && (0 == strcmp(p->name, key)))
@@ -174,8 +175,6 @@ int main()
   while(1) {
     redirect = 0;
     vmstate.compiling = 0;
-    vmstate.raw = 0;
-    vmstate.quiet = 0;
     vmstate.base = 10;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
@@ -202,7 +201,7 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-cell vm(struct vmstate *vmstate, void **xt)
+cell vm(struct vmstate *vmstate, void *const*xt)
 {
 
   /* The VM registers */
@@ -535,11 +534,6 @@ while((t.i = my_getchar()) != ')') {
   if (t.i < 0) cthrow(-39, unexpected end of file);
 }
 
-primary(linecomment, `\\', immediate)
-while((t.i = my_getchar()) != '\n') {
-  if (t.i < 0) cthrow(-39, unexpected end of file);
-}
-
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
 
@@ -573,12 +567,12 @@ dnl s -- cfa tf (found) -- s ff (not found)
 dnl s is deallocated when found
 {
    char *key = sp[-1].s;
-   word *p = find(vmstate->dictionary, key);
+   const word *p = find(vmstate->dictionary, key);
    if (p)
    {
      sp--;
      try_deallocate(sp[0].a, &vmstate->dp);
-     (sp++)->a = &p->code;
+     (sp++)->a = (void *)&p->code;
      (sp++)->i = 1;
    }
    else (sp++)->i = 0;
@@ -782,15 +776,19 @@ secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 )
 
-dnl ( a -- a )
-secondary(else,, .immediate=1,
- LIT, BRANCH, COMMA, HERE, ZERO, COMMA,
- SWAP, HERE, SWAP, STORE
-)
-
 dnl ( a -- )
 secondary(then,, .immediate=1,
  HERE, SWAP, STORE
+)
+
+dnl -- pad
+secondary(ahead,, .immediate=1, l(
+ LIT BRANCH COMMA HERE ZERO COMMA
+))
+
+dnl ( a -- a )
+secondary(else,, .immediate=1,
+ AHEAD, SWAP, THEN
 )
 
 dnl ( -- a )
@@ -799,8 +797,7 @@ dnl ( a -- )
 secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
-secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
+secondary(while,, .immediate=1, IF)
 
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
@@ -819,16 +816,16 @@ primary(cold)
   goto start;
 
 primary(raw)
- vmstate->raw = 1;
+ terminal.raw = 1;
 
 primary(cooked)
- vmstate->raw = 0;
+ terminal.raw = 0;
 
 primary(echo)
- vmstate->quiet = 0;
+ terminal.quiet = 0;
 
 primary(quiet)
- vmstate->quiet = 1;
+ terminal.quiet = 1;
 
 secondary(qword, ?word,,
   WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .s="undefined word", THROW )
@@ -840,10 +837,11 @@ secondary(brackettick, ['], .immediate=1, l(
 ))
 
 secondary(postpone,, .immediate=1, l(
-   QWORD,
+   QWORD
    IMMEDIATEP ZBRANCH self[6] COMMA EXIT
    LITERAL LIT COMMA COMMA
 ))
+
 dnl convenience
 
 dnl non-core
@@ -866,7 +864,7 @@ start:
 {
     thread(top, BYE)
     ip = TOP;
-    (sp++)->a = xt;
+    (sp++)->a = (void *)xt;
     undivert(div_start)
     goto execute;
 }

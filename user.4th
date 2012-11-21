@@ -1,8 +1,3 @@
-\ non-platform-specific forth code
-
-: forget ( read a word to forget, adjusts dp )
-	?word >word dup >link @ context ! >name @ dp ! ;
-
 \ bit flipping
 
 : flip ( c a -- ) 
@@ -124,7 +119,7 @@ repeat drop ;
     &&dodoes of ." does>" lf @ disas endof
     drop lf
   endcase
-  drop
+  2drop
 ; 
 
 : skip[if] ( -- )
@@ -173,11 +168,6 @@ again ;
       r@ throw
     endcase
   endtry
-; immediate
-
-: restart
-	postpone branch
-	context @ >code >body ,
 ; immediate
 
 : octal 8 base c! ;
