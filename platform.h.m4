@@ -1,7 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#include "types.h"
+#include "stubforth.h"
 #include "MC68EZ328.h"
 #include <vivo.h>
 
@@ -11,11 +11,9 @@ unsigned char *redirect;
 
 void **forth_vectors[8];
 
-static void my_puts(const char *);
-
 static int putchar(int c)
 {
-  if (!vmstate.raw)
+  if (!terminal.raw)
     if (c=='\n')
       putchar('\r');
 
@@ -258,10 +256,10 @@ static int getchar()
   c = (unsigned char) ring.buf[ring.beg];
   ring.beg = (ring.beg + 1) % sizeof(ring.buf);
 
-  if (! vmstate.raw)
+  if (! terminal.raw)
     if (c == '\r')
       c = '\n';
-  if (! vmstate.quiet)
+  if (! terminal.quiet)
     putchar(c);
   return c;
 }
