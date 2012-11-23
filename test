@@ -33,6 +33,8 @@ libc " getchar" 0 cbind getchar
 libc " kill" 2 cbind kill
 libc " getopt" 3 cbind getopt
 
+.( testing FFI call... )
 .( getpid => ) getpid . lf
 
+.( turning interactive... ) lf
 0 redirect !
