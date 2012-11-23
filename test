@@ -17,13 +17,9 @@ here ?word flip - . .( bytes) lf
 
 argc @ 1- dumpargs
 
-.( testing dlopen... ) lf
+.( testing dlopen... ) 
 
 " /lib/libc.so.6" dlopen constant libc
-
-: cbind ( handle sym nargs -- )
-	<builds , dlsym ,
-  does>	2@ call	;
 
 libc " printf" 0 cbind printf
 libc " getpid" 0 cbind getpid
