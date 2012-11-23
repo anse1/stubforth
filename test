@@ -1,7 +1,7 @@
 #! /home/andreas/src/c/stubforth/stubforth
 .( this is ) hi
 .( mmaped dataspace used: )
-here ?word forget - . .( bytes) lf
+here ?word flip - . .( bytes) lf
 .( cell size of your build: ) cell . .( bytes) lf
 .( cell alignment of your build: ) 1 aligned . .( bytes) lf
 .( argc: ) 	argc ? lf
@@ -35,8 +35,4 @@ libc " getopt" 3 cbind getopt
 
 .( getpid => ) getpid . lf
 
-.( mmaped dataspace used: )
-here ?word forget - . .( bytes) lf
-
 0 redirect !
-
