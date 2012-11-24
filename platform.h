@@ -11,7 +11,7 @@
    interpreter. */
 
 static void putchar(int c);
-static void my_puts(const char *s);
+void my_puts(const char *s);
 
 static void dumphex(int c) {
   int nibble=32;
@@ -186,7 +186,7 @@ static int getchar()
   ring.out = (ring.out + 1) % sizeof(ring.buf);
   if (c=='\r')
     c = '\n';
-  if (!vmstate.quiet)
+  if (!terminal.quiet)
     putchar(c);
   return c;
 }
