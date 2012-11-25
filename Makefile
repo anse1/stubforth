@@ -58,8 +58,8 @@ TAGS: .
 BINFMT = arm
 ELFFMT = elf32-littlearm
 
-%.o : %.4th
-	cat $< > $<-source
+user.o : user.4th cortexm.4th
+	cat $+ > $<-source
 	dd if=/dev/zero of=$<-source bs=1 count=1 oflag=append conv=notrunc
 	$(OBJCOPY) -I binary -B $(BINFMT) -O $(ELFFMT) \
 	 --rename-section .data=.rodata.4th,alloc,load,readonly,data,contents \
