@@ -3,6 +3,7 @@
 
 #include "stubforth.h"
 #include "cortexm.h"
+#include "lm4f120.h"
 
 /* The platform needs to provide my_getchar() and putchar() */
 
@@ -67,12 +68,20 @@ void uart_handler_1(struct exception_frame *frame)
 {
   int status;
 
-  while (0 /* input */) {
-    ring.buf[ring.in] = 666;
+  while (! (*UARTFR & (1<<4) /* RXFE */ )) {
+    int data = *UARTDR;
+    if (data == 3) goto force_break;
+    ring.buf[ring.in] = data;
     ring.in = (ring.in + 1) % sizeof(ring.buf);
   }
 
-  if (0 /* break detected */) {
+  status = *UARTRSR;
+  if (status & (1<<2) /* BE */ ) {
+  force_break:
+    *UARTRSR = 0;
+    my_puts(" <BREAK>\n");
+    /* Patch ReturnAddress in exception frame to return to _cstart
+       instead. */
     frame->ra = &_cstart;
     return;
   }
@@ -103,7 +112,7 @@ void *vectors[64] __attribute__((aligned(256))) = {
    [18] = default_handler,
    [19] = default_handler,
    [20] = default_handler,
-   [21] = default_handler,
+   [21] = uart_handler, /* lm4f120 uart0 */
    [22] = default_handler,
    [23] = default_handler,
    [24] = default_handler,
@@ -136,7 +145,7 @@ void *vectors[64] __attribute__((aligned(256))) = {
    [51] = default_handler,
    [52] = default_handler,
    [53] = default_handler,
-   [54] = default_handler,
+   [38+16] = uart_handler, /* stm32f4 usart2 */
    [55] = default_handler,
    [56] = default_handler,
    [57] = default_handler,
@@ -153,6 +162,10 @@ static void initio()
 
 
   /* interrupt on break and data ready */
+  *UARTIM = (1<<4) | (1<<9);
+  *UARTLCRH &= ~(1<<4);
+
+  *(volatile int *)0xE000E104 = 0x40;
 
   asm volatile ("cpsie i");
 }
@@ -164,7 +177,11 @@ static void putchar(int c)
   if (!terminal.raw && c=='\n')
     putchar('\r');
 
-  /* TX code */
+  do {
+    status = *UARTFR;
+  } while (! (status & (1<<7))) /* TXFE */;
+
+  *UARTDR = c;
 }
 
 
