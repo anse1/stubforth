@@ -183,7 +183,6 @@ static void putchar(int c)
   *usart2_dr = c;
 }
 
-
 static int getchar()
 {
   unsigned char c;
@@ -198,12 +197,4 @@ static int getchar()
   return c;
 }
 
-void _exit(int i)
-{
-     while(1)
-          ;
-}
-
-
 #endif
-
