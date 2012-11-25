@@ -199,11 +199,4 @@ static int getchar()
   return c;
 }
 
-void _exit(int i)
-{
-     while(1)
-          ;
-}
-
-
 #endif
