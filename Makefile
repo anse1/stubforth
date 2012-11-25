@@ -61,6 +61,6 @@ ELFFMT = elf32-littlearm
 	cat $< > $<-source
 	dd if=/dev/zero of=$<-source bs=1 count=1 oflag=append conv=notrunc
 	$(OBJCOPY) -I binary -B $(BINFMT) -O $(ELFFMT) \
-	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
+	 --rename-section .data=.rodata.4th,alloc,load,readonly,data,contents \
 	 $<-source $@
 	rm $<-source
