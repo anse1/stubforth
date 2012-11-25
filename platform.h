@@ -24,22 +24,28 @@ static void dumphex(int c) {
 
 volatile long tick;
 
-__attribute__((interrupt))
 void sys_tick(void)
 {
   tick++;
 }
 
-__attribute__((interrupt))
+__attribute__((naked))
 void default_handler(void)
 {
+  asm("mov r0, sp");
+  asm("b default_handler_1");
+}
+
+void default_handler_1(struct exception_frame *frame)
+{
   int xpsr;
-  my_puts("x_x default handler x_x\n");
+  my_puts("\nx_x default handler x_x\n");
 
   my_puts("  xpsr: ");
   asm ("mrs %0, xpsr": "=r" (xpsr)) ;
   dumphex(xpsr);
-  putchar('\n');
+  my_puts("\n    pc: ");
+  dumphex((int)frame->ra);
   while(1)
     ;
 }
@@ -50,6 +56,7 @@ volatile struct {
   int out;
 } ring;
 
+__attribute__((naked))
 void uart_handler(void)
 {
   asm("mov r0, sp");
