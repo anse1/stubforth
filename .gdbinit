@@ -282,3 +282,7 @@ define init
   set ring.out = 0
   set tick=0
 end
+
+define xt
+  p *((word *)(((void *)$arg0)-12))
+end
