@@ -6,7 +6,7 @@
 #define ACTLR	(volatile int *)0xe000e008
 #define CPUID	(volatile int *)0xe000ed00
 #define ICSR	(volatile int *)0xe000ed04
-#define VTOR	(volatile int *)0xe000ed08
+#define VTOR	(volatile void **)0xe000ed08
 #define AIRCR	(volatile int *)0xe000ed0c
 #define SCR	(volatile int *)0xe000ed10
 #define CCR	(volatile int *)0xe000ed14
@@ -34,3 +34,16 @@
 #define NVIC_IPR (volatile int *)0xE000E400
 
 #endif
+
+struct exception_frame {
+  int r0;
+  int r1;
+  int r2;
+  int r3;
+  int r12;
+  void *lr;
+  void *ra;
+  int xpsr;
+};
+
+extern void *_cstart;

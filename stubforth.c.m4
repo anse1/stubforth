@@ -850,7 +850,7 @@ include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
-dnl include(ffi.m4)
+include(ffi.m4)
 dnl include(floating.m4)
 
 dnl platform

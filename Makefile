@@ -1,8 +1,11 @@
+TTY=/dev/ttyACM0
 
 CC = arm-none-eabi-gcc
-CFLAGS =    -O2 -g -Wall -Wcast-align -mcpu=cortex-m4 -mthumb 
+OBJCOPY = arm-none-eabi-objcopy
+CFLAGS =    -O2 -g -Wall -mcpu=cortex-m4 -mthumb 
 SYNC = -s
 LIBGCC = $(shell $(CC) -print-libgcc-file-name)
+
 LDFLAGS= -Wl,-Tcortexm.ld stm32f4.ld -nostdlib $(LIBGCC)
 
 all: stubforth
@@ -23,6 +26,8 @@ stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 start.o: start.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
+size: stubforth.elf.size
+
 stubforth.elf:  start.o stubforth.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
@@ -34,8 +39,8 @@ stubforth.elf:  start.o stubforth.o
 %.c: %.c.m4 Makefile *.m4
 	m4 $(SYNC) $< > $@
 
-check: stubforth
-	expect test.tcl
+check: stubforth.elf
+	expect test.tcl $(TTY)
 
 clean:
 	rm -f *grind.out.* stubforth
@@ -49,3 +54,8 @@ TAGS: .
 	--regex-forth='/(primary|secondary|constant|master)\(([a-z0-9_]+)/\2/' \
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
+
+%.o : %.4th
+	$(OBJCOPY) -I binary -B arm -O elf32-littlearm \
+	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
+	 $< $@

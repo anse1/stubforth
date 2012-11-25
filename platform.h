@@ -1,9 +1,9 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+#include "stubforth.h"
 #include "cortexm.h"
 #include "stm32f4.h"
-#include "stubforth.h"
 
 /* The platform needs to provide my_getchar() and putchar() */
 
@@ -11,7 +11,6 @@
    interpreter. */
 
 static void putchar(int c);
-void my_puts(const char *s);
 
 static void dumphex(int c) {
   int nibble=32;
@@ -46,13 +45,18 @@ void default_handler(void)
 }
 
 volatile struct {
-  char buf[2048];
+  char buf[1024];
   int in;
   int out;
 } ring;
 
-__attribute__((interrupt))
 void uart_handler(void)
+{
+  asm("mov r0, sp");
+  asm("b uart_handler_1");
+}
+
+void uart_handler_1(struct exception_frame *frame)
 {
   int status = *usart2_sr;
 
@@ -64,19 +68,15 @@ void uart_handler(void)
     my_puts(" <BREAK>\n");
     *usart2_sr &= ~(1<<8);
     /* Patch stack frame to return to _cstart instead. */
-    asm("mov r2, sp");
-    asm("add r2, #(8*4)");
-    asm("movw r3, #:lower16:_cstart");
-    asm("movt r3, #:upper16:_cstart");
-    asm("str r3, [r2]");
+    frame->ra = &_cstart;
     return;
   }
 }
 
-extern void _start;
+extern void *_start;
 
 void *vectors[128] __attribute__((aligned(256))) = {
-   [0] = 0x20000000,
+  [0] = (void *)0x20000000,
    [1] = &_start,
    [2] = default_handler,
    [3] = default_handler,
@@ -142,7 +142,6 @@ void *vectors[128] __attribute__((aligned(256))) = {
 
 static void initio()
 {
-  ring.in = ring.out;
   *VTOR=vectors;
   *rcc_apb1enr |= 1<<17;
   *rcc_apb1lpenr |= 1<<17;
