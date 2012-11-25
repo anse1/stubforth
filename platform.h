@@ -149,6 +149,7 @@ void *vectors[128] __attribute__((aligned(256))) = {
 
 static void initio()
 {
+  ring.in = ring.out;
   *VTOR=vectors;
   *rcc_apb1enr |= 1<<17;
   *rcc_apb1lpenr |= 1<<17;
