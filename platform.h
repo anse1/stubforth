@@ -149,8 +149,12 @@ void *vectors[128] __attribute__((aligned(256))) = {
 
 static void initio()
 {
+  *rcc_cr |= 1 <<16; /* HSE enable */
+  while (!*rcc_cr & (1<<17) /* HSE ready */)
+    ;
   ring.in = ring.out;
   *VTOR=vectors;
+  *rcc_ahb1enr |= 1<<0;
   *rcc_apb1enr |= 1<<17;
   *rcc_apb1lpenr |= 1<<17;
   *usart2_cr1 |= 1<<13;
@@ -160,7 +164,6 @@ static void initio()
   *gpioa_moder |= (2<<(2*3));
   *gpioa_afrl |= 7 << 3*4 ;
   *gpioa_afrl |= 7 << 2*4 ;
-
 
 /* # HSE=AHB1=AHB2: 8MHz */
   *rcc_cfgr = 5;

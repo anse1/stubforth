@@ -230,6 +230,7 @@ set $usart2_gtpr = $USART2_BASE + 6
 
 define uinit
  set *$rcc_apb1enr |= 1<<17
+ set *$rcc_apb1enr |= 1<<0
  set *$rcc_apb1lpenr |= 1<<17
   set *$usart2_cr1 |= 1<<13
   set *$usart2_cr1 |= 1<<3
@@ -248,13 +249,11 @@ define uinit
   set *$gpioa_afrl |= 7 << 3*4 
   set *$gpioa_afrl |= 7 << 2*4 
 
+  set *$rcc_cr |= 1 << 16
 # HSE=AHB1=AHB2: 8MHz
    set *$rcc_cfgr = 5
 # 8MHz/16/4.3125 = 0.115942028986MHz
    set *$usart2_brr = 0x45
-
-
-
 end
 
 define u2sr
