@@ -2,7 +2,7 @@
 GCC = gcc
 CFLAGS = -O2  -g -Wall -Wcast-align
 SYNC = -s
-
+OBJCOPY = objcopy
 all: stubforth
 
 config.h: .rev.h
@@ -18,8 +18,8 @@ stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
-stubforth:  stubforth.o
-	$(GCC) $(CFLAGS) -o $@ $<
+stubforth:  stubforth.o user.o
+	$(GCC) $(CFLAGS) -o $@ $+
 
 %.size: % size.sh
 	. ./size.sh $<
@@ -46,7 +46,12 @@ TAGS: .
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
+BINFMT = i386:x86-64
+ELFFMT = elf64-x86-64
 %.o : %.4th
-	$(OBJCOPY) -I binary -B arm -O elf32-littlearm \
+	cat $< > $<-source
+	dd if=/dev/zero of=$<-source bs=1 count=1 oflag=append conv=notrunc
+	$(OBJCOPY) -I binary -B $(BINFMT) -O $(ELFFMT) \
 	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
-	 $< $@
+	 $<-source $@
+	rm $<-source
