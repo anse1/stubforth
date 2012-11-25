@@ -28,7 +28,7 @@ start.o: start.S
 
 size: stubforth.elf.size
 
-stubforth.elf:  start.o stubforth.o user.o
+stubforth.elf:  start.o stubforth.o source.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 %.size: % size.sh
@@ -46,6 +46,8 @@ clean:
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg *.elf
+	rm -f *.vcg
+	rm -f builtin.4th
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -58,10 +60,11 @@ TAGS: .
 BINFMT = arm
 ELFFMT = elf32-littlearm
 
-user.o : user.4th cortexm.4th
-	cat $+ > $<-source
-	dd if=/dev/zero of=$<-source bs=1 count=1 oflag=append conv=notrunc
+builtin.4th: user.4th
+	cat $+ > $@
+	dd if=/dev/zero of=$@ bs=1 count=1 oflag=append conv=notrunc
+
+source.o : builtin.4th
 	$(OBJCOPY) -I binary -B $(BINFMT) -O $(ELFFMT) \
 	 --rename-section .data=.rodata.4th,alloc,load,readonly,data,contents \
-	 $<-source $@
-	rm $<-source
+	 $< $@
