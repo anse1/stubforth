@@ -18,7 +18,7 @@ stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
-stubforth:  stubforth.o user.o
+stubforth:  stubforth.o source.o
 	$(GCC) $(CFLAGS) -o $@ $+
 
 %.size: % size.sh
@@ -37,6 +37,7 @@ clean:
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
+	rm -f builtin.4th
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -46,12 +47,13 @@ TAGS: .
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
+builtin.4th: user.4th
+	cat $+ > $@
+	dd if=/dev/zero of=$@ bs=1 count=1 oflag=append conv=notrunc
+
 BINFMT = i386:x86-64
 ELFFMT = elf64-x86-64
-%.o : %.4th
-	cat $< > $<-source
-	dd if=/dev/zero of=$<-source bs=1 count=1 oflag=append conv=notrunc
+source.o : builtin.4th
 	$(OBJCOPY) -I binary -B $(BINFMT) -O $(ELFFMT) \
 	 --rename-section .data=.rodata.4th,alloc,load,readonly,data,contents \
-	 $<-source $@
-	rm $<-source
+	 $< $@

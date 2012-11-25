@@ -4,6 +4,6 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
-extern char _binary_user_4th_source_start[];
-
-secondary(boot2,boot,, LIT, .s=_binary_user_4th_source_start, EVALUATE, HI, QUIT)
+extern char _binary_builtin_4th_start[];
+constant(builtin,, .s=_binary_builtin_4th_start)
+secondary(boot2,boot,, BUILTIN, EVALUATE, HI, QUIT)
