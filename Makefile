@@ -45,7 +45,7 @@ check: stubforth.elf
 clean:
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
-	rm -f *.vcg
+	rm -f *.vcg *.elf
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
