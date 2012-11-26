@@ -105,11 +105,13 @@ rcc_ahb1enr @ 1 3 << or rcc_ahb1enr !
 55 c 2 * << gpiod moder !
 f c << gpiod odr !
 
-: ledon c <<  gpiod odr @ or gpiod odr ! ;
-: ledoff c << ~ gpiod odr @ and gpiod odr ! ;
+hex
+: ledon cells [ c gpiod odr bb2a ] literal + 1 swap ! ;
+: ledoff cells [ c gpiod odr bb2a ] literal + 0 swap ! ;
+: ledflip cells [ c gpiod odr bb2a ] literal + 1 swap +! ;
 
 decimal
-: heartbeat begin 900 ms 4 ledon 100 ms 4 ledoff again ;
+: heartbeat begin 900 ms 2 ledon 100 ms 2 ledoff again ;
 
 hex
 : unused 10010000 here - ;
