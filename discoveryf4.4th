@@ -100,10 +100,10 @@ rcc 84 + constant rcc_plli2scfgr
 
 \ 4 leds @ gpiod:12  
 
+rcc_ahb1enr @ 1 3 << or rcc_ahb1enr !
+
 55 c 2 * << gpiod moder !
 f c << gpiod odr !
-
-rcc_ahb1enr @ 1 3 << or rcc_ahb1enr !
 
 : ledon c <<  gpiod odr @ or gpiod odr ! ;
 : ledoff c << ~ gpiod odr @ and gpiod odr ! ;
