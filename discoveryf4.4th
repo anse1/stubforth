@@ -110,3 +110,6 @@ f c << gpiod odr !
 
 decimal
 : heartbeat begin 900 ms 4 ledon 100 ms 4 ledoff again ;
+
+hex
+: unused 10010000 here - ;
