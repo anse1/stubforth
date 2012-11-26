@@ -23,7 +23,7 @@ static void dumphex(int c) {
   }
 }
 
-volatile long tick;
+volatile int tick;
 
 void sys_tick(void)
 {

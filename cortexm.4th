@@ -29,7 +29,7 @@ decimal
 
 hex
 : bb2a ( bit# a -- alias-a )
- 	dup 20000000 20008000 within if
+ 	dup 20000000 20100000 within if
 		20000000 22000000 bboffset
 		exit then
 	dup 40000000 40100000 within if
