@@ -68,7 +68,6 @@ A0000000 constant fsmc
 40000000 constant tim2
 
 rcc 0 + constant rcc_cr
-rcc 0 + constant rcc_cr
 rcc 4 + constant rcc_pllcfgr
 rcc 8 + constant rcc_cfgr
 rcc 12 + constant rcc_cir
@@ -101,8 +100,13 @@ rcc 84 + constant rcc_plli2scfgr
 
 \ 4 leds @ gpiod:12  
 
-
 55 c 2 * << gpiod moder !
 f c << gpiod odr !
 
 rcc_ahb1enr @ 1 3 << or rcc_ahb1enr !
+
+: ledon c <<  gpiod odr @ or gpiod odr ! ;
+: ledoff c << ~ gpiod odr @ and gpiod odr ! ;
+
+decimal
+: heartbeat begin 900 ms 4 ledon 100 ms 4 ledoff again ;
