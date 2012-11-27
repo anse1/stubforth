@@ -692,7 +692,7 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    char *s = (char *)vmstate->dp;
    do {
       c = my_getchar();
-      if (c < 0) cthrow(-39, unexpected end of file);
+      if (c < 0) cthrow(0);
    } while (!IS_WORD(c));
    do {
       *s++ = c;
@@ -855,15 +855,19 @@ secondary(if,, .immediate=1,
  LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 )
 
-dnl ( a -- a )
-secondary(else,, .immediate=1,
- LIT, BRANCH, COMMA, HERE, ZERO, COMMA,
- SWAP, HERE, SWAP, STORE
-)
-
 dnl ( a -- )
 secondary(then,, .immediate=1,
  HERE, SWAP, STORE
+)
+
+dnl -- pad
+secondary(ahead,, .immediate=1, l(
+ LIT BRANCH COMMA HERE ZERO COMMA
+))
+
+dnl ( a -- a )
+secondary(else,, .immediate=1,
+ AHEAD, SWAP, THEN
 )
 
 dnl ( -- a )

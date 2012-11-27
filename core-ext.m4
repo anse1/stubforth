@@ -29,11 +29,6 @@ secondary(endcase,, .immediate=1, l(
  LIT RFROM COMMA LIT DROP COMMA
 ))
 
-dnl -- pad
-secondary(ahead,, .immediate=1, l(
- LIT BRANCH COMMA HERE ZERO COMMA
-))
-
 dnl -- pad xt
 secondary(try,, .immediate=1, l(
   AHEAD HERE
@@ -94,10 +89,6 @@ primary(tworto, 2r>)
 primary(tworload, 2r@)
 *sp++ = rp[-2];
 *sp++ = rp[-1];
-
-secondary(noname, :noname,, l(
-  HERE LIT &&enter COMMA RESUME
-))
 
 primary(within)
 {

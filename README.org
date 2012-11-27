@@ -1,0 +1,87 @@
+stubforth
+
+A small C-based forth intended to run on bare metal.
+
+* Goals
+- Portability
+- Maintainability
+- C integration
+  - Zero-terminated forth strings
+  - Reentrant VM
+  - FFI
+- Size (about 10k for a 32-bit build)
+
+* Design
+** C Extensions used
+Using C extensions contradicts the goal of ultimate portability, but
+some of them are too good to pass up and support for them is common
+with non-GCC compilers. The following extensions are currently used:
+
+- Labels as Values :: Instantly puts you into the ballpark of the
+     fastest C-Forths out there.
+- Named initializers :: Allows robust filling of static C structs with
+     macros.
+- Inline assembly ::
+- =__alignof__= ::
+- +Cast to Union+ ::
+- +Static initialization of flexible arrays+ ::
+** m4
+M4 is used to hide the boring aspects of constructing Forth words as
+static C structs.
+
+** Source organization
+Platform-specific code resides on individual branches to avoid
+littering the code with conditional compilation.
+
+The =master= branch contains the least specialized code.  It expects a
+hosted C environment and uses getchar() and putchar() from libc for
+I/O.  This is the branch new platform-independent features are added
+and to start porting to new platforms from.
+
+**** =posix=
+Makes stubforth a nicer citizen on POSIX systems.  =mmap= is used to
+provide a persistent dictionary, =dlopen= is available to forth code
+to allow FFI-access to the C world.  For scripting convenience, =#!= is
+an alias to =\= and command line arguments are available to forth
+code.
+
+An example to query PostgreSQL from forth by using libpq via FFI is
+included.
+
+**** =m68k/dragonball=
+Targets MC68EZ328 Palm-Like hardware.  Includes code to use the
+builtin LCD controller, BBADS7843 touchscreen controller and write to
+te28f160 flash.  Uses builtin UART for I/O.  Interrupt handlers can be
+written in Forth.
+
+Also, some example forth code to zoom the mandelbrot set.
+
+**** =arm/cortexm=
+This branch is used to collect vendor independent code to support
+Cortex M chips, such as NVIC setup or startup code that is merged down
+into the silicon vendor branches.
+
+***** =arm/lm4f120=
+Targets TI's Stellaris Launchpad.  Uses the Launchpad's USB-CDC-UART
+bridge for I/O.  Not that an ascii 3 is interpreted as a line break on
+this port, as the bridge doesn't pass out-of-band line breaks.
+
+***** =arm/stm32=
+Targets the STM32F4-Discovery board.  Uses USART2 for I/O.
+
+**** =x86_64/linux=
+Targets the Linux kernel by using syscalls instead of libc for I/O.  A
+=syscall= primary is provided.
+
+
+** Standard conformance
+I try to follow the standards unless it violates the goals or doesn't
+make sense to me.
+
+Some grave departures:
+
+- Most words that return an error flag in the standard throw an
+  exception instead.
+- No counted strings.
+- Use of =does>= with =<builds= instead of =create=.
+- Throwing a 0 does non-local control flow without rolling back the parameter stack.
