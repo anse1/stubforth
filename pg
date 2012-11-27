@@ -1,6 +1,6 @@
-#! /home/andreas/src/c/stubforth/stubforth
+#! /home/andreas/src/stubforth/stubforth
 
-" /usr/lib/libpq.so.5" dlopen constant libpq
+" libpq.so" dlopen constant libpq
 
 libpq " PQconnectdb"	1	cbind pqconnectdb
 libpq " PQerrorMessage" 1	cbind pqerrormessage

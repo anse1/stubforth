@@ -19,7 +19,7 @@ argc @ 1- dumpargs
 
 .( testing dlopen... ) 
 
-" /lib/libc.so.6" dlopen constant libc
+" libc.so.6" dlopen constant libc
 
 libc " printf" 0 cbind printf
 libc " getpid" 0 cbind getpid
