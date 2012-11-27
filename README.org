@@ -45,7 +45,7 @@ to allow FFI-access to the C world.  For scripting convenience, =#!= is
 an alias to =\= and command line arguments are available to forth
 code.
 
-An example to query PostgreSQL from forth by using libpq via FFI is
+An example to query PostgreSQL from forth using libpq via FFI is
 included.
 
 **** =m68k/dragonball=
@@ -63,8 +63,8 @@ into the silicon vendor branches.
 
 ***** =arm/lm4f120=
 Targets TI's Stellaris Launchpad.  Uses the Launchpad's USB-CDC-UART
-bridge for I/O.  Not that an ascii 3 is interpreted as a line break on
-this port, as the bridge doesn't pass out-of-band line breaks.
+bridge for I/O.  Note that an ascii 3 is interpreted as a line break
+on this port, as the bridge doesn't pass out-of-band line breaks.
 
 ***** =arm/stm32=
 Targets the STM32F4-Discovery board.  Uses USART2 for I/O.
