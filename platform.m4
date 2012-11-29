@@ -9,7 +9,7 @@ primary(dlopen)
 {
   sp[-1].a = dlopen(sp[-1].s, RTLD_LAZY);
   if (! sp[-1].a)
-     cthrow(,dlerror());
+       return t.s=dlerror(), t;
 }
 
 dnl handle s -- (void *)
