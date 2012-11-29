@@ -38,6 +38,7 @@ clean:
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
+	rm -f $(HOME)/.stubforth
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -47,7 +48,9 @@ TAGS: .
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
-dict: user.4th platform.4th stubforth
+dict: $(HOME)/.stubforth
+
+$(HOME)/.stubforth: user.4th platform.4th stubforth
 	dd if=/dev/zero of=$(HOME)/.stubforth bs=1k count=128
 	( cat user.4th platform.4th; echo sync bye ) | ./stubforth
 
