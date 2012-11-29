@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
     fchdir(oldpwd);
   }
 
-  v = mmap((void *)0x100000000ULL, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_SHARED, dataspace_fd, 0);
+  v = mmap((void *)0x10000000, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_SHARED, dataspace_fd, 0);
   if (v == MAP_FAILED) {
     perror("mmap");
     return -1;
