@@ -20,7 +20,7 @@ primary(dlsym)
   sp--;
   t.s = dlerror();
   if (t.s)
-    cthrow(,t.s);
+     return t;
 }
 
 void *dlopen(const char *filename, int flag);
