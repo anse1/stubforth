@@ -8,7 +8,7 @@ LIBGCC = $(shell $(CC) -print-libgcc-file-name)
 
 LDFLAGS= -Wl,-Tcortexm.ld stm32f4.ld -nostdlib $(LIBGCC)
 
-all: stubforth
+all: stubforth.elf
 
 config.h: .rev.h
 
