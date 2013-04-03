@@ -31,7 +31,7 @@ stubforth:  stubforth.o
 %.c: %.c.m4 Makefile *.m4
 	m4 $(SYNC) $< > $@
 
-check: stubforth
+check: stubforth $(HOME)/.stubforth
 	expect test.tcl
 
 clean:
