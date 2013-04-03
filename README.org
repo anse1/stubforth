@@ -55,18 +55,20 @@ Some grave departures:
 
 
 * Source
-
 ** Repository
 git://gate450.dyndns.org/git/stubforth
+
+See the file COPYING for warranty and redistribution conditions.
 
 ** Branches
 Platform-specific code resides on individual branches to avoid
 littering the code with conditional compilation.
 
-The =master= branch contains the least specialized code.  It expects a
-hosted C environment and uses getchar() and putchar() from libc for
-I/O.  This is the branch new platform-independent features are added
-and to start porting to new platforms from.
+*** =master=
+This branch contains the least specialized code.  It expects a hosted
+C environment and uses getchar() and putchar() from libc for I/O.
+This is the branch new platform-independent features are added and to
+start porting to new platforms from.
 
 *** =posix=
 Makes stubforth a nicer citizen on POSIX systems.  =mmap= is used to
