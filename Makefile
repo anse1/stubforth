@@ -7,7 +7,7 @@ SYNC = -s
 LIBGCC = $(shell $(CC) -print-libgcc-file-name)
 LDFLAGS= -Wl,-Tcortexm.ld -nostdlib $(LIBGCC)
 
-all: stubforth
+all: stubforth.elf
 
 config.h: .rev.h
 
