@@ -1,4 +1,7 @@
 
+set tdesc filename ./gdb-target.xml
+set architecture arm
+
 set $udr = ((char *)0x4000C000)
 set $uartdr = $udr + 0x000
 set $uartrsr = $uartecr = $udr + 0x004
