@@ -1,6 +1,7 @@
 stubforth
 
-A small C-based forth system intended to run on bare metal.
+A small, C-based, indirect threaded forth system intended to run on
+bare metal.
 
 file:stubforth.jpg
 
@@ -13,10 +14,9 @@ file:stubforth.jpg
 * Design
 ** C Extensions used
 Using C extensions contradicts the goal of ultimate portability, but
-some of them are too good to pass up and support for them is common
-with non-GCC compilers.  For example, stubforth compiles with
-[[http://pp.info.uni-karlsruhe.de/firm/Main_Page][libFirm/CParser]]
-too.  The following extensions are currently used:
+some of them are too good to pass up and support for them is common in
+other compilers than GCC.  For example, stubforth compiles with
+[[http://pp.info.uni-karlsruhe.de/firm/Main_Page][libFirm/CParser]] too.  The following extensions are currently used:
 
 - Labels as Values :: Instantly puts you into the ballpark of the
      fastest C-Forths out there.
@@ -29,7 +29,8 @@ too.  The following extensions are currently used:
 ** M4
 M4 is used to hide the boring aspects of constructing Forth words as
 static C structs.  Here are some examples of how definitions of Forth
-words look like in subforth's source before M4 lowers them to plain C:
+words look like in subforth's source before M4 expands them to code
+and static structs in plain C:
 
 : primary(min)
 :   sp--;
@@ -90,7 +91,7 @@ mandelbrot set.
 *** =arm/cortexm=
 This branch is used to collect vendor independent code to support
 Cortex M chips, such as NVIC setup or startup code that is merged down
-into the silicon vendor branches.
+into the following silicon vendor branches.
 
 ***** =arm/lm4f120=
 Targets TI's Stellaris Launchpad.  Uses the Launchpad's USB-CDC-UART
@@ -104,3 +105,13 @@ Targets the STM32F4-Discovery board.  Uses USART2 for I/O.
 Targets the Linux kernel by using syscalls instead of libc for I/O.  A
 =syscall= primary is provided.
 
+* Bugs
+** TODO Make use of GCC's Named Address Spaces to support Harvard architectures.
+An ATMega8 ought to be a feasible target.
+** TODO Allow dictionaries in persistent store.
+Currently, persistence of non-static words is achieved by storing
+Forth source in Flash and compiling them on startup.
+** TODO Init some of the C runtime using C code.
+Part of the C runtime environment can be initialized from C itself,
+such as BSS initialization.  Currently, everything before main is done
+in assembly on the platform branches.
