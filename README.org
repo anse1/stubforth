@@ -29,7 +29,7 @@ other compilers than GCC.  For example, stubforth compiles with
 ** M4
 M4 is used to hide the boring aspects of constructing Forth words as
 static C structs.  Here are some examples of how definitions of Forth
-words look like in subforth's source before M4 expands them to code
+words look like in stubforth's source before M4 expands them to code
 and static structs in plain C:
 
 : primary(min)
