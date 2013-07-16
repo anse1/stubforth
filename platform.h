@@ -68,10 +68,13 @@ void uart_handler_1(struct exception_frame *frame)
   int status = *usart2_sr;
 
   if (status & (1<<5)) {
-    ring.buf[ring.in] = *usart2_dr;
+    int data = *usart2_dr;
+    if (data == 3) goto force_break;
+    ring.buf[ring.in] = data;
     ring.in = (ring.in + 1) % sizeof(ring.buf);
   }
   if (status & (1<<8)) {
+  force_break:
     my_puts(" <BREAK>\n");
     *usart2_sr &= ~(1<<8);
     /* Patch stack frame to return to _cstart instead. */
