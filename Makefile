@@ -178,8 +178,3 @@ TAGS: .
 	--regex-forth='/(primary|secondary|constant|master)\(([a-z0-9_]+)/\2/' \
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
-
-%.o : %.4th
-	$(OBJCOPY) -I binary -B arm -O elf32-littlearm \
-	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
-	 $< $@
