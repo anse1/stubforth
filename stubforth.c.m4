@@ -613,7 +613,7 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    char *s = (char *)vmstate->dp;
    do {
       c = my_getchar();
-      if (c < 0) cthrow(-39, unexpected end of file);
+      if (c < 0) cthrow(0);
    } while (!IS_WORD(c));
    do {
       *s++ = c;

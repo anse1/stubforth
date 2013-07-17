@@ -19,3 +19,4 @@ core
 bblock.?.fprog
 block.?.fprog
 chainload.?
+builtin.4th
