@@ -2,15 +2,28 @@
 #define PLATFORM_H
 
 #include "stubforth.h"
+#include "hd6417708r.h"
 
-/* The platform needs to provide my_getchar() and putchar() */
-#include <stdio.h>
 
 /* flags.break_condition can be set in an ISR to interrupt the
    interpreter. */
 
 static void initio()
 {
+
+}
+
+int putchar(int c) {
+  while (! (TDRE & *SCSSR))
+    ;
+  *SCTDR = c;
+  return c;
+}
+
+int getchar(void) {
+  while (! (RDRF & *SCSSR))
+    ;
+  return *SCRDR;
 }
 
 #endif
