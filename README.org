@@ -7,7 +7,7 @@ file:stubforth.jpg
 
 * Goals
 - Portability :: trivially portable to anything GCC targets
-- Maintainability :: common build system, testsuite included
+- Maintainability :: testsuite included
 - C integration :: zero-terminated forth strings, reentrant VM, FFI
 - Size :: about 10kB for a 32-bit build
 
@@ -18,7 +18,7 @@ some of them are too good to pass up and support for them is common in
 other compilers than GCC.  For example, stubforth compiles with
 [[http://pp.info.uni-karlsruhe.de/firm/Main_Page][libFirm/CParser]] too.  The following extensions are currently used:
 
-- Labels as Values :: Instantly puts you into the ballpark of the
+- Labels as Values :: Instantly puts you inside the ballpark of the
      fastest C-Forths out there.
 - Named initializers :: Allows robust filling of static C structs with
      macros.
@@ -41,7 +41,6 @@ and static structs in plain C:
 :  LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
 : )
 
-
 ** Standard conformance
 I try to follow the standards unless doing so would violate the goals
 or not make sense to me.
@@ -53,7 +52,6 @@ Some grave departures:
 - No counted strings.
 - Use of =does>= with =<builds= instead of =create=.
 - Throwing a 0 does non-local control flow without rolling back the parameter stack.
-
 
 * Source
 ** Repository
@@ -87,6 +85,7 @@ builtin LCD controller, BBADS7843 touchscreen controller and write to
 te28f160 flash.  Uses builtin UART for I/O.  Interrupt handlers can be
 written in Forth.  Also includes some forth code to zoom the
 mandelbrot set.
+
 
 *** =arm/cortexm=
 This branch is used to collect vendor independent code to support
