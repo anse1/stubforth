@@ -1,6 +1,6 @@
 
 GCC = sh-elf-gcc
-CFLAGS = -O2  -g -Wall -Wcast-align -ffreestanding -fno-strict-aliasing
+CFLAGS = -O2 -m3 -g -Wall -Wcast-align -ffreestanding -fno-strict-aliasing
 SYNC = -s
 
 all: stubforth
