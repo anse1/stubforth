@@ -1,7 +1,8 @@
-
-GCC = sh-elf-gcc
-CFLAGS = -O2 -m3 -g -Wall -Wcast-align -ffreestanding -fno-strict-aliasing
+T=/dev/ttyUSB0
+SHGCC = sh-elf-gcc
+SHCFLAGS = -O2 -m3 -g -Wall -Wcast-align -ffreestanding -fno-strict-aliasing
 SYNC = -s
+CFLAGS = -std=c99
 
 all: stubforth
 
@@ -13,21 +14,33 @@ config.h: .rev.h
 	echo -n '"' >> $@
 
 stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
-	$(GCC) $(CFLAGS) -o $@ -c $<
+	$(SHGCC) $(SHCFLAGS) -o $@ -c $<
 
 
-test.o : test.c 
-	$(GCC) $(CFLAGS) -o $@ -c $<
+%.o : %.S
+	sh-elf-as  --big  -c $< -o $@
 
-% : %.o
-	sh-elf-ld lancom.ld test.o -o test
+%.o : %.c
+	$(SHGCC) $(SHCFLAGS) -o $@ -c $<
 
+% : %.c
+% : %.S
+
+
+test : init.o test.o
+	sh-elf-ld -T lancom.ld $+ -o $@
+
+%.bin: %
+	sh-elf-objcopy $<  -O binary $@
+
+%.D : %
+	sh-elf-objdump -b binary -m sh3  -D  $<
 
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
-	$(GCC) $(CFLAGS) -o $@ -S $<
+	$(SHGCC) $(SHCFLAGS) -o $@ -S $<
 
 stubforth:  stubforth.o
-	$(GCC) $(CFLAGS) -o $@ $<
+	$(SHGCC) $(SHCFLAGS) -o $@ $<
 
 %.size: % size.sh
 	. ./size.sh $<
@@ -46,6 +59,7 @@ clean:
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
 	rm -f test test.o
+	rm -f test.o test test.bin
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -60,3 +74,16 @@ TAGS: .
 	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
 	 $< $@
 
+image.upx:  test.bin upx
+	cp ~/ext/lancom/ftp.lancom.de/LANCOM-Archive/LC-DSL-I-10/LC-DSLI10-A-CV-2.11.0007.upx $@ 
+	chmod u+w $@
+# 	: arrange for test.bin to be loaded at 0x20000
+# 	dd if=test.bin of=$@ bs=1 seek=65920  conv=notrunc
+	: overwrite code with test.bin
+	dd if=test.bin of=$@ bs=1 seek=12496 conv=notrunc
+	: fix checksums
+	./upx  $@
+
+flash: image.upx
+	expect wipe.tcl $T
+	./upxload.sh $<
