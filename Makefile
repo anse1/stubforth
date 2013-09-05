@@ -1,6 +1,6 @@
 T=/dev/ttyUSB0
 SHGCC = sh-elf-gcc
-SHCFLAGS = -O2 -m3 -g -Wall -Wcast-align -ffreestanding -fno-strict-aliasing
+SHCFLAGS = -O2 -m3 -g -Wall -Wcast-align -ffreestanding -fno-strict-aliasing -mrenesas
 SYNC = -s
 CFLAGS = -std=c99
 
@@ -27,7 +27,7 @@ stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
 % : %.S
 
 
-test : init.o test.o
+test : init.o  # test.o
 	sh-elf-ld -T lancom.ld $+ -o $@
 
 %.bin: %
