@@ -1,8 +1,7 @@
 
-	.globl _main
+	.global _main
 _init:
-	mov.l _main, r0
-	jsr @r0
+2:	
   	mov #0x55, r4
   	extu.b	r4,r4			  
   	mov.w	.sr,r2
@@ -23,3 +22,4 @@ _init:
 	.short 0xfe86
 .sr:
 	.short 0xfe88
+	.align 2
