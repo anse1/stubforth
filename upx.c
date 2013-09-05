@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <assert.h>
 #include <stdio.h>
 #include <errno.h>
 #include <stdint.h>
@@ -66,49 +67,34 @@ int main (int argc, char *argv[]) {
   printf("    checksum of rom descriptor: %04x <- %04x.\n", 0xffff - sum8(&map[2], 126), WORD_AT(0));
   *WORDP_AT(UPX_DESCRIPTOR_SUM) = htons(0xffff - sum8(&map[2], 126));
 
-  printf("    checksum of checksum block: %04x <- %04x.\n", 0xffff - sum8(&map[0x82], 126), WORD_AT(0x80));
-
-  for(int sum=0; sum<63; sum++) {
-    int offset = sum * 0x400 + 0x100;
-    int from_file = WORD_AT(0x82 + sum*2);
-    int computed = 0xffff - sum8(&map[offset], 1024);
-
-    if ( 1 || computed != from_file) {
-
-      printf("\tchecksum of data %03d at offset %06x: %04x <- %04x.\n", sum, offset, computed, from_file);
-/*       *WORDP_AT(0x82+sum*2) = htons(computed); */
-/*       *WORDP_AT(UPX_CHECKSUM_BLOCK_SUM) = htons(0xffff - sum8(&map[0x82], 126)); */
-    }
-  }
-
-
-
-  for(int o=0xfd00; o < size; o+=0x80) {
-    int offset = o;
+  for (int chk_block=0x80;chk_block < size;chk_block += 0x80 + 63*1024) {
+    int offset = chk_block;
     int from_file = WORD_AT(offset);
     offset +=2;
     int computed = 0xffff - sum8(&map[offset], 126);
 
-    if (computed == from_file) {
-      printf("    checksum block found at offset %06x: %04x <- %04x.\n", offset, computed, from_file);
+    assert(computed == from_file);
 
+    printf("    checksum block found at offset %06x: %04x <- %04x.\n", offset, computed, from_file);
 
       for(int sum=0; sum<63; sum++) {
-	int offset = sum * 0x400 + o + 0x80;
+	int data_offset = sum * 0x400 + chk_block + 0x80;
 
-	if (offset >= size) {
+	if (data_offset >= size) {
 	  puts("EOF");
 	  exit(0);
 	}
-	int from_file = WORD_AT(o + 2 + sum*2);
-	int computed = 0xffff - sum8(&map[offset], 1024);
+	int from_file = WORD_AT(chk_block + 2 + sum*2);
+	int computed = 0xffff - sum8(&map[data_offset], 1024);
 
-	printf("\tchecksum of data %03d at offset %06x: %04x <- %04x.\n", sum, offset, computed, from_file);
-      }
+	if (computed != from_file) {
+	  printf("\tchecksum of block %03d at data offset %06x: %04x <- %04x.\n", sum, data_offset, computed, from_file);
+	  *WORDP_AT(chk_block + 2 + sum*2) = htons(computed);
+	  *WORDP_AT(chk_block) = htons(0xffff - sum8(&map[2+chk_block], 126));
+	}
+
     }
   }
-
-
   return 0;
 }
 
