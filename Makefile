@@ -15,6 +15,14 @@ config.h: .rev.h
 stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
 
+
+test.o : test.c 
+	$(GCC) $(CFLAGS) -o $@ -c $<
+
+% : %.o
+	sh-elf-ld lancom.ld test.o -o test
+
+
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
@@ -37,6 +45,7 @@ clean:
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
+	rm -f test test.o
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -50,3 +59,4 @@ TAGS: .
 	$(OBJCOPY) -I binary -B arm -O elf32-littlearm \
 	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
 	 $< $@
+
