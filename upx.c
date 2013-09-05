@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <arpa/inet.h>
 
@@ -46,6 +48,11 @@ int main (int argc, char *argv[]) {
   if (fd == -1)
     error("open");
 
+  off_t size = lseek(fd, 0, SEEK_END);
+
+  if (size == (off_t) -1)
+    error("lseek");
+
   char *map = mmap(NULL, 1<<24, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 
   if (!map)
@@ -76,7 +83,7 @@ int main (int argc, char *argv[]) {
 
 
 
-  for(int o=0; o < 1<<23; o+=0x80) {
+  for(int o=0xfd00; o < size; o+=0x80) {
     int offset = o;
     int from_file = WORD_AT(offset);
     offset +=2;
@@ -88,6 +95,11 @@ int main (int argc, char *argv[]) {
 
       for(int sum=0; sum<63; sum++) {
 	int offset = sum * 0x400 + o + 0x80;
+
+	if (offset >= size) {
+	  puts("EOF");
+	  exit(0);
+	}
 	int from_file = WORD_AT(o + 2 + sum*2);
 	int computed = 0xffff - sum8(&map[offset], 1024);
 
