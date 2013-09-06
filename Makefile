@@ -74,7 +74,7 @@ TAGS: .
 	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
 	 $< $@
 
-image.upx:  test.bin upx
+image.upx:  test.bin upx Makefile
 	cp ~/ext/lancom/ftp.lancom.de/LANCOM-Archive/LC-DSL-I-10/LC-DSLI10-A-CV-2.11.0007.upx $@ 
 	chmod u+w $@
 # 	: arrange for test.bin to be loaded at 0x20000
