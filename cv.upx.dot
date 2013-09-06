@@ -1,5 +1,8 @@
 # -*- compile-command:   dotty cv.upx.dot   -*-
-digraph procedures {
+digraph  procedures  {
+node [fontsize=12]
+
+ graph [nodesep=0.1]
 
  c005eb0 [ color=green]
 
@@ -35,7 +38,7 @@ c006dd0 [ label=getchar, color=green]
 		 c005dd0 
 
 	 c006ab0  ->  c006f80 
-	 unk_c0061c6  ->  c006620  
+	 c006180  ->  c006620  
 
 	 c004ab0  ->  { c006ab0  c005eb0  c006b40   c004d50   }
 
