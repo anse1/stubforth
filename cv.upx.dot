@@ -68,17 +68,16 @@ c006ab0 [color=green]
 }
 
 
-}
 c006a70 -> c006dd0
 
-
-c006ab0 -> c006f80
-
 c006d10 -> {
-	c007040
+	c007040 [label="divmania", color=green]
 	c005dd0
 	c0047f0
 }
+
+}
+
 
 c0047f0 -> {
 c003ac4
