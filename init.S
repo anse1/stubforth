@@ -3,6 +3,23 @@
 
 	bsr _init
 	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 _init:
   	mov #0x55, r4  ! <- 0c006f84
 	sts pr, r5 
