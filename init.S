@@ -1,9 +1,31 @@
 
 	.global _main
+
+	bsr _init
+	nop
 _init:
-2:	
-  	mov #0x55, r4
-  	extu.b	r4,r4			  
+  	mov #0x55, r4  ! <- 0c006f84
+	sts pr, r5 
+	bsr putchar
+	nop  ! delay
+	mov r5, r4
+	bsr putchar
+	shlr8 r5 ! delay
+	mov r5, r4
+	bsr putchar
+	shlr8 r5 ! delay
+	mov r5, r4
+	bsr putchar
+	shlr8 r5 ! delay
+	mov r5, r4
+	bsr putchar
+	nop ! delay
+	bsr _init   
+	nop   ! delay
+	
+
+putchar:
+  	extu.b	r4,r4	! <- 0c006fa4
   	mov.w	.sr,r2
 1:
 	mov.b	@r2,r1			  
@@ -15,7 +37,7 @@ _init:
   	mov.b	@r1,r0			  
   	and	#127,r0			  
   	mov.b	r0,@r1			  
-  	bra 1b
+  	rts
 	nop
 
 .dr:
