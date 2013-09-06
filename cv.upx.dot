@@ -18,8 +18,6 @@ c006620 [ color=green]
 
 	 c005610 [color=green ]
 
-unk_c006a7a-> c006dd0
-
 c006dd0 [ label=getchar, color=green]
 
 	 c006f80  [
@@ -38,10 +36,10 @@ c006dd0 [ label=getchar, color=green]
 
 	 c006ab0  ->  c006f80 
 	 unk_c0061c6  ->  c006620  
-	 unk_c004d02  ->  c006ab0  
-	 unk_c004d02  ->  c005eb0  
-	 unk_c004d02  ->  c006b40  
-	 unk_c004d02  ->  c004d50  
+
+	 c004ab0  ->  { c006ab0  c005eb0  c006b40   c004d50   }
+
+
 	 c004d50  ->  c005e10  
 	 c004d50  ->  c005dd0  
 	 c005e10  ->  c005eb0  
@@ -75,6 +73,35 @@ c006d10 -> {
 	c005dd0
 	c0047f0
 }
+
+c003fb0 [color=green, label=init]
+
+c003fb0 -> {
+	c005090 [color=green]
+}
+
+
+c005090  -> {
+
+ac00001c
+c004a34
+c004ab0
+c005e40
+c005eb0
+c006320
+c006ab0
+c006b40
+c006f80
+c006d10
+c004750
+c006ff0
+c006e60
+c0047b0
+c0057d0
+
+}
+
+
 
 }
 
