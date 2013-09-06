@@ -19,7 +19,7 @@ c006620 [ color=green]
 
 	  c005610 -> { c005e10 c006ab0}
 
-	 c005610 [color=green ]
+	 c005610 [color=green, label=prepare_port ]
 
 c006dd0 [ label=getchar, color=green]
 
@@ -27,10 +27,9 @@ c006dd0 [ label=getchar, color=green]
 		label =  putchar 
 		color =  green 
 	]
-	 c006ab0  [color =  green ]
+	 c006ab0  [color =  green, label=puts ]
 	 c004d50  [color =  green ]
 	 c005e10  [color =  green ]
-		 c006ab0 
 		 c005eb0 
 		 c006b40 
 		 c004d50 
@@ -48,10 +47,10 @@ c006dd0 [ label=getchar, color=green]
 	 c005e10  ->  c005eb0  
 c006760 [ color=green]
 
-unk_c006bd0_c006c9e [color=green]
+c006bd0 [color=green]
 
 
-unk_c006bd0_c006c9e -> {
+c006bd0 -> {
 c0047f0 [color=green]
 
 c006650 [color=green]
@@ -80,7 +79,7 @@ c006d10 -> {
 c003fb0 [color=green, label=init]
 
 c003fb0 -> {
-	c005090 [color=green]
+	c005090 [color=green, label=firmsafe_converter]
 }
 
 c006370 [color=green]
@@ -92,11 +91,11 @@ c0065f0 [color=green]
 
 
 c005090  -> {
-ac00001c
+# ac00001c
 # c004a34
 c004750 [color=green]
 c0047b0 [color=green]
-c004ab0 [color=green]
+c004ab0 [color=green, label=image_loader]
 c0057d0 [color=green]
 c005e40 [color=green]
 c005eb0
@@ -123,5 +122,48 @@ c005e40 ->  {
 }
 
 
+
+c0055b0 [label=exception_handler_a]
+c0055e0 [label=exception_handler_b]
+c005a40 -> {
+ c005e10
+ c005610
 }
 
+
+c005cd0 -> {
+c005e10
+c005610
+c0047f0
+}
+
+
+c006250 -> {
+c006620
+c0065c0 [color=green]
+
+}
+
+c0062a0 -> {
+c006590 [color=green]
+c0065f0
+
+}
+
+
+c006950 -> {
+c006f80
+
+}
+
+
+ c006f10 -> {
+c006ab0
+c006e60
+
+}
+
+
+
+
+}
