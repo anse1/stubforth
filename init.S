@@ -1,64 +1,40 @@
 
 	.global _main
+	.global _cinit
 
-	bsr _init
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
 _init:
-  	mov #0x55, r4  ! <- 0c006f84
-	sts pr, r5 
-	bsr putchar
-	nop  ! delay
-	mov r5, r4
-	bsr putchar
-	shlr8 r5 ! delay
-	mov r5, r4
-	bsr putchar
-	shlr8 r5 ! delay
-	mov r5, r4
-	bsr putchar
-	shlr8 r5 ! delay
-	mov r5, r4
-	bsr putchar
-	nop ! delay
-	bsr _init   
-	nop   ! delay
-	
+  	mov.l .leds, r6
+	mov.b r7, @r6
+	mov #0x50, r7
+	mov.l .stack,r15
+	stc.l	spc,@-r15
+	stc.l	ssr,@-r15
+	sts.l	pr,@-r15
 
-putchar:
-  	extu.b	r4,r4	! <- 0c006fa4
-  	mov.w	.sr,r2
-1:
-	mov.b	@r2,r1			  
-  	cmp/pz	r1			  
-  	bt	1b
-  	mov.w	.dr,r1
-  	mov.b	r4,@r1			  
-  	add	#2,r1			  
-  	mov.b	@r1,r0			  
-  	and	#127,r0			  
-  	mov.b	r0,@r1			  
-  	rts
+	mov #0xA0, r7
+	mov.l .cinit, r1
+	jsr @r1
+
+	mov #0x10, r7
+	xor r0,r0
+	add #1,r0
+	mov.l .main, r1
+	jsr @r1
 	nop
-
-.dr:
-	.short 0xfe86
-.sr:
-	.short 0xfe88
+	mov.l .leds, r6
+1:	
+	mov #0x20, r7
+	mov.b r7, @r6
+	mov #0x10, r7
+	bra 1b
+	mov.b r7, @r6
+	
 	.align 2
+.leds:
+	.long 0xb8000014
+.stack:
+	.long _stack
+.main:
+	.long _main
+.cinit:
+	.long _cinit
