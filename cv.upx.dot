@@ -126,7 +126,7 @@ c005e40 ->  {
 c0055b0 [label=exception_handler_a]
 c0055e0 [label=exception_handler_b]
 c005a40 -> {
- c005e10
+ c005e10 [label=reads_b800000]
  c005610
 }
 
