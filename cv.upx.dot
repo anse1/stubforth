@@ -1,0 +1,108 @@
+# -*- compile-command:   dotty cv.upx.dot   -*-
+digraph procedures {
+
+ c005eb0 [ color=green]
+
+  c006b40 -> c0069f0
+
+  c006b40 [ color=green ]
+
+  c0069f0 ->   c006f80
+c0069f0 [ color=green ]
+c006620 [ color=green]
+
+	 c005dd0 -> c005610
+	 c005dd0 [color=green ]
+
+	  c005610 -> { c005e10 c006ab0}
+
+	 c005610 [color=green ]
+
+unk_c006a7a-> c006dd0
+
+c006dd0 [ label=getchar, color=green]
+
+	 c006f80  [
+		label =  putchar 
+		color =  green 
+	]
+	 c006ab0  [color =  green ]
+	 c004d50  [color =  green ]
+	 c005e10  [color =  green ]
+		 c006ab0 
+		 c005eb0 
+		 c006b40 
+		 c004d50 
+		 c005e10 
+		 c005dd0 
+
+	 c006ab0  ->  c006f80 
+	 unk_c0061c6  ->  c006620  
+	 unk_c004d02  ->  c006ab0  
+	 unk_c004d02  ->  c005eb0  
+	 unk_c004d02  ->  c006b40  
+	 unk_c004d02  ->  c004d50  
+	 c004d50  ->  c005e10  
+	 c004d50  ->  c005dd0  
+	 c005e10  ->  c005eb0  
+c006760 [ color=green]
+
+unk_c006bd0_c006c9e [color=green]
+
+
+unk_c006bd0_c006c9e -> {
+c0047f0 [color=green]
+
+c006650 [color=green]
+c006a70 [color=green]
+c006ab0 [color=green]
+c006d10 [color=green]
+c006e60 [color=green]
+c006e90 [color=green]
+}
+
+
+c006e90-> {
+c006ab0 [color=green]
+
+}
+
+c006ab0 -> c006f80
+
+}
+c006a70 -> c006dd0
+
+
+c006ab0 -> c006f80
+
+c006d10 -> {
+	c007040
+	c005dd0
+	c0047f0
+}
+
+c0047f0 -> {
+c003ac4
+c003cf2
+c003ea8
+c0040d6
+c0041fc
+c00442a
+c0045e0
+c00480e
+c00526c
+c00549a
+c005650
+c00587e
+c004f18
+c005146
+c004b34
+c004d62
+
+}
+
+
+
+
+}
+
