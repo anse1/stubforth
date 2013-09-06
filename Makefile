@@ -87,3 +87,4 @@ image.upx:  test.bin upx
 flash: image.upx
 	expect wipe.tcl $T
 	./upxload.sh $<
+	touch flash
