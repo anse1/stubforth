@@ -80,28 +80,44 @@ c003fb0 -> {
 	c005090 [color=green]
 }
 
+c006370 [color=green]
 
-c005090  -> {
 
-ac00001c
-c004a34
-c004ab0
-c005e40
-c005eb0
-c006320
-c006ab0
-c006b40
-c006f80
-c006d10
-c004750
-c006ff0
-c006e60
-c0047b0
-c0057d0
-
+c006370 -> {
+c0065f0 [color=green]
 }
 
 
+c005090  -> {
+ac00001c
+# c004a34
+c004750 [color=green]
+c0047b0 [color=green]
+c004ab0 [color=green]
+c0057d0 [color=green]
+c005e40 [color=green]
+c005eb0
+c006320 [color=green]
+c006ab0
+c006b40
+c006d10
+c006e60
+c006f80
+c006ff0 [color=green]
+
+}
+
+c006ff0 -> {
+c004700 [ color=green ]
+}
+
+c0057d0 -> {
+	c005e10 
+}
+
+c005e40 ->  {
+	c0068b0 [color=green]
+}
 
 }
 
