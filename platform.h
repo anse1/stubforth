@@ -88,11 +88,11 @@ int getchar(void) {
   data = *SCRDR;
   *SCSSR &= ~RDRF;
 
-  if (!terminal.quiet)
-    putchar(data);
   if (!terminal.raw)
     if (data == '\r')
       data = '\n';
+  if (!terminal.quiet)
+    putchar(data);
 
   return data;
 }
