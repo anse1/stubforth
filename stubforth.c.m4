@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
 
   while(1) {
     vmstate.compiling = 0;
-    vmstate.base = 16;
+    vmstate.base = 10;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
