@@ -107,11 +107,11 @@ Targets the Linux kernel by using syscalls instead of libc for I/O.  A
 *** =sh/lancom=
 Runs on a "ELSA LANCOM DSL/I-10 Office" router with Hitachi's SH3.
 
-Uses the original Bootloader on the Platform.  Builds a UPX file that
-can be uploaded w/ the original firmware updater.
+Uses the original bootloader on the Platform which can be activated by
+briding JP2.  Builds a UPX file that can be uploaded w/ the original
+firmware updater.
 
 Except the memory-mapped LEDs, no hardware support besides the UART.
-
 
 * Bugs
 ** TODO Make use of GCC's Named Address Spaces to support Harvard architectures.
