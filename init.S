@@ -11,13 +11,16 @@ _init:
 	stc.l	ssr,@-r15
 	sts.l	pr,@-r15
 
+	mov #0, r0
 	mov #0xA0, r7
 	mov.l .cinit, r1
 	jsr @r1
+	nop
 
+	mov.b r7, @r6
 	mov #0x10, r7
-	xor r0,r0
-	add #1,r0
+	mov #0xA0, r7
+	mov #0, r0
 	mov.l .main, r1
 	jsr @r1
 	nop
