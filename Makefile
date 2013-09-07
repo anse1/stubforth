@@ -80,7 +80,9 @@ TAGS: .
 	 $< $@
 
 builtin.4th: user.4th Makefile
-	cat $< > $@
+	echo '.( Loading builtin.4th...)' > $@
+	cat $< >> $@
+	echo '.( done.)' >> $@
 	echo 0 redirect ! >> $@
 
 %.upx:  %.bin upx Makefile

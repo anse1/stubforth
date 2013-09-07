@@ -6,6 +6,7 @@
 
 extern const char binary_builtin_4th_start[];
 
-constant(user4th,, .s=binary_builtin_4th_start)
+constant(builtin4th,, .s=binary_builtin_4th_start)
 
+secondary(boot2, boot,, LIT, .s=binary_builtin_4th_start, REDIRECT, STORE, HI, QUIT)
 
