@@ -104,6 +104,9 @@ Targets the STM32F4-Discovery board.  Uses USART2 for I/O.
 Targets the Linux kernel by using syscalls instead of libc for I/O.  A
 =syscall= primary is provided.
 
+*** sh/lancom
+Runs on a DSL router with Hitachi's SH3.
+
 * Bugs
 ** TODO Make use of GCC's Named Address Spaces to support Harvard architectures.
 An ATMega8 ought to be a feasible target.
