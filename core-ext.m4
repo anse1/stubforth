@@ -109,3 +109,9 @@ primary(backslash, `\\', immediate)
 while((t.i = my_getchar()) != '\n') {
   if (t.i < 0) cthrow(-39, unexpected end of file);
 }
+
+secondary(marker,,, l(
+ CONTEXT LOAD DP LOAD
+ BUILDS COMMA COMMA
+ DOES DUP LOAD DP STORE CELL ADD
+ LOAD CONTEXT STORE))
