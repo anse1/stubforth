@@ -15,8 +15,8 @@ file:stubforth.jpg
 ** C Extensions used
 Using C extensions contradicts the goal of ultimate portability, but
 some of them are too good to pass up and support for them is common in
-other compilers than GCC.  For example, stubforth compiles with
-[[http://pp.info.uni-karlsruhe.de/firm/Main_Page][libFirm/CParser]] too.  The following extensions are currently used:
+other compilers than GCC (such as Libfirm/cparser).  The following
+extensions are currently used:
 
 - Labels as Values :: Instantly puts you inside the ballpark of the
      fastest C-Forths out there.
@@ -104,8 +104,14 @@ Targets the STM32F4-Discovery board.  Uses USART2 for I/O.
 Targets the Linux kernel by using syscalls instead of libc for I/O.  A
 =syscall= primary is provided.
 
-*** sh/lancom
-Runs on a DSL router with Hitachi's SH3.
+*** =sh/lancom=
+Runs on a "ELSA LANCOM DSL/I-10 Office" router with Hitachi's SH3.
+
+Uses the original bootloader on the Platform which can be activated by
+briding JP2.  Builds a UPX file that can be uploaded w/ the original
+firmware updater.
+
+Except the memory-mapped LEDs, no hardware support besides the UART.
 
 * Bugs
 ** TODO Make use of GCC's Named Address Spaces to support Harvard architectures.
@@ -115,5 +121,14 @@ Currently, persistence of non-static words is achieved by storing
 Forth source in Flash and compiling them on startup.
 ** TODO Init some of the C runtime using C code.
 Part of the C runtime environment can be initialized from C itself,
-such as BSS initialization.  Currently, everything before main is done
-in assembly on the platform branches.
+such as BSS initialization, copying data from ROM, etc.  Currently,
+everything before main is done in assembly on the platform branches.
+
+Update: sh/lancom does some of the initialization in C.  How to
+generalize...
+
+** TODO Factor terminal code out into baremetal branch
+Currently, buffering and raw/cooked/echo/noecho is duplicated in the
+platform branches.  =master= isn't the right place, as these are not
+useful in a hosted environment.
+
