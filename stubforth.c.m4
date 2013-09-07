@@ -3,9 +3,9 @@ changecom(/*,*/)
 #include "stubforth.h"
 #include "config.h"
 
-cell return_stack[1000];
-cell param_stack[1000];
-cell dictionary_stack[1000];
+cell return_stack[10000];
+cell param_stack[10000];
+cell dictionary_stack[10000];
 
 struct vmstate vmstate;
 
