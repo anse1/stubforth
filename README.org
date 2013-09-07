@@ -126,3 +126,9 @@ everything before main is done in assembly on the platform branches.
 
 Update: sh/lancom does some of the initialization in C.  How to
 generalize...
+
+** TODO Factor terminal code out into baremetal branch
+Currently, buffering and raw/cooked/echo/noecho is duplicated in the
+platform branches.  =master= isn't the right place, as these are not
+useful in a hosted environment.
+
