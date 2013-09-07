@@ -67,10 +67,6 @@ int putchar(int c) {
   status &= ~TDRE;
   *SCSSR = status;
 
-  do {
-    status = *SCSSR;
-  } while (! (TEND & status));
-
   if (!terminal.raw)
     if (c == '\n')
       putchar('\r');
