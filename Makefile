@@ -65,6 +65,7 @@ clean:
 	rm -f *.vcg
 	rm -f test test.o
 	rm -f test.o test test.bin
+	rm -f builtin.4th
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -79,10 +80,10 @@ TAGS: .
 	--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 	 $< $@
 
-builtin.4th: user.4th Makefile
+builtin.4th: user.4th lancom.4th
 	echo '.( Loading builtin.4th...)' > $@
-	cat $< >> $@
-	echo '.( done.)' >> $@
+	cat $+ >> $@
+	echo '.( done.) lf ' >> $@
 	echo 0 redirect ! >> $@
 
 %.upx:  %.bin upx Makefile
