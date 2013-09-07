@@ -41,7 +41,7 @@ test : init.o cinit.o test.o
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
 	$(SHGCC) $(SHCFLAGS) -o $@ -S $<
 
-stubforth:  init.o cinit.o stubforth.o
+stubforth:  init.o cinit.o stubforth.o builtin.o
 	sh-elf-gcc $(SHCFLAGS) -Wl,-T lancom.ld $+ -lgcc  -o $@
 
 stubforth: lancom.ld
@@ -75,9 +75,13 @@ TAGS: .
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
 %.o : %.4th
-	$(OBJCOPY) -I binary -B arm -O elf32-littlearm \
-	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
+	sh-elf-objcopy -I binary -B sh -O elf32-sh \
+	--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 	 $< $@
+
+builtin.4th: user.4th Makefile
+	cat $< > $@
+	echo 0 redirect ! >> $@
 
 %.upx:  %.bin upx Makefile
 	cp ~/ext/lancom/ftp.lancom.de/LANCOM-Archive/LC-DSL-I-10/LC-DSLI10-A-CV-2.11.0007.upx $@ 
@@ -89,6 +93,9 @@ TAGS: .
 	dd if=$< of=$@ bs=1 seek=256 conv=notrunc
 	: fix checksums
 	./upx  $@
+
+upx: upx.c
+	gcc -std=c99 $< -o $@
 
 %.flash: %.upx
 	expect wipe.tcl $T
