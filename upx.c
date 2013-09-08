@@ -43,6 +43,11 @@ int sum8(unsigned char *map, int count) {
 int main (int argc, char *argv[]) {
   int fd = open(argv[1], O_RDWR);
 
+  if (argc != 3) {
+    printf("usage: %s romimage size\n", argv[0]);
+    return -1;
+  }
+
   if (fd == -1)
     fd = open(argv[1], O_RDONLY);
 
