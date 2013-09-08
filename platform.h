@@ -11,53 +11,6 @@ void default_handler (void) {
   return;
 }
 
-void *vectors[] = {
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-  &default_handler,
-};
-
 static int lowest_bit_set (int value) {
   int i;
   for (i=0; (i<32) && !(1 & value); i++)
@@ -65,6 +18,9 @@ static int lowest_bit_set (int value) {
   return i;
 }
 
+void set_vbr(void *addr) {
+  asm("ldc %0, vbr" : /* no outputs */ : "r"(addr));
+}
 
 void led_pwr(int new) {
   int state = *LED18;
@@ -148,10 +104,7 @@ static void initio()
 
 /*                 End */
 
-  {
-    register void **reg = vectors;
-    asm("ldc %0, vbr" : /* no outputs */ : "r"(reg));
-  }
+
 }
 
 int putchar(int c) {
