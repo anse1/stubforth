@@ -13,7 +13,7 @@ config.h: .rev.h
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@
 
-stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
+stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h
 	$(SHGCC) $(SHCFLAGS) -o $@ -c $<
 
 
@@ -67,7 +67,7 @@ clean:
 	rm -f test.o test test.bin
 	rm -f builtin.4th
 	rm -f stubforth.upx test.upx upx *.padded *.flash
-	rm -f *.bin
+	rm -f *.bin symbols.h symbols.4th
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -82,8 +82,8 @@ TAGS: .
 	--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 	 $< $@
 
-builtin.4th: user.4th lancom.4th
-	echo '.( Loading builtin.4th...)' > $@
+builtin.4th: user.4th symbols.4th lancom.4th 
+	echo '.( Loading builtin.4th...) lf' > $@
 	cat $+ >> $@
 	echo '.( ready.) lf ' >> $@
 	echo 0 redirect ! >> $@
@@ -106,3 +106,10 @@ upx: upx.c
 	expect wipe.tcl $T
 	./upxload.sh $<
 	touch $@
+
+symbols.h: symtoh.m4 symbols.m4 
+	m4 $(SYNC) $< > $@
+
+symbols.4th: symto4th.m4 symbols.m4 Makefile
+	m4 $< > $@
+

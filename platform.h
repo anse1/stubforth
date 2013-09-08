@@ -2,9 +2,61 @@
 #define PLATFORM_H
 
 #include "stubforth.h"
-#include "hd6417708r.h"
-#include "lancom.h"
+#include "symbols.h"
 
+__attribute__((interrupt_handler))
+void default_handler (void) {
+
+  my_puts("default_handler invoked\n\r");
+  return;
+}
+
+void *vectors[] = {
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+  &default_handler,
+};
 
 static int lowest_bit_set (int value) {
   int i;
@@ -96,6 +148,10 @@ static void initio()
 
 /*                 End */
 
+  {
+    register void **reg = vectors;
+    asm("ldc %0, vbr" : /* no outputs */ : "r"(reg));
+  }
 }
 
 int putchar(int c) {

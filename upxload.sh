@@ -13,5 +13,5 @@ stty -F $T 230400
 echo -n xu > $T
 < $T  > $T sx -t 10 $1
 
-echo -n s0 > $T
+echo -n s1 > $T
 stty -F $T 115200
