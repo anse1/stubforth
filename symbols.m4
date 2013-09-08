@@ -15,8 +15,8 @@ dnl
 dnl     const(address, name, comment)
 dnl
 mmio2(ffffff80, FRQCR, Frequency control, 112)
-mmio1(ffffff6c, PCR, PCMCIA control, a2)
-mmio1(ffffff60, BCR1, Bus control 1, 13)
+mmio2(ffffff6c, PCR, PCMCIA control, a2)
+mmio2(ffffff60, BCR1, Bus control 1, 13)
 dnl ¬le, burst, a5pcm, a6pcm
 mmio2(ffffff62, BCR2, Bus control 2, 1bd8)
 dnl        01 10 11 11 01 10 00
