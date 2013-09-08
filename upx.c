@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <arpa/inet.h>
 
@@ -30,7 +31,6 @@
 
 #define error(msg)					\
   do { perror(msg); exit(EXIT_FAILURE); } while (0)
-
 
 int sum8(unsigned char *map, int count) {
   int sum = 0;
@@ -56,8 +56,12 @@ int main (int argc, char *argv[]) {
 
   char *map = mmap(NULL, 1<<24, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 
+  *LONGP_AT(UPX_LENGTH) = htonl(atol(argv[2]));
+
   if (!map)
     error("mmap");
+
+  strcpy(&map[UPX_DATE], argv[1]);
 
   printf("    rom descriptor\n"
 	 "\tstart\tlength\tentry\tascii\n"
