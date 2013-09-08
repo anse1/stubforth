@@ -67,6 +67,7 @@ clean:
 	rm -f test.o test test.bin
 	rm -f builtin.4th
 	rm -f stubforth.upx test.upx upx *.padded *.flash
+	rm -f *.bin
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
