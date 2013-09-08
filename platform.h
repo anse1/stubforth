@@ -148,9 +148,17 @@ int getchar(void) {
 
   led_dsl(1);
 
-  do {
+  while (1) {
     status = *SCSSR;
-  } while (! (RDRF & status));
+
+    if ((ORER|FER|PER) & status) {
+      *SCSSR &= ~(ORER|FER|PER);
+      continue;
+    }
+
+    if (RDRF & status)
+      break;
+  }
 
   data = *SCRDR;
   *SCSSR &= ~RDRF;
