@@ -1,4 +1,4 @@
-# -*- compile-command:   dotty cv.upx.dot   -*-
+# -*- compile-command: "dotty cv.upx.dot"   -*-
 digraph  procedures  {
 node [fontsize=12]
 
