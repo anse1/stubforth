@@ -108,7 +108,7 @@ Targets the Linux kernel by using syscalls instead of libc for I/O.  A
 Runs on a "ELSA LANCOM DSL/I-10 Office" router with Hitachi's SH3.
 
 Uses the original bootloader on the Platform which can be activated by
-briding JP2.  Builds a UPX file that can be uploaded w/ the original
+bridging JP2.  Builds an UPX file that can be uploaded w/ the original
 firmware updater.
 
 Except the memory-mapped LEDs, no hardware support besides the UART.
