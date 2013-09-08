@@ -37,18 +37,18 @@ void led_dsl(int new) {
   *LED18 = state;
 }
 
+int led34_state;
+
 void led_chan1(int new) {
-  int state = *LED34;
-  state &= ~LED3_MASK;
-  state |= new << lowest_bit_set(LED3_MASK);
-  *LED34 = state;
+  led34_state &= ~LED3_MASK;
+  led34_state |= new << lowest_bit_set(LED3_MASK);
+  *LED34 = led34_state;
 }
 
 void led_chan2(int new) {
-  int state = *LED34;
-  state &= ~LED4_MASK;
-  state |= new << lowest_bit_set(LED4_MASK);
-  *LED34 = state;
+  led34_state &= ~LED4_MASK;
+  led34_state |= new << lowest_bit_set(LED4_MASK);
+  *LED34 = led34_state;
 }
 
 /* flags.break_condition can be set in an ISR to interrupt the

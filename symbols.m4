@@ -101,3 +101,4 @@ mmio4(fffffeac, TCOR2, Timer constant register 2)
 mmio4(fffffeb0, TCNT2, Timer counter 2           )
 mmio4(fffffeb8, TCPR2, Input capture register 2  )
 
+const(10000000, SMSC, SMSC IOBASE)
