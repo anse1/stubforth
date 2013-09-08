@@ -37,3 +37,7 @@ primary(vbrload, vbr@)
     sp++;
 }
 
+primary(wload, w@)
+  sp[-1].i = *((short *)sp[-1].a);
+
+secondary(wq, w?,, WLOAD, DOT)
