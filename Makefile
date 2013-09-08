@@ -85,7 +85,7 @@ TAGS: .
 builtin.4th: user.4th lancom.4th
 	echo '.( Loading builtin.4th...)' > $@
 	cat $+ >> $@
-	echo '.( done.) lf ' >> $@
+	echo '.( ready.) lf ' >> $@
 	echo 0 redirect ! >> $@
 
 %.padded: %.bin

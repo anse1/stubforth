@@ -7,7 +7,10 @@ cpld 14 + constant led34
 
 : sw1 cpld c + c@ 40 and if 1 else 0 then ;
 
-
-
 ffffffec constant ccr
+
+.( activating cache...)
+1 ccr !
+.( ok) lf
+
 
