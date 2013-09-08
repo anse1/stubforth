@@ -29,3 +29,11 @@ primary(led_chan2)
 primary(warmstart)
   warmstart();
 
+primary(vbrload, vbr@)
+{
+    void *vbr;
+    asm("stc vbr, %0" : "=r"(vbr): /* no inputs */);
+    sp[0].a=vbr;
+    sp++;
+}
+
