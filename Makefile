@@ -66,6 +66,7 @@ clean:
 	rm -f test test.o
 	rm -f test.o test test.bin
 	rm -f builtin.4th
+	rm -f stubforth.upx test.upx upx *.padded *.flash
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -103,4 +104,4 @@ upx: upx.c
 %.flash: %.upx
 	expect wipe.tcl $T
 	./upxload.sh $<
-	touch flash
+	touch $@
