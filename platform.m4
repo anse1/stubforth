@@ -10,3 +10,22 @@ constant(builtin4th,, .s=binary_builtin_4th_start)
 
 secondary(boot2, boot,, LIT, .s=binary_builtin_4th_start, REDIRECT, STORE, HI, QUIT)
 
+primary(led_pwr)
+  sp--;
+  led_pwr(sp[0].i);
+
+primary(led_dsl)
+  sp--;
+  led_dsl(sp[0].i);
+
+primary(led_chan1)
+  sp--;
+  led_chan1(sp[0].i);
+
+primary(led_chan2)
+  sp--;
+  led_chan2(sp[0].i);
+
+primary(warmstart)
+  warmstart();
+
