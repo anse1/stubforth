@@ -86,16 +86,16 @@ builtin.4th: user.4th lancom.4th
 	echo '.( done.) lf ' >> $@
 	echo 0 redirect ! >> $@
 
-%.upx:  %.bin upx Makefile
-	cp ~/ext/lancom/ftp.lancom.de/LANCOM-Archive/LC-DSL-I-10/LC-DSLI10-A-CV-2.11.0007.upx $@ 
-	chmod u+w $@
-# 	: arrange for test.bin to be loaded at 0x20000
-# 	dd if=test.bin of=$@ bs=1 seek=65920  conv=notrunc
-# 	: overwrite code with test.bin
-# 	dd if=test.bin of=$@ bs=1 seek=12496 conv=notrunc
-	dd if=$< of=$@ bs=1 seek=256 conv=notrunc
-	: fix checksums
-	./upx  $@
+%.padded: %.bin
+	cp $< $@
+	let size=$$(stat --format="%s" $<) ; \
+	dd if=/dev/zero bs=1 count=$$(((((size+1023)/1024)*1024)-size)) \
+		conv=notrunc oflag=append of=$@
+
+%.upx:  %.padded upx Makefile head.upx
+	dd if=head.upx of=$@
+	dd bs=1 seek=256 if=$< count=$$(stat --format="%s" $<) of=$@
+	./upx $@ $$(stat --format="%s" stubforth.bin)
 
 upx: upx.c
 	gcc -std=c99 $< -o $@
