@@ -1,6 +1,7 @@
 
 	.global _main
 	.global _cinit
+	.global _restart
 
 _init:
   	mov.l .leds, r6
@@ -16,7 +17,8 @@ _init:
 	mov.l .cinit, r1
 	jsr @r1
 	nop
-
+_restart:
+	mov.l .stack,r15
 	mov.b r7, @r6
 	mov #0x10, r7
 	mov #0xA0, r7
