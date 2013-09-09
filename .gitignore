@@ -16,3 +16,7 @@ stubforth
 flashload
 core
 builtin.4th
+stubforth.flash
+symbols.4th
+symbols.h
+upx
