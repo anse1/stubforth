@@ -12,6 +12,7 @@ hex
 
 
 : key? SCSSR c@ RDRF and ;
+: emit? SCSSR c@ TDRE and ;
 
 \ try to figure out CPLD wiring
 : peek ( increment address )
