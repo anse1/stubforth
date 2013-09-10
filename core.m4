@@ -73,5 +73,5 @@ secondary(evaluate,,, l(
 ))
 
 secondary(ichar, [char], .immediate=1, l(
- KEY LITERAL EXIT
+ KEY LITERAL
 ))
