@@ -1,6 +1,6 @@
 
 MEMORY {
-       ROM : ORIGIN = 0x10000, LENGTH = 4M
+       ROM : ORIGIN = 0x10000, LENGTH = 2M
        RAM : ORIGIN = 0x0c000000 , LENGTH = 4M
 }
 
