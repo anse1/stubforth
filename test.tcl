@@ -203,6 +203,14 @@ test { -1  2  2  within . } {0 $}
 test { -1  2 -1  within . } {0 $}
 test {  0 -1  1  within . } {1 $}
 
-send "forget testsuite-marker \n"
+test { marker oblivious  : oblivion 666 . ; oblivion } {666 $}
+send { oblivious oblivion
+}
 
+expect {
+    timeout { error }
+    -re abort:.*$
+}
+
+send "forget testsuite-marker bye\n"
 
