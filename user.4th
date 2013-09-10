@@ -63,7 +63,6 @@ constant &&dovar
 : xtp context @ ['] xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: words context @ begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
@@ -88,8 +87,6 @@ or 0= and ;
     endcase
   then
 ;
-
-: [char] key postpone literal ; immediate
 
 : disas
   begin dup . dup @ .pretty lf eotp 0= while

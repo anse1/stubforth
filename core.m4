@@ -71,3 +71,7 @@ secondary(evaluate,,, l(
  THROW
  RFROM REDIRECT STORE
 ))
+
+secondary(ichar, [char], .immediate=1, l(
+ KEY LITERAL EXIT
+))
