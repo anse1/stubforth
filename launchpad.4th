@@ -43,45 +43,43 @@ fc0 constant tmpp
 4004e000 constant widetimer4
 4004f000 constant widetimer5
 
-000 constant GPIODATA \  R/W Data                      615
-400 constant GPIODIR \   R/W Direction                 616
-404 constant GPIOIS \    R/W Interrupt Sense           617
-408 constant GPIOIBE \   R/W Interrupt Both Edges      618
-40C constant GPIOIEV \   R/W Interrupt Event           619
-410 constant GPIOIM \    R/W Interrupt Mask            620
-414 constant GPIORIS \   RO  Raw Interrupt Status      621
-418 constant GPIOMIS \   RO  Masked Interrupt Status   622
-41C constant GPIOICR \   W1C Interrupt Clear           623
-420 constant GPIOAFSEL \ R/W Alternate Function Select 624
-500 constant GPIODR2R \  R/W 2-mA Drive Select         626
-504 constant GPIODR4R \  R/W 4-mA Drive Select         627
-508 constant GPIODR8R \  R/W 8-mA Drive Select         628
-50C constant GPIOODR \   R/W Open Drain Select         629
-510 constant GPIOPUR \   R/W Pull-Up Select            630
-514 constant GPIOPDR \    R/W GPIO Pull-Down Select         632
-518 constant GPIOSLR \    R/W GPIO Slew Rate Control Select 634
-51C constant GPIODEN \    R/W GPIO Digital Enable           635
-520 constant GPIOLOCK \   R/W GPIO Lock                     637
-524 constant GPIOCR \      -  GPIO Commit                   638
-528 constant GPIOAMSEL \  R/W GPIO Analog Mode Select       640
-52C constant GPIOPCTL \   R/W GPIO Port Control             641
-530 constant GPIOADCCTL \ R/W GPIO ADC Control              643
-534 constant GPIODMACTL \ R/W GPIO DMA Control              644
+000 constant gpiodata
+400 constant gpiodir
+404 constant gpiois
+408 constant gpioibe
+40c constant gpioiev
+410 constant gpioim
+414 constant gpioris
+418 constant gpiomis
+41c constant gpioicr
+420 constant gpioafsel
+500 constant gpiodr2r
+504 constant gpiodr4r
+508 constant gpiodr8r
+50c constant gpioodr
+510 constant gpiopur
+514 constant gpiopdr
+518 constant gpioslr
+51c constant gpioden
+520 constant gpiolock
+524 constant gpiocr
+528 constant gpioamsel
+52c constant gpiopctl
+530 constant gpioadcctl
+534 constant gpiodmactl
 
-40004000 constant GPIOAAPBBASE
-40058000 constant GPIOAAHBBASE
-40005000 constant GPIOBAPBBASE
-40059000 constant GPIOBAHBBASE
-40006000 constant GPIOCAPBBASE
-4005A000 constant GPIOCAHBBASE
-40007000 constant GPIODAPBBASE
-4005B000 constant GPIODAHBBASE
-40024000 constant GPIOEAPBBASE
-4005C000 constant GPIOEAHBBASE
-40025000 constant GPIOFAPBBASE
-4005D000 constant GPIOFAHBBASE
-
-\ PD0:TCK PD1:TMS PD2:TDI PD3:TDO
+40004000 constant gpioaapbbase
+40058000 constant gpioaahbbase
+40005000 constant gpiobapbbase
+40059000 constant gpiobahbbase
+40006000 constant gpiocapbbase
+4005a000 constant gpiocahbbase
+40007000 constant gpiodapbbase
+4005b000 constant gpiodahbbase
+40024000 constant gpioeapbbase
+4005c000 constant gpioeahbbase
+40025000 constant gpiofapbbase
+4005d000 constant gpiofahbbase
 
 : jtaginit
 	7 GPIODIR GPIODAPBBASE + !
