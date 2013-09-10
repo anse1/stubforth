@@ -268,9 +268,6 @@ define uint
   set *$usart2_cr2 |= (1<<6)
 end
 
-#target extended :4242
-#load
-
 define init
   uinit
   set $sp=0x10010000
@@ -285,3 +282,10 @@ end
 define xt
   p *((word *)(((void *)$arg0)-12))
 end
+
+#target extended :4242
+#load
+
+tar ext /dev/ttyACM0
+mon swdp_scan
+att 1
