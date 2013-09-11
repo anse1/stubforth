@@ -67,9 +67,9 @@ BINFMT = arm
 ELFFMT = elf32-littlearm
 
 builtin.4th: user.4th cortexm.4th
-	echo ".(Loading $@...) lf" > $@
+	echo ".( Loading $@...) lf" > $@
 	cat $+ >> $@
-	echo ".(Ready.) lf" > $@
+	echo ".( Ready.) lf" >> $@
 	dd if=/dev/zero of=$@ bs=1 count=1 oflag=append conv=notrunc
 
 source.o : builtin.4th
