@@ -4,8 +4,8 @@
 _start:
 	movw r0, #:lower16:_bss_start
         movt r0, #:upper16:_bss_start
-	movw r1, #:lower16:_end
-        movt r1, #:upper16:_end
+	movw r1, #:lower16:_bss_end
+        movt r1, #:upper16:_bss_end
 
 	movw r2, #0
 1:
