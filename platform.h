@@ -157,7 +157,7 @@ __attribute__((section(".vectors")))
 static void initio()
 {
   *RCC_CR |= 1 <<16; /* HSE enable */
-  while (!*RCC_CR & (1<<17) /* HSE ready */)
+while (!((*RCC_CR) & (1<<17)) /* HSE ready */)
     ;
   ring.in = ring.out;
   *VTOR=vectors;
