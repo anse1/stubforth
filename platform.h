@@ -207,27 +207,12 @@ static void initio()
  *GPIOA_APB_DEN = 0x3;
 
 
-*UARTDR = 0x0;
-*UARTRSR = 0x0;
-*UARTFR = 0x90;
-*UARTILPR = 0x0;
 *UARTIBRD = 0x15;
 *UARTFBRD = 0x2d;
 *UARTLCRH = 0x70;
 *UARTCTL = 0x301;
-*UARTIFLS = 0x0;
 *UARTIM = 0x50;
 *UARTRIS = 0xf;
-*UARTMIS = 0x0;
-*UARTICR = 0x0;
-*UARTDMACTL = 0x0;
-*UARTLCTL = 0x0;
-*UARTLSS = 0x0;
-*UARTLTIM = 0x0;
-*UART9BITADDR = 0x0;
-*UART9BITAMASK = 0xff;
-*UARTPP = 0x3;
-*UARTCC = 0x0;
 
   /* interrupt on break and data ready */
   *UARTIM = (1<<4) | (1<<9);
