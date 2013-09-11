@@ -2,8 +2,6 @@ hex
 
 .( Loading launchpad.4th...) lf
 
-: unused [ hex ] 20008000 here - ;
-
 000 constant tmcfg
 004 constant tmtamr
 008 constant tmtbmr
