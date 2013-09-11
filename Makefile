@@ -6,7 +6,7 @@ CFLAGS =    -O2 -g -Wall -mcpu=cortex-m4 -mthumb
 SYNC = -s
 LIBGCC = $(shell $(CC) -print-libgcc-file-name)
 
-LDFLAGS= -Wl,-Tcortexm.ld stm32f4.ld -nostdlib $(LIBGCC)
+LDFLAGS= -Wl,-Tcortexm.ld -nostdlib $(LIBGCC)
 
 all: stubforth.elf
 

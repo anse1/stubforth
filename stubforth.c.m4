@@ -5,7 +5,6 @@ changecom(/*,*/)
 
 cell return_stack[1000];
 cell param_stack[1000];
-__attribute__((section(".ccm")))
 cell dictionary_stack[1000];
 
 struct vmstate vmstate;
