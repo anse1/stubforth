@@ -42,6 +42,7 @@ check: stubforth.elf
 	expect test.tcl $(TTY)
 
 clean:
+	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg *.elf
