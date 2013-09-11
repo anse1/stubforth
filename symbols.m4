@@ -58,11 +58,11 @@ mmio4(E000EF00, STIR, Software Triggered Interrupt Register, , 00000000)
 dnl NVIC
 
 mmio4(E000E004, ICTR, Controller Type Register)
-mmio4(E000E100, NVIC_ISER0, Interrupt Set-Enable Registers)
-mmio4(E000E180, NVIC_ICER0, Interrupt Clear-Enable Registers)
-mmio4(E000E200, NVIC_ISPR0, Interrupt Set-Pending Registers)
-mmio4(E000E280, NVIC_ICPR0, Interrupt Clear-Pending Registers)
-mmio4(E000E300, NVIC_IABR0, Interrupt Active Bit Register)
-mmio4(E000E400, NVIC_IPR0, Interrupt Priority Register)
+mmio4(E000E100, NVIC_ISER, Interrupt Set-Enable Registers)
+mmio4(E000E180, NVIC_ICER, Interrupt Clear-Enable Registers)
+mmio4(E000E200, NVIC_ISPR, Interrupt Set-Pending Registers)
+mmio4(E000E280, NVIC_ICPR, Interrupt Clear-Pending Registers)
+mmio4(E000E300, NVIC_IABR, Interrupt Active Bit Register)
+mmio4(E000E400, NVIC_IPR, Interrupt Priority Register)
 
 dnl Silicon implementor symbols follow
