@@ -162,12 +162,80 @@ static void initio()
   ring.in = ring.out;
   *VTOR=vectors;
 
+  *RCC=0x24e0540;
+  *GPIOHBCTL=0x7e00;
+  *RCC2=0x2404000; /* not used */
+  *MOSCCTL=0x0;
+  *DSLPCLKCFG=0x7800000;
+  *PLLFREQ0=0x32;
+  *PLLFREQ0=0x1;
+  *RCGCTIMER=0x3;
+  *RCGCGPIO=0x21;
+  *RCGCHIB=0x1;
+  *RCGCUART=0x1;
+  *SCGCHIB=0x1;
+  *DCGCHIB=0x1;
+  *PRTIMER=0x3;
+  *PRGPIO=0x21;
+  *PRHIB=0x1;
+  *PRUART=0x1;
+
+
+/* 14.4 Initialization and Configuration */
+/*      To enable and initialize the UART, the following steps are necessary: */
+/*      1. Enable the UART module using the RCGCUART register (see page 314). */
+
+  *RCGCUART=0x1;
+
+/*      2. Enable the clock to the appropriate GPIO module via the RCGCGPIO register (see page 310). */
+/*          To find out which GPIO port to enable, refer to Table 21-5 on page 1134. */
+  *RCGCGPIO=0x21;
+
+/*      3. Set the GPIO AFSEL bits for the appropriate pins (see page 624). To determine which GPIOs to */
+
+*GPIOA_APB_AFSEL = 3;
+
+/*          configure, see Table 21-4 on page 1130. */
+/*      4. Configure the GPIO current level and/or slew rate as specified for the mode selected (see */
+/*          page 626 and page 634). */
+
+/* 5. Configure the PMCn fields in the GPIOPCTL register to assign the UART signals to the appropriate */
+/*    pins (see page 641 and Table 21-5 on page 1134). */
+
+ *GPIOA_APB_PCTL = 0x222211;
+
+ *GPIOA_APB_DEN = 0x3;
+
+
+*UARTDR = 0x0;
+*UARTRSR = 0x0;
+*UARTFR = 0x90;
+*UARTILPR = 0x0;
+*UARTIBRD = 0x15;
+*UARTFBRD = 0x2d;
+*UARTLCRH = 0x70;
+*UARTCTL = 0x301;
+*UARTIFLS = 0x0;
+*UARTIM = 0x50;
+*UARTRIS = 0xf;
+*UARTMIS = 0x0;
+*UARTICR = 0x0;
+*UARTDMACTL = 0x0;
+*UARTLCTL = 0x0;
+*UARTLSS = 0x0;
+*UARTLTIM = 0x0;
+*UART9BITADDR = 0x0;
+*UART9BITAMASK = 0xff;
+*UARTPP = 0x3;
+*UARTCC = 0x0;
 
   /* interrupt on break and data ready */
   *UARTIM = (1<<4) | (1<<9);
   *UARTLCRH &= ~(1<<4);
 
   *(volatile int *)0xE000E104 = 0x40;
+
+  *NVIC_ISER |= (1<<5);
 
   asm volatile ("cpsie i");
 }

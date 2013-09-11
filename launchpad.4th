@@ -1,5 +1,7 @@
 hex
 
+.( Loading launchpad.4th...) lf
+
 : unused [ hex ] 20008000 here - ;
 
 000 constant tmcfg
@@ -81,10 +83,6 @@ fc0 constant tmpp
 40025000 constant gpiofapbbase
 4005d000 constant gpiofahbbase
 
-: jtaginit
-	7 GPIODIR GPIODAPBBASE + !
-;
-
 : red 8 << tmtbmatchr timer0 + ! ;
 : green 8 << tmtbmatchr timer1 + ! ;
 : blue 8 << tmtamatchr timer1 + ! ;
@@ -96,7 +94,9 @@ fc0 constant tmpp
 ;
 
 decimal
+
 400000 syst_rvr !
+
 : ms 10 / >r tick @ begin wfi tick @ over - r@ > until r> 2drop ;
 : heartbeat begin 900 ms [ hex ] 300000 col [ decimal ] 100 ms [ hex ] 000000 col again ;
 
