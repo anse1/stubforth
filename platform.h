@@ -84,10 +84,13 @@ void uart_handler_1(struct exception_frame *frame)
 }
 
 extern void *_start;
+extern void *_stack_base;
 
-void *vectors[128] __attribute__((aligned(256))) = {
-  [0] = (void *)0x20000000,
-   [1] = &_start,
+void *vectors[128]
+__attribute__((section(".vectors")))
+ = {
+   [0] = (void *)&_stack_base,
+   [1] = 1 + (char *)&_start,
    [2] = default_handler,
    [3] = default_handler,
    [4] = default_handler,
