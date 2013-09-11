@@ -1,5 +1,5 @@
 MEMORY {
-       rom : ORIGIN = 0x0, LENGTH = 256k
+       flash : ORIGIN = 0x08000000, LENGTH = 256k
        ram : ORIGIN = 0x20000000, LENGTH = 32k
 }
 
@@ -12,10 +12,14 @@ MEMORY {
 
 SECTIONS
 {
-  .text : { *(.text) } >ram
-  .data : { *(.data) } >ram
-  .bss : { *(.bss) } > ram
+  .vectors : { *(.vectors) } >flash
+  .text : { *(.text) } >flash
+  .data : { *(.data) } >ram AT>flash
+  .bss : { *(.bss) } > ram 
   _bss_start = ADDR(.bss);
   _bss_end = ADDR(.bss) + SIZEOF(.bss);
+  _data_start = ADDR(.data);
+  _data_load_start = LOADADDR(.data);
+  _data_end = ADDR(.data) + SIZEOF(.data);
   _stack_base = ORIGIN(ram) + LENGTH(ram) - 4;
 }
