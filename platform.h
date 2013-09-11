@@ -1,6 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+#include "symbols.h"
 #include "stubforth.h"
 #include "cortexm.h"
 #include "lm4f120.h"

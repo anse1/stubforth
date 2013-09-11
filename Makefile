@@ -1,11 +1,12 @@
 TTY=/dev/ttyACM0
 
-CC = arm-none-eabi-gcc
+GCC = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 CFLAGS =    -O2 -g -Wall -mcpu=cortex-m4 -mthumb 
 SYNC = -s
-LIBGCC = $(shell $(CC) -print-libgcc-file-name)
-LDFLAGS= -Wl,-Tcortexm.ld lm4f120.ld -nostdlib $(LIBGCC)
+
+LIBGCC = $(shell $(GCC) -print-libgcc-file-name)
+LDFLAGS= -Wl,-Tcortexm.ld -nostdlib $(LIBGCC)
 
 all: stubforth.elf
 
@@ -16,19 +17,19 @@ config.h: .rev.h
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@
 
-stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
-	$(CC) $(CFLAGS) -o $@ -c $<
+stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
+	$(GCC) $(CFLAGS) -o $@ -c $<
 
-stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
-	$(CC) $(CFLAGS) -o $@ -S $<
+stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
+	$(GCC) $(CFLAGS) -o $@ -S $<
 
 start.o: start.S
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(GCC) $(CFLAGS) -c $< -o $@
 
 size: stubforth.elf.size
 
-stubforth.elf:  start.o stubforth.o  cortexm.ld
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
+stubforth.elf:  start.o stubforth.o source.o cortexm.ld
+	$(GCC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 %.size: % size.sh
 	. ./size.sh $<
@@ -42,12 +43,18 @@ check: stubforth.elf
 	expect test.tcl $(TTY)
 
 clean:
+	rm -f symbols.h symbols.4th symbols.gdb
 	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg *.elf
 	rm -f *.vcg
 	rm -f builtin.4th
+
+symbols.%: symto%.m4 symbols.m4
+	m4 $< > $@
+
+dev:	symbols.gdb TAGS
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
@@ -60,8 +67,9 @@ TAGS: .
 BINFMT = arm
 ELFFMT = elf32-littlearm
 
-builtin.4th: user.4th cortexm.4th launchpad.4th
-	for f in $+; do echo ".( Loading $$f...) lf"; cat $+ ; done > $@
+builtin.4th: user.4th symbols.4th cortexm.4th launchpad.4th
+	echo ".( Loading $@...) lf" > $@
+	cat $+ >> $@
 	echo ".( Ready.) lf" >> $@
 	dd if=/dev/zero of=$@ bs=1 count=1 oflag=append conv=notrunc
 
