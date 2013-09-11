@@ -66,7 +66,7 @@ TAGS: .
 BINFMT = arm
 ELFFMT = elf32-littlearm
 
-builtin.4th: user.4th cortexm.4th discoveryf4.4th
+builtin.4th: user.4th symbols.4th cortexm.4th discoveryf4.4th
 	cat $+ > $@
 	dd if=/dev/zero of=$@ bs=1 count=1 oflag=append conv=notrunc
 
