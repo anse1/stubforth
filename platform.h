@@ -66,10 +66,10 @@ void uart_handler(void)
 
 void uart_handler_1(struct exception_frame *frame)
 {
-  int status = *usart2_sr;
+  int status = *USART2_SR;
 
   if (status & (1<<5)) {
-    int data = *usart2_dr;
+    int data = *USART2_DR;
     if (data == 3) goto force_break;
     ring.buf[ring.in] = data;
     ring.in = (ring.in + 1) % sizeof(ring.buf);
@@ -77,7 +77,7 @@ void uart_handler_1(struct exception_frame *frame)
   if (status & (1<<8)) {
   force_break:
     my_puts(" <BREAK>\n");
-    *usart2_sr &= ~(1<<8);
+    *USART2_SR &= ~(1<<8);
     /* Patch stack frame to return to _cstart instead. */
     frame->ra = &_cstart;
     return;
@@ -156,29 +156,29 @@ __attribute__((section(".vectors")))
 
 static void initio()
 {
-  *rcc_cr |= 1 <<16; /* HSE enable */
-  while (!*rcc_cr & (1<<17) /* HSE ready */)
+  *RCC_CR |= 1 <<16; /* HSE enable */
+  while (!*RCC_CR & (1<<17) /* HSE ready */)
     ;
   ring.in = ring.out;
   *VTOR=vectors;
-  *rcc_ahb1enr |= 1<<0;
-  *rcc_apb1enr |= 1<<17;
-  *rcc_apb1lpenr |= 1<<17;
-  *usart2_cr1 |= 1<<13;
-  *usart2_cr1 |= 1<<3;
-  *usart2_cr1 |= 1<<2;
-  *gpioa_moder |= (2<<(2*2));
-  *gpioa_moder |= (2<<(2*3));
-  *gpioa_afrl |= 7 << 3*4 ;
-  *gpioa_afrl |= 7 << 2*4 ;
+  *RCC_AHB1ENR |= 1<<0;
+  *RCC_APB1ENR |= 1<<17;
+  *RCC_APB1LPENR |= 1<<17;
+  *USART2_CR1 |= 1<<13;
+  *USART2_CR1 |= 1<<3;
+  *USART2_CR1 |= 1<<2;
+  *GPIOA_MODER |= (2<<(2*2));
+  *GPIOA_MODER |= (2<<(2*3));
+  *GPIOA_AFRL |= 7 << 3*4 ;
+  *GPIOA_AFRL |= 7 << 2*4 ;
 
 /* # HSE=AHB1=AHB2: 8MHz */
-  *rcc_cfgr = 5;
+  *RCC_CFGR = 5;
 /* # 8MHz/16/4.3125 = 0.115942028986MHz */
-  *usart2_brr = 0x45;
+  *USART2_BRR = 0X45;
 
-  *usart2_cr1 |= (1<<5);
-  *usart2_cr2 |= (1<<6);
+  *USART2_CR1 |= (1<<5);
+  *USART2_CR2 |= (1<<6);
   *(volatile int *)0xE000E104 = 0x40;
 
   asm volatile ("cpsie i");
@@ -188,9 +188,9 @@ static void putchar(int c)
 {
   if (c=='\n')
     putchar('\r');
-  while (! (*usart2_sr & 1<<7))
+  while (! (*USART2_SR & 1<<7))
     ;
-  *usart2_dr = c;
+  *USART2_DR = c;
 }
 
 static int getchar()
