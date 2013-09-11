@@ -34,17 +34,16 @@ check: stubforth
 	expect test.tcl
 
 clean:
-	rm -f symbols.h symbols.4th
+	rm -f symbols.h symbols.4th symbols.gdb
 	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
 
-symbols.h: symtoh.m4 symbols.m4
+symbols.%: symto%.m4 symbols.m4
 	m4 $< > $@
 
-symbols.4th: symto4th.m4 symbols.m4
-	m4 $< > $@
+dev:	symbols.gdb TAGS
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \
