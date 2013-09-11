@@ -4,7 +4,6 @@
 #include "symbols.h"
 #include "stubforth.h"
 #include "cortexm.h"
-#include "lm4f120.h"
 
 /* The platform needs to provide my_getchar() and putchar() */
 
