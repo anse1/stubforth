@@ -5,7 +5,7 @@ changecom(/*,*/)
 
 cell return_stack[1000];
 cell param_stack[1000];
-cell dictionary_stack[1000];
+cell dictionary_stack[4000];
 
 struct vmstate vmstate;
 
@@ -296,6 +296,9 @@ primary(over)
 
 primary(s0)
   (sp++)->a = sp_base;
+
+primary(d0)
+  (sp++)->a = dp_base;
 
 primary(qstack, ?stack)
   if (sp < sp_base)
