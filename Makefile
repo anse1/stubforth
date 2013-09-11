@@ -27,7 +27,7 @@ start.o: start.S
 
 size: stubforth.elf.size
 
-stubforth.elf:  start.o stubforth.o source.o
+stubforth.elf:  start.o stubforth.o source.o cortexm.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 %.size: % size.sh
@@ -42,6 +42,7 @@ check: stubforth.elf
 	expect test.tcl $(TTY)
 
 clean:
+	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg *.elf

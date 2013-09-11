@@ -1,3 +1,7 @@
+MEMORY {
+       flash : ORIGIN = 0x08000000, LENGTH = 256k
+       ram : ORIGIN = 0x20000000, LENGTH = 32k
+}
 
 /* 0x00000000 flash */
 /* 0x10000000 ccm data ram (stm32f4), stellarisware rom (lm4f120) */
@@ -8,11 +12,14 @@
 
 SECTIONS
 {
-  _stack_base = 0x10010000;
-  . = 0x20000000;
-  .text : { *(.text) }
-  .data : { *(.data) }
-  _bss_start = . ;
-  .bss : { *(.bss) }
-  _end = .;
+  .vectors : { *(.vectors) } >flash
+  .text : { *(.text) } >flash
+  .data : { *(.data) } >ram AT>flash
+  .bss : { *(.bss) } > ram 
+  _bss_start = ADDR(.bss);
+  _bss_end = ADDR(.bss) + SIZEOF(.bss);
+  _data_start = ADDR(.data);
+  _data_load_start = LOADADDR(.data);
+  _data_end = ADDR(.data) + SIZEOF(.data);
+  _stack_base = ORIGIN(ram) + LENGTH(ram) - 4;
 }
