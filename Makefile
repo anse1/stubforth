@@ -12,10 +12,10 @@ config.h: .rev.h
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@
 
-stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h
+stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
 
-stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
+stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
 stubforth:  stubforth.o
@@ -34,10 +34,17 @@ check: stubforth
 	expect test.tcl
 
 clean:
+	rm -f symbols.h symbols.4th
 	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
+
+symbols.h: symtoh.m4 symbols.m4
+	m4 $< > $@
+
+symbols.4th: symto4th.m4 symbols.m4
+	m4 $< > $@
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \

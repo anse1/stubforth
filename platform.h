@@ -1,6 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+#include "symbols.h"
 #include "stubforth.h"
 
 /* The platform needs to provide my_getchar() and putchar() */
