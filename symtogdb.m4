@@ -7,4 +7,3 @@ define(mmio4, `set $`'downcase($2) = ((int *)0x$1 ')
 define(const, `set $`'downcase($2) = 0x$1 ')
 
 include(symbols.m4)
-
