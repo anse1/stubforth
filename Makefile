@@ -27,7 +27,7 @@ start.o: start.S
 
 size: stubforth.elf.size
 
-stubforth.elf:  start.o stubforth.o source.o cortexm.ld
+stubforth.elf:  start.o stubforth.o  cortexm.ld
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $+
 
 %.size: % size.sh

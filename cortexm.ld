@@ -12,9 +12,9 @@ MEMORY {
 
 SECTIONS
 {
-  .vectors : { *(.vectors) } >flash
-  .text : { *(.text) } >flash
-  .data : { *(.data) } >ram AT>flash
+  .vectors : { *(.vectors) } >ram
+  .text : { *(.text) } >ram
+  .data : { *(.data) } >ram AT>ram
   .bss : { *(.bss) } > ram 
   _bss_start = ADDR(.bss);
   _bss_end = ADDR(.bss) + SIZEOF(.bss);

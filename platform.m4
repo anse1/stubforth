@@ -4,9 +4,9 @@
    redefine it here to initialize hardware, extend the dictionary from
    ROM, etc. */
 
-extern char _binary_builtin_4th_start[];
-constant(builtin,, .s=_binary_builtin_4th_start)
-secondary(boot2,boot,, BUILTIN, EVALUATE, HI, QUIT)
+dnl extern char _binary_builtin_4th_start[];
+dnl constant(builtin,, .s=_binary_builtin_4th_start)
+dnl secondary(boot2,boot,, BUILTIN, EVALUATE, HI, QUIT)
 
 primary(xpsr)
 {
