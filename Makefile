@@ -60,6 +60,8 @@ check: stubforth
 	expect test.tcl
 
 clean:
+	rm -f symbols.h symbols.4th symbols.gdb
+	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
@@ -68,6 +70,11 @@ clean:
 	rm -f builtin.4th
 	rm -f stubforth.upx test.upx upx *.padded *.flash
 	rm -f *.bin symbols.h symbols.4th
+
+symbols.%: symto%.m4 symbols.m4
+	m4 $< > $@
+
+dev:	symbols.gdb TAGS
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \

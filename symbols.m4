@@ -12,6 +12,7 @@ dnl         |   |       ^--valid identifier for asm, C and forth
 dnl         |   ^--hexadecimal number
 dnl         ^-- size in Bytes
 dnl
+dnl other constants
 dnl     const(address, name, comment)
 dnl
 mmio2(ffffff80, FRQCR, Frequency control, 112)
