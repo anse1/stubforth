@@ -1,7 +1,6 @@
 changecom(/*,*/)
 
 define(`downcase', `translit(`$*', `A-Z', `a-z')')
-hex
 define(mmio1, `set $`'downcase($2) = ((char *)0x$1 ')
 define(mmio2, `set $`'downcase($2) = ((short *)0x$1 ')
 define(mmio4, `set $`'downcase($2) = ((int *)0x$1 ')
