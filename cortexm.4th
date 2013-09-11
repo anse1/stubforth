@@ -9,6 +9,7 @@
 \                   | ^--pll bypass
 \                   ^--pll pwrdn
 
+.( Loading cortexm.4th...) lf
 hex
 400fe000 constant rcc_base
 7c rcc_base + constant moscctl
