@@ -66,7 +66,7 @@ TAGS: .
 BINFMT = arm
 ELFFMT = elf32-littlearm
 
-builtin.4th: user.4th cortexm.4th
+builtin.4th: user.4th symbols.4th cortexm.4th
 	echo ".( Loading $@...) lf" > $@
 	cat $+ >> $@
 	echo ".( Ready.) lf" >> $@
