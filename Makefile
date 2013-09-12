@@ -70,6 +70,7 @@ clean:
 	rm -f builtin.4th
 	rm -f stubforth.upx test.upx upx *.padded *.flash
 	rm -f *.bin symbols.h symbols.4th
+	rm -f *.elf
 
 symbols.%: symto%.m4 symbols.m4
 	m4 $< > $@
