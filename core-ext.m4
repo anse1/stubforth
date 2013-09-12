@@ -119,6 +119,6 @@ secondary(marker,,, l(
 static void *pad;
 primary(pad)
 if (!pad)
-   pad = __builtin_alloca(1024);
+   pad = __builtin_alloca(PAD_SIZE);
 sp[0].a = pad;
 sp++;
