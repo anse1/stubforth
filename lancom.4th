@@ -4,15 +4,15 @@ marker lancom
 
 hex
 
-: sw1 SWITCHES c@ 40 and 0= ;
+: sw1 switches c@ 40 and 0= ;
 
 \ .( activating cache...)
 \ 1 CCR !
 \ .( ok) lf
 
 
-: key? SCSSR c@ RDRF and ;
-: emit? SCSSR c@ TDRE and ;
+: key? scssr c@ rdrf and ;
+: emit? scssr c@ tdre and ;
 
 \ try to figure out CPLD wiring
 : peek ( increment address )
@@ -29,7 +29,6 @@ hex
 	begin dup @ drop over + key? until
 ;
 
-: bank SMSC e + c! ;
-: sd SMSC 10 dump ;
-
+: bank smsc e + c! ;
+: sd smsc 10 dump ;
 
