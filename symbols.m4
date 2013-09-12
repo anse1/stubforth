@@ -12,6 +12,9 @@ dnl         |   |       ^--valid identifier for asm, C and forth
 dnl         |   ^--hexadecimal number
 dnl         ^-- size in Bytes
 dnl
+dnl Used when perpherals exist multiple times
+dnl     indirect(offset, name, comment)
+dnl
 dnl other constants
 dnl     const(address, name, comment)
 dnl
