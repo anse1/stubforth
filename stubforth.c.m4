@@ -474,6 +474,7 @@ primary(plusstore, +!)
  *(vmint *)sp[-1].a += sp[-2].i;
  sp -= 2;
 
+dnl ( src dst u -- )
 primary(move)
 {
  char *s = sp[-3].s;
