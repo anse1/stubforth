@@ -175,7 +175,7 @@ int main()
   while(1) {
     redirect = 0;
     vmstate.compiling = 0;
-    vmstate.base = 10;
+    vmstate.base = 16;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
