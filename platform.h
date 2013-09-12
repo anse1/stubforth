@@ -162,13 +162,47 @@ static void initio()
   ring.in = ring.out;
   *VTOR=vectors;
 
-  *RCC=0x24e0540;
+/* The PLL is configured using direct register writes to the RCC/RCC2 register. If the RCC2 register */
+/* is being used, the USERCC2 bit must be set and the appropriate RCC2 bit/field is used. The steps */
+/* required to successfully change the PLL-based system clock are: */
+/* 1. Bypass the PLL and system clock divider by setting the BYPASS bit and clearing the USESYS */
+/*     bit in the RCC register, thereby configuring the microcontroller to run off a "raw" clock source */
+/*     and allowing for the new PLL configuration to be validated before switching the system clock */
+/*     to the PLL. */
+
+  *RCC |= 1<<11;
+  *RCC &= ~(1<<22);
+
+
+/* 2. Select the crystal value (XTAL) and oscillator source (OSCSRC), and clear the PWRDN bit in */
+/*     RCC/RCC2. Setting the XTAL field automatically pulls valid PLL configuration data for the */
+/*     appropriate crystal, and clearing the PWRDN bit powers and enables the PLL and its output. */
+  *RCC &= ~(0x1f<<6);
+  *RCC |= 0x15<<6;
+
+/*   *PLLFREQ0=0x32; */
+/*   *PLLFREQ1=0x1; */
+
+  *RCC &= ~(1<<13);
+
+/* 3. Select the desired system divider (SYSDIV) in RCC/RCC2 and set the USESYS bit in RCC. The */
+/*     SYSDIV field determines the system frequency for the microcontroller. */
+  *RCC &=~(0xf<<23);
+  *RCC |=0x4<<23;
+  *RCC |= 1<<22;
+
+/* 4. Wait for the PLL to lock by polling the PLLLRIS bit in the Raw Interrupt Status (RIS) register. */
+  while(! (*RIS & (1<<6)))
+    ;
+/* 5. Enable use of the PLL by clearing the BYPASS bit in RCC/RCC2. */
+  *RCC &= ~(1<<11);
+
+
+/*   *RCC=0x24e0540; */
   *GPIOHBCTL=0x7e00;
-  *RCC2=0x2404000; /* not used */
+/*   *RCC2=0x2404000; /\* not used *\/ */
   *MOSCCTL=0x0;
   *DSLPCLKCFG=0x7800000;
-  *PLLFREQ0=0x32;
-  *PLLFREQ0=0x1;
   *RCGCTIMER=0x3;
   *RCGCGPIO=0x21;
   *RCGCHIB=0x1;
