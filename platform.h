@@ -68,17 +68,17 @@ void uart_handler_1(struct exception_frame *frame)
 {
   int status;
 
-  while (! (*UARTFR & (1<<4) /* RXFE */ )) {
-    int data = *UARTDR;
+  while (! (*UART0(UARTFR) & (1<<4) /* RXFE */ )) {
+    int data = *UART0(UARTDR);
     if (data == 3) goto force_break;
     ring.buf[ring.in] = data;
     ring.in = (ring.in + 1) % sizeof(ring.buf);
   }
 
-  status = *UARTRSR;
+  status = *UART0(UARTRSR);
   if (status & (1<<2) /* BE */ ) {
   force_break:
-    *UARTRSR = 0;
+    *UART0(UARTRSR) = 0;
     my_puts(" <BREAK>\n");
     /* Patch ReturnAddress in exception frame to return to _cstart
        instead. */
@@ -193,7 +193,7 @@ static void initio()
 
 /*      3. Set the GPIO AFSEL bits for the appropriate pins (see page 624). To determine which GPIOs to */
 
-*GPIOA_APB_AFSEL = 3;
+  *GPIOA_APB(GPIOAFSEL) = 3;
 
 /*          configure, see Table 21-4 on page 1130. */
 /*      4. Configure the GPIO current level and/or slew rate as specified for the mode selected (see */
@@ -202,21 +202,21 @@ static void initio()
 /* 5. Configure the PMCn fields in the GPIOPCTL register to assign the UART signals to the appropriate */
 /*    pins (see page 641 and Table 21-5 on page 1134). */
 
- *GPIOA_APB_PCTL = 0x222211;
+ *GPIOA_APB(GPIOPCTL) = 0x222211;
 
- *GPIOA_APB_DEN = 0x3;
+ *GPIOA_APB(GPIODEN) = 0x3;
 
 
-*UARTIBRD = 0x15;
-*UARTFBRD = 0x2d;
-*UARTLCRH = 0x70;
-*UARTCTL = 0x301;
-*UARTIM = 0x50;
-*UARTRIS = 0xf;
+ *UART0(UARTIBRD) = 0x15;
+ *UART0(UARTFBRD) = 0x2d;
+ *UART0(UARTLCRH) = 0x70;
+ *UART0(UARTCTL) = 0x301;
+ *UART0(UARTIM) = 0x50;
+ *UART0(UARTRIS) = 0xf;
 
   /* interrupt on break and data ready */
-  *UARTIM = (1<<4) | (1<<9);
-  *UARTLCRH &= ~(1<<4);
+ *UART0(UARTIM) = (1<<4) | (1<<9);
+ *UART0(UARTLCRH) &= ~(1<<4);
 
   *(volatile int *)0xE000E104 = 0x40;
 
@@ -233,10 +233,10 @@ static void putchar(int c)
     putchar('\r');
 
   do {
-    status = *UARTFR;
+    status = *UART0(UARTFR);
   } while (! (status & (1<<7))) /* TXFE */;
 
-  *UARTDR = c;
+  *UART0(UARTDR) = c;
 }
 
 
