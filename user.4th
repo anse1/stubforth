@@ -30,7 +30,8 @@ repeat drop ;
 begin dup while
 dumpaddr dump8
 dup 0= if exit then
-bl dump8 lf repeat lf ;
+bl dump8 lf repeat lf
+2drop ;
 
 : dumpraw ( addr n -- )
 over + swap
