@@ -11,7 +11,6 @@ hex
 \ .( ok) lf
 
 
-: key? scssr c@ rdrf and ;
 : emit? scssr c@ tdre and ;
 
 \ try to figure out CPLD wiring

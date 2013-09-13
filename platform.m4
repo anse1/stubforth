@@ -26,9 +26,6 @@ primary(led_chan2)
   sp--;
   led_chan2(sp[0].i);
 
-primary(warmstart)
-  warmstart();
-
 primary(vbrload, vbr@)
 {
     void *vbr;
@@ -58,3 +55,7 @@ primary(wstore, w!)
   *((short *)sp[-1].a) = sp[-1].i;
 
 secondary(wq, w?,, WLOAD, DOT)
+
+primary(keyq, key?)
+  sp[0].i = (ring.in != ring.out);
+  sp++;

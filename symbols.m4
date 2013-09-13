@@ -106,3 +106,7 @@ mmio4(fffffeb0, TCNT2, Timer counter 2           )
 mmio4(fffffeb8, TCPR2, Input capture register 2  )
 
 const(10000000, SMSC, SMSC IOBASE)
+
+mmio2(fffffee0, ICR, Interrupt control register)
+mmio2(fffffee2, IPRA, Interrupt priority level setting register A)
+mmio2(fffffee4, IPRB, Interrupt priority level setting register B)
