@@ -3,12 +3,11 @@
 
 #include "symbols.h"
 #include "stubforth.h"
-#include "symbols.h"
 
 __attribute__((interrupt_handler))
 __attribute__((section(".interrupt_handler")))
 void interrupt_handler (void) {
-
+  (void) INTEVT; /* bits 11-0 */
   my_puts("interrupt_handler invoked\n\r");
   while(1)
     ;
@@ -18,6 +17,7 @@ __attribute__((interrupt_handler))
 __attribute__((section(".exception_handler")))
 void exception_handler (void) {
 
+  (void) EXPEVT; /* bits 11-0 */
   my_puts("exception_handler invoked\n\r");
   while(1)
     ;
