@@ -6,10 +6,21 @@
 #include "symbols.h"
 
 __attribute__((interrupt_handler))
-void default_handler (void) {
+__attribute__((section(".interrupt_handler")))
+void interrupt_handler (void) {
 
-  my_puts("default_handler invoked\n\r");
-  return;
+  my_puts("interrupt_handler invoked\n\r");
+  while(1)
+    ;
+}
+
+__attribute__((interrupt_handler))
+__attribute__((section(".exception_handler")))
+void exception_handler (void) {
+
+  my_puts("exception_handler invoked\n\r");
+  while(1)
+    ;
 }
 
 static int lowest_bit_set (int value) {
@@ -55,8 +66,12 @@ void led_chan2(int new) {
 /* flags.break_condition can be set in an ISR to interrupt the
    interpreter. */
 
+extern void vector_base;
+
 static void initio()
 {
+
+  set_vbr(&vector_base);
 
   led_pwr(0);
   led_dsl(0);

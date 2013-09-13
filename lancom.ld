@@ -9,14 +9,22 @@ SECTIONS
          .text :
            {
              *(.text)
-           } > ROM
-         .rodata :
-           {
              *(.rodata)
              *(.rodata.str1.4)
-             rodata_end = .;
-	     _etext = . ;
            } > ROM
+
+	  .vectors : 
+	    {	  
+	     _vector_base = .;
+	     . = _vector_base + 0x100;
+	     *(.exception_handler)
+	     . = _vector_base + 0x600;
+	     *(.interrupt_handler)
+	    _etext = . ;
+
+	     } > ROM
+
+	   _vector_base = ADDR(.vectors);
          .data : AT(_etext)
            {
              *(.data)
