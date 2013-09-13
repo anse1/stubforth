@@ -46,7 +46,7 @@ void led_chan2(int new) {
 
 #define RING_NEXT(x) x = (x + 1) % RING_SIZE
 volatile struct {
-  unsigned char buf[RING_SIZE];
+  unsigned int buf[RING_SIZE];
   int in;
   int out;
 } ring;

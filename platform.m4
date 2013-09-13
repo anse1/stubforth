@@ -59,3 +59,6 @@ secondary(wq, w?,, WLOAD, DOT)
 primary(keyq, key?)
   sp[0].i = (ring.in != ring.out);
   sp++;
+
+primary(sleep)
+  asm("sleep");
