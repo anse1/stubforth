@@ -4,23 +4,44 @@
 #include "symbols.h"
 #include "stubforth.h"
 
+static void ehex(int);
+
+void warmstart(void) {
+      led_dsl(2);
+      led_chan1(2);
+      led_chan2(2);
+      my_puts("warmstart...\n");
+      asm (" mov.l .restart, r1");
+/*       asm (" jmp @r1"); */
+      asm (" ldc r1, spc");
+      asm (" rte");
+      asm (" nop");
+      asm (" .align 2");
+      asm (".restart:");
+      asm (" .long _restart");
+}
+
+
 __attribute__((interrupt_handler))
 __attribute__((section(".interrupt_handler")))
 void interrupt_handler (void) {
   (void) INTEVT; /* bits 11-0 */
-  my_puts("interrupt_handler invoked\n\r");
-  while(1)
-    ;
+  my_puts("x_x interrupt_handler x_x \n\r");
+  my_puts("INTEVT:");
+  ehex(*INTEVT);
+  my_puts("\n\r");
+  warmstart();
 }
 
 __attribute__((interrupt_handler))
 __attribute__((section(".exception_handler")))
 void exception_handler (void) {
 
-  (void) EXPEVT; /* bits 11-0 */
-  my_puts("exception_handler invoked\n\r");
-  while(1)
-    ;
+  my_puts("x_x exception_handler x_x\n\r");
+  my_puts("EXPEVT:");
+  ehex(*EXPEVT);
+  my_puts("\n\r");
+  warmstart();
 }
 
 static int lowest_bit_set (int value) {
@@ -145,17 +166,12 @@ int putchar(int c) {
   return c;
 }
 
-void warmstart(void) {
-      led_dsl(2);
-      led_chan1(2);
-      led_chan2(2);
-      my_puts("warmstart...\n");
-      asm (" mov.l .restart, r1");
-      asm (" jmp @r1");
-      asm (" nop");
-      asm (" .align 2");
-      asm (".restart:");
-      asm (" .long _restart");
+static void ehex(int i) {
+  const char *hexchars="0123456789abcdefghijklmnopqrstuvwxyz";
+  if(i) {
+    ehex(i>>4);
+    putchar(hexchars[0xf & i]);
+  }
 }
 
 int getchar(void) {
