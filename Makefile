@@ -53,6 +53,11 @@ clean:
 	rm -f *.o *.s *.elf *.srec *.brec *.bin
 	rm -f flashload chainload.? bblock.?.fprog block.?.fprog
 
+
+slow:
+	echo FFFFF902020026 > $(TTY) # ubaud
+	stty -F $(TTY) 38400
+
 init:
 #	stty -F $(TTY) -isig -icanon -echo -opost -onlcr -icrnl -imaxbel
 	stty -F $(TTY) 9600
@@ -85,7 +90,7 @@ init:
 	cat $< > $(TTY)
 
 %.prog : %.4th
-	./infuse.tcl $(TTY) < $<
+	LC_ALL=C ./infuse.tcl $(TTY) < $<
 
 %.size : %.elf %.bin
 	m68k-elf-nm -t d --size-sort --print-size $<
@@ -104,6 +109,9 @@ flash.elf : flash.o stubforth.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
 
 dummy.elf : flash.o dummy.o $(LIBGCC)
+	$(LD) -T vivo.ld $+ -o $@
+
+ram.elf : start.o dummy.o $(LIBGCC)
 	$(LD) -T vivo.ld $+ -o $@
 
 flashload: flashload.c
@@ -185,3 +193,10 @@ TAGS: .
 	--regex-forth='/(primary|secondary|constant|master)\(([a-z0-9_]+)/\2/' \
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
+
+ibuf.o: ibuf.S
+	m68k-elf-as -c $< -o $@
+
+ibuf.elf : ibuf.o Makefile
+	m68k-elf-ld -Ttext=ffffffaa $<  -o $@ 
+
