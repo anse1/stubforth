@@ -37,6 +37,21 @@ primary(vbrload, vbr@)
     sp++;
 }
 
+primary(srload, sr@)
+{
+    void *sr;
+    asm("stc sr, %0" : "=r"(sr): /* no inputs */);
+    sp[0].a=sr;
+    sp++;
+}
+
+primary(srstore, sr!)
+{
+    void *sr = sp[-1].a;
+    asm("ldc %0, sr" : /* no outputs */ : "r"(sr));
+    sp--;
+}
+
 primary(wload, w@)
   sp[-1].i = *((short *)sp[-1].a);
 primary(wstore, w!)
