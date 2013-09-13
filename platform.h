@@ -51,18 +51,18 @@ volatile struct {
   int out;
 } ring;
 
+__attribute__((noreturn))
 void warmstart(int silent) {
       led_dsl(2);
       led_chan1(2);
       led_chan2(2);
-      ring.in = ring.out;
 
       if (!silent) {
 	my_puts("SPC: ");
 	int spc;
 	asm (" stc spc, %0" : "=r"(spc));
 	ehex(spc);
-	my_puts("\n\rwarmstart...\n\r");
+	my_puts("\nwarmstart...\n");
       }
 
       asm (" mov.l .restart, r1");
@@ -156,7 +156,7 @@ const char *exceptstr(int code) {
   }
 }
 
-int sci_interrupt(void);
+void sci_interrupt(void);
 __attribute__((interrupt_handler))
 __attribute__((section(".interrupt_handler")))
 void interrupt_handler (void) {
@@ -201,6 +201,13 @@ void set_vbr(void *addr) {
    interpreter. */
 
 extern void vector_base;
+
+static void sei() {
+  int status;
+  asm (" stc sr, %0" : "=r"(status));
+  status |= 0x10000000;
+  asm(" ldc %0, sr" : /* no outputs */ : "r"(status));
+}
 
 static void initio()
 {
@@ -254,6 +261,8 @@ static void initio()
   *SCSCR |= (1<<6); /* RIE */
 
   *IPRB = 0xf << 4; /* unmask by setting priority */
+
+  ring.in = ring.out = 0;
 }
 
 int putchar(int c) {
@@ -305,7 +314,7 @@ int getchar(void) {
   return data;
 }
 
-int sci_interrupt(void) {
+void sci_interrupt(void) {
   char status;
   int data;
   status = *SCSSR;
