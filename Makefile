@@ -20,10 +20,10 @@ config.h: .rev.h
 	echo -n $$(git describe --always --dirty) >> $@
 	echo -n '"' >> $@
 
-stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h platform.h
+stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
 
-stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h platform.h
+stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
 stubforth:  stubforth.o
@@ -45,6 +45,8 @@ check: stubforth.elf
 	./test.tcl $(TTY)
 
 clean:
+	rm -f symbols.h symbols.4th symbols.gdb
+	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
 	rm -f *.vcg
@@ -170,6 +172,11 @@ block.%.fprog: block.%.bin flashload
 	./flashload < $(TTY) > $(TTY) $<
 	sendbreak > $(TTY)
 	touch $@
+
+symbols.%: symto%.m4 symbols.m4
+	m4 $< > $@
+
+dev:	symbols.gdb TAGS
 
 TAGS: .
 	ctags-exuberant -e  --langdef=forth --langmap=forth:.4th.m4 \

@@ -30,7 +30,8 @@ repeat drop ;
 begin dup while
 dumpaddr dump8
 dup 0= if exit then
-bl dump8 lf repeat lf ;
+bl dump8 lf repeat lf
+2drop ;
 
 : dumpraw ( addr n -- )
 over + swap
@@ -63,7 +64,6 @@ constant &&dovar
 : xtp context @ ['] xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: words context @ begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
@@ -88,8 +88,6 @@ or 0= and ;
     endcase
   then
 ;
-
-: [char] key postpone literal ; immediate
 
 : disas
   begin dup . dup @ .pretty lf eotp 0= while
@@ -121,54 +119,6 @@ repeat drop ;
   endcase
   2drop
 ; 
-
-: skip[if] ( -- )
- begin
-   word
-   dup ," [if]" compare 0= if
-     drop" recurse 1
-   else
-     dup ," [then]" compare swap drop"
-   then
-   while
- repeat
-;
-
-\ read and discard till [then] or [else] is read, skipif on [if]
-\ leaves t/f on stack when then/else was read
-: skip[block] ( -- t/f )
- begin
-   word
-   dup ," [if]" compare 0= if
-     drop" skip[if]
-   else
-     dup ," [then]" compare 0= if drop" 1 exit then
-     dup ," [else]" compare 0= if drop" 0 exit then
-     drop"
-   then
-again ;
-
-" dangling else" constant err[else]
-" dangling then" constant err[then]
-
-: [else] err[else] throw ; immediate
-: [then] err[then] throw ; immediate
-
-: [if]
-  0= if skip[block] if exit then then
-  try
-    begin
-      word
-      interpret
-    again
-  catch>
-    case
-      err[else] of skip[if] endof
-      err[then] of endof
-      r@ throw
-    endcase
-  endtry
-; immediate
 
 : octal 8 base c! ;
 : binary 2 base c! ;

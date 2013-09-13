@@ -3,8 +3,8 @@ changecom(/*,*/)
 #include "stubforth.h"
 #include "config.h"
 
-cell return_stack[1000];
-cell param_stack[1000];
+cell return_stack[RETURN_STACK_SIZE];
+cell param_stack[PARAM_STACK_SIZE];
 extern cell dictionary_stack[];
 
 struct vmstate vmstate;
@@ -175,7 +175,7 @@ int main()
   while(1) {
     redirect = 0;
     vmstate.compiling = 0;
-    vmstate.base = 10;
+    vmstate.base = 16;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
@@ -474,6 +474,7 @@ primary(plusstore, +!)
  *(vmint *)sp[-1].a += sp[-2].i;
  sp -= 2;
 
+dnl ( src dst u -- )
 primary(move)
 {
  char *s = sp[-3].s;

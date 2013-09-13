@@ -14,3 +14,10 @@ secondary(restart,, .immediate=1, l(
   LIT BRANCH COMMA
   CONTEXT LOAD TOCODE TOBODY COMMA
 ))
+
+secondary(words,,, l(
+  CONTEXT LOAD DUP TOCODE
+  TOWORD TONAME LOAD TYPE BL
+  TOLINK LOAD QDUP NULLP
+  ZBRANCH self[2]
+))
