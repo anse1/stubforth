@@ -31,7 +31,7 @@ hex
 : bank smsc e + c! ;
 : sd smsc 10 dump ;
 
-\ .( enabling cache...)
-\ 1 ccr !
-\ .( ok) lf
+.( enabling cache...)
+1 ccr !
+.( ok) lf
 
