@@ -31,7 +31,9 @@ hex
 : bank smsc e + c! ;
 : sd smsc 10 dump ;
 
-\ .( enabling cache...)
-\ 1 ccr !
-\ .( ok) lf
+: monitor 0 a0000000 call ;
 
+.( enabling cache...)
+8 ccr !
+1 ccr !
+.( ok) lf
