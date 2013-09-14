@@ -57,7 +57,7 @@ variable somevar
 forget somevar
 constant &&dovar
 
-666 42 2constant 2con ?word 2con forget 2con
+666 42 2constant 2con ?word 2con @ forget 2con
 constant &&do2con
 
 \ xt &word -- \ throws 1 if found
