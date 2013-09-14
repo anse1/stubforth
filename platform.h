@@ -56,7 +56,7 @@ void warmstart(int silent) {
       led_chan1(2);
       led_chan2(2);
 
-      if (1 || !silent) {
+      if (!silent) {
 	my_puts("SPC: ");
 	unsigned short *spc;
 	asm (" stc spc, %0" : "=r"(spc));
@@ -70,7 +70,7 @@ void warmstart(int silent) {
 	my_puts(" ring.out: ");
 	ehex(ring.out);
 
-	my_puts("\nwarmstart...\n");
+	my_puts("warmstart...\n");
       }
 
       asm (" mov.l .restart, r1");
@@ -208,48 +208,47 @@ void interrupt_handler (void) {
 __attribute__((interrupt_handler))
 __attribute__((section(".exception_handler")))
 void exception_handler (void) {
-  my_puts("\nx_x exception_handler x_x\n");
+
+  my_puts("\n,----[ ");
 
   ehex(*EXPEVT);
   my_puts(" - ");
   my_puts(exceptstr(*EXPEVT));
-  putchar('\n');
 
-  my_puts("PC: ");
+  my_puts(" ]\n| ");
+
+  my_puts("spc=");
   unsigned short *spc;
   asm (" stc spc, %0" : "=r"(spc));
   ehex(spc);
 /*   my_puts(" ("); */
 /*   ehex(*spc); */
 /*   my_puts(")\n"); */
-  putchar('\n');
 
-  my_puts("SSR: ");
+  my_puts(" ssr=");
   unsigned int ssr;
   asm (" stc ssr, %0" : "=r"(ssr));
   ehex(ssr);
-  putchar('\n');
 
-  my_puts("SR: ");
+  my_puts(" sr=");
   unsigned int sr;
   asm (" stc sr, %0" : "=r"(sr));
   ehex(sr);
-  putchar('\n');
 /*   sr&=~(1<<28); */
 /*   asm(" ldc %0, sr" : /\* no outputs *\/ : "r"(sr)); */
 
   register unsigned int *r15 asm("r15");
 
-  my_puts("R15: ");
+  my_puts(" r15=");
   ehex(r15);
 
-  my_puts("\nbank0 registers:");
+  my_puts("\n|");
 
   int i;
 
 #define dumpbank(r)				\
-  asm(" stc " # r  "_bank, %0": "=r"(i));	\
-  my_puts("\n " # r ":\t"); ehex(i)
+  asm(" stc " #r  "_bank, %0": "=r"(i));	\
+  my_puts(" " #r "="); ehex(i)
 
   dumpbank(r0);
   dumpbank(r1);
@@ -260,44 +259,8 @@ void exception_handler (void) {
   dumpbank(r6);
   dumpbank(r7);
 
-  my_puts("\nregisters from stack frame: ");
-
-  i = 15;
-
-/*   my_puts("\n r0:\t"); ehex(r15[i]); */
-  i--;
-/*   my_puts("\n r1:\t"); ehex(r15[i]); */
-  i--;
-/*   my_puts("\n r2:\t"); ehex(r15[i]); */
-  i--;
-/*   my_puts("\n r3:\t"); ehex(r15[i]); */
-  i--;
-/*   my_puts("\n r4:\t"); ehex(r15[i]); */
-  i--;
-/*   my_puts("\n r5:\t"); ehex(r15[i]); */
-  i--;
-/*   my_puts("\n r6:\t"); ehex(r15[i]); */
-  i--;
-/*   my_puts("\n r7:\t"); ehex(r15[i]); */
-  i--;
-  my_puts("\n r8:\t"); ehex(r15[i]);
-  i--;
-  my_puts("\n r9:\t"); ehex(r15[i]);
-  i--;
-  my_puts("\n r10:\t"); ehex(r15[i]);
-  i--;
-  my_puts("\n r11:\t"); ehex(r15[i]);
-  i--;
-  my_puts("\n r14:\t"); ehex(r15[i]);
-  i--;
-/*   my_puts("\n mach:\t"); ehex(r15[i]); */
-/*   i--; */
-/*   my_puts("\n macl:\t"); ehex(r15[i]); */
-/*   i--; */
-  my_puts("\n pr:\t"); ehex(r15[i]);
-  putchar('\n');
-
-  warmstart(0);
+  my_puts("\n`----\n");
+  warmstart(1);
 }
 
 __attribute__((interrupt_handler))
