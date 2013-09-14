@@ -62,3 +62,5 @@ primary(keyq, key?)
 
 primary(sleep)
   asm("sleep");
+
+constant(secret,, .a=&debug)

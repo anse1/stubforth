@@ -4,7 +4,7 @@
 #include "symbols.h"
 #include "stubforth.h"
 
-static void ehex(int);
+static void ehex(unsigned int);
 
 static int lowest_bit_set (int value) {
   int i;
@@ -51,17 +51,25 @@ volatile struct {
   int out;
 } ring;
 
-__attribute__((noreturn))
 void warmstart(int silent) {
       led_dsl(2);
       led_chan1(2);
       led_chan2(2);
 
-      if (!silent) {
+      if (1 || !silent) {
 	my_puts("SPC: ");
-	int spc;
+	unsigned short *spc;
 	asm (" stc spc, %0" : "=r"(spc));
 	ehex(spc);
+/* 	my_puts(" ("); */
+/* 	ehex(*spc); */
+/* 	my_puts(")"); */
+
+	my_puts("\nring.in: ");
+	ehex(ring.in);
+	my_puts(" ring.out: ");
+	ehex(ring.out);
+
 	my_puts("\nwarmstart...\n");
       }
 
@@ -124,21 +132,21 @@ const char *exceptstr(int code) {
   case 0x3C0:
     return "IRLx";
   case 0x400:
-    return "TMU0                       TUNI0";
+    return "TMU0/TUNI0";
   case 0x420:
-    return "TMU1                       TUNI1";
+    return "TMU1/TUNI1";
   case 0x440:
-    return "TMU2                       TUNI2";
+    return "TMU2/TUNI2";
   case 0x460:
     return "TICPI2";
   case 0x480:
-    return "RTC                        ATI";
+    return "RTC/ATI";
   case 0x4A0:
     return "PRI";
   case 0x4C0:
     return "CUI";
   case 0x4E0:
-    return "SCI                        ERI";
+    return "SCI/ERI";
   case 0x500:
     return "RXI";
   case 0x520:
@@ -146,15 +154,16 @@ const char *exceptstr(int code) {
   case 0x540:
     return "TEI";
   case 0x560:
-    return "WDT                        ITI";
+    return "WDT/ITI";
   case 0x580:
-    return "REF                        RCMI";
+    return "REF/RCMI";
   case 0x5A0:
     return "ROVI";
   default:
     return "unknown";
   }
 }
+
 
 void sci_interrupt(void);
 __attribute__((interrupt_handler))
@@ -168,7 +177,7 @@ void interrupt_handler (void) {
     sci_interrupt();
     break;
   default:
-    my_puts("x_x default interrupt_handler x_x \n\r");
+    my_puts("\nx_x default interrupt_handler x_x \n");
     my_puts("INTEVT: ");
     ehex(evt);
     my_puts(" (");
@@ -178,18 +187,138 @@ void interrupt_handler (void) {
     warmstart(0);
     break;
   }
+  asm(" mov.l canary2, %0" : "=r"(evt));
+  asm(" mov.l canary2, r0");
+  asm(" mov.l canary2, r1");
+  asm(" mov.l canary2, r2");
+  asm(" mov.l canary2, r3");
+  asm(" mov.l canary2, r4");
+  asm(" mov.l canary2, r5");
+  asm(" mov.l canary2, r6");
+  asm(" mov.l canary2, r7");
+  asm(" bra 1f");
+  asm(" nop");
+  asm(".align 2");
+  asm(" canary2: .long 0xcafebab3");
+  asm("1:");
+
+  return;
 }
 
 __attribute__((interrupt_handler))
 __attribute__((section(".exception_handler")))
 void exception_handler (void) {
+  my_puts("\nx_x exception_handler x_x\n");
 
-  my_puts("x_x exception_handler x_x\n\r");
+  ehex(*EXPEVT);
+  my_puts(" - ");
+  my_puts(exceptstr(*EXPEVT));
+  putchar('\n');
+
+  my_puts("PC: ");
+  unsigned short *spc;
+  asm (" stc spc, %0" : "=r"(spc));
+  ehex(spc);
+/*   my_puts(" ("); */
+/*   ehex(*spc); */
+/*   my_puts(")\n"); */
+  putchar('\n');
+
+  my_puts("SSR: ");
+  unsigned int ssr;
+  asm (" stc ssr, %0" : "=r"(ssr));
+  ehex(ssr);
+  putchar('\n');
+
+  my_puts("SR: ");
+  unsigned int sr;
+  asm (" stc sr, %0" : "=r"(sr));
+  ehex(sr);
+  putchar('\n');
+/*   sr&=~(1<<28); */
+/*   asm(" ldc %0, sr" : /\* no outputs *\/ : "r"(sr)); */
+
+  register unsigned int *r15 asm("r15");
+
+  my_puts("R15: ");
+  ehex(r15);
+
+  my_puts("\nbank0 registers:");
+
+  int i;
+
+#define dumpbank(r)				\
+  asm(" stc " # r  "_bank, %0": "=r"(i));	\
+  my_puts("\n " # r ":\t"); ehex(i)
+
+  dumpbank(r0);
+  dumpbank(r1);
+  dumpbank(r2);
+  dumpbank(r3);
+  dumpbank(r4);
+  dumpbank(r5);
+  dumpbank(r6);
+  dumpbank(r7);
+
+  my_puts("\nregisters from stack frame: ");
+
+  i = 15;
+
+/*   my_puts("\n r0:\t"); ehex(r15[i]); */
+  i--;
+/*   my_puts("\n r1:\t"); ehex(r15[i]); */
+  i--;
+/*   my_puts("\n r2:\t"); ehex(r15[i]); */
+  i--;
+/*   my_puts("\n r3:\t"); ehex(r15[i]); */
+  i--;
+/*   my_puts("\n r4:\t"); ehex(r15[i]); */
+  i--;
+/*   my_puts("\n r5:\t"); ehex(r15[i]); */
+  i--;
+/*   my_puts("\n r6:\t"); ehex(r15[i]); */
+  i--;
+/*   my_puts("\n r7:\t"); ehex(r15[i]); */
+  i--;
+  my_puts("\n r8:\t"); ehex(r15[i]);
+  i--;
+  my_puts("\n r9:\t"); ehex(r15[i]);
+  i--;
+  my_puts("\n r10:\t"); ehex(r15[i]);
+  i--;
+  my_puts("\n r11:\t"); ehex(r15[i]);
+  i--;
+  my_puts("\n r14:\t"); ehex(r15[i]);
+  i--;
+/*   my_puts("\n mach:\t"); ehex(r15[i]); */
+/*   i--; */
+/*   my_puts("\n macl:\t"); ehex(r15[i]); */
+/*   i--; */
+  my_puts("\n pr:\t"); ehex(r15[i]);
+  putchar('\n');
+
+  warmstart(0);
+}
+
+__attribute__((interrupt_handler))
+__attribute__((section(".tlb_handler")))
+void tlb_handler (void) {
+  my_puts("x_x tlb_handler x_x\n\r");
+
+  my_puts("SPC: ");
+  unsigned short *spc;
+  asm (" stc spc, %0" : "=r"(spc));
+  ehex(spc);
+  my_puts(" (");
+  ehex(*spc);
+  my_puts(")\n");
+
   my_puts("EXPEVT: ");
   ehex(*EXPEVT);
   my_puts(" (");
   my_puts(exceptstr(*EXPEVT));
-  my_puts(")\n\r");
+  my_puts(")\n");
+
   warmstart(0);
 }
 
@@ -287,19 +416,18 @@ int putchar(int c) {
   return c;
 }
 
-static void ehex(int i) {
-  const char *hexchars="0123456789abcdefghijklmnopqrstuvwxyz";
-  if(i) {
-    ehex(i>>4);
-    putchar(hexchars[0xf & i]);
-  }
+static void ehex(unsigned int i) {
+  static const char *hexchars="0123456789abcdefghijklmnopqrstuvwxyz";
+  if (i / 16)
+    ehex(i / 16);
+  putchar(hexchars[i % 16]);
 }
 
 int getchar(void) {
   int data;
   led_dsl(1);
-  while (ring.in == ring.out)
-    ;
+  while (ring.in == ring.out) {
+  }
   data = ring.buf[ring.out];
   RING_NEXT(ring.out);
 
@@ -314,17 +442,26 @@ int getchar(void) {
   return data;
 }
 
+static int debug;
+
 void sci_interrupt(void) {
   char status;
   int data;
   status = *SCSSR;
 
+  asm (" stc sr, %0" : "=r"(data));
+  debug = data;
+
   if ((ORER|FER|PER) & status) {
     *SCSSR &= ~(ORER|FER|PER);
-    my_puts(" <BREAK>\r\n");
-    warmstart(1);
-  }
 
+    if (status & ORER) {
+      putchar('!');
+    } else {
+      my_puts(" <BREAK>\r\n");
+      warmstart(1);
+    }
+  }
   if (RDRF & status)
     {
       data = *SCRDR;
@@ -338,6 +475,24 @@ void sci_interrupt(void) {
       ring.buf[ring.in] = data;
       RING_NEXT(ring.in);
     }
+
+  asm(" mov.l canary, %0" : "=r"(status));
+  asm(" mov.l canary, %0" : "=r"(data));
+  asm(" mov.l canary, r0");
+  asm(" mov.l canary, r1");
+  asm(" mov.l canary, r2");
+  asm(" mov.l canary, r3");
+  asm(" mov.l canary, r4");
+  asm(" mov.l canary, r5");
+  asm(" mov.l canary, r6");
+  asm(" mov.l canary, r7");
+  asm(" bra 1f");
+  asm(" nop");
+  asm(".align 2");
+  asm(" canary: .long 0xdeadbeef");
+  asm("1:");
+
+  return;
 }
 
 #endif

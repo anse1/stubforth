@@ -38,7 +38,7 @@ test : init.o cinit.o test.o
 %.D : %
 	sh-elf-objdump -b binary -m sh3  -D  $<
 
-stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h
+stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h
 	$(SHGCC) $(SHCFLAGS) -o $@ -S $<
 
 stubforth:  init.o cinit.o stubforth.o builtin.o

@@ -18,6 +18,8 @@ SECTIONS
 	     _vector_base = .;
 	     . = _vector_base + 0x100;
 	     *(.exception_handler)
+	     . = _vector_base + 0x400;
+	     *(.tlb_handler)
 	     . = _vector_base + 0x600;
 	     *(.interrupt_handler)
 	    _etext = . ;
@@ -39,5 +41,5 @@ SECTIONS
 	 _bstart = ADDR(.bss);
 	 _bend =  ADDR(.bss) + SIZEOF(.bss);
 
-     _stack = 0x0c3c0000;
+     _stack = 0x0c300000;
        }
