@@ -852,6 +852,7 @@ include(tools.m4)
 include(string.m4)
 include(ffi.m4)
 include(floating.m4)
+include(double.m4)
 
 dnl platform
 

@@ -205,6 +205,8 @@ expect {
     -re abort:.*$
 }
 
+test { 5 7 2constant twocon twocon twocon . . . . } {7 5 7 5 $}
+
 send "forget testsuite-marker bye\n"
 
 interact
