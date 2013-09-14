@@ -1,6 +1,6 @@
 T=/dev/ttyUSB0
 SHGCC = sh-elf-gcc
-SHCFLAGS = -O2 -m3  -lgcc -g -Wall -Wcast-align -nostdlib -nostartfiles -ffreestanding -fno-strict-aliasing # -mrenesas
+SHCFLAGS = -O2 -m2  -lgcc -g -Wall -Wcast-align -nostdlib -nostartfiles -ffreestanding -fno-strict-aliasing # -mrenesas
 SYNC = -s
 CFLAGS = -std=c99
 

@@ -187,20 +187,20 @@ void interrupt_handler (void) {
     warmstart(0);
     break;
   }
-  asm(" mov.l canary2, %0" : "=r"(evt));
-  asm(" mov.l canary2, r0");
-  asm(" mov.l canary2, r1");
-  asm(" mov.l canary2, r2");
-  asm(" mov.l canary2, r3");
-  asm(" mov.l canary2, r4");
-  asm(" mov.l canary2, r5");
-  asm(" mov.l canary2, r6");
-  asm(" mov.l canary2, r7");
-  asm(" bra 1f");
-  asm(" nop");
-  asm(".align 2");
-  asm(" canary2: .long 0xcafebab3");
-  asm("1:");
+/*   asm(" mov.l canary2, %0" : "=r"(evt)); */
+/*   asm(" mov.l canary2, r0"); */
+/*   asm(" mov.l canary2, r1"); */
+/*   asm(" mov.l canary2, r2"); */
+/*   asm(" mov.l canary2, r3"); */
+/*   asm(" mov.l canary2, r4"); */
+/*   asm(" mov.l canary2, r5"); */
+/*   asm(" mov.l canary2, r6"); */
+/*   asm(" mov.l canary2, r7"); */
+/*   asm(" bra 1f"); */
+/*   asm(" nop"); */
+/*   asm(".align 2"); */
+/*   asm(" canary2: .long 0xcafebab3"); */
+/*   asm("1:"); */
 
   return;
 }
@@ -476,21 +476,21 @@ void sci_interrupt(void) {
       RING_NEXT(ring.in);
     }
 
-  asm(" mov.l canary, %0" : "=r"(status));
-  asm(" mov.l canary, %0" : "=r"(data));
-  asm(" mov.l canary, r0");
-  asm(" mov.l canary, r1");
-  asm(" mov.l canary, r2");
-  asm(" mov.l canary, r3");
-  asm(" mov.l canary, r4");
-  asm(" mov.l canary, r5");
-  asm(" mov.l canary, r6");
-  asm(" mov.l canary, r7");
-  asm(" bra 1f");
-  asm(" nop");
-  asm(".align 2");
-  asm(" canary: .long 0xdeadbeef");
-  asm("1:");
+/*   asm(" mov.l canary, %0" : "=r"(status)); */
+/*   asm(" mov.l canary, %0" : "=r"(data)); */
+/*   asm(" mov.l canary, r0"); */
+/*   asm(" mov.l canary, r1"); */
+/*   asm(" mov.l canary, r2"); */
+/*   asm(" mov.l canary, r3"); */
+/*   asm(" mov.l canary, r4"); */
+/*   asm(" mov.l canary, r5"); */
+/*   asm(" mov.l canary, r6"); */
+/*   asm(" mov.l canary, r7"); */
+/*   asm(" bra 1f"); */
+/*   asm(" nop"); */
+/*   asm(".align 2"); */
+/*   asm(" canary: .long 0xdeadbeef"); */
+/*   asm("1:"); */
 
   return;
 }
