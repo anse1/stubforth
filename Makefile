@@ -111,8 +111,10 @@ upx: upx.c
 	gcc -std=c99 $< -o $@
 
 %.flash: %.upx
+	stty -F $T 115200
+	stty -F $T -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke
 	expect wipe.tcl $T
-	./upxload.sh $<
+	./upxload.sh $T $<
 	touch $@
 
 symbols.h: symtoh.m4 symbols.m4 

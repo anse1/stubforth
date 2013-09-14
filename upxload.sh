@@ -1,17 +1,15 @@
 set -ex
 
-T=/dev/ttyUSB0
-stty -F $T 115200
-
 # delete all firmware slots
-# echo -n xfd0y > $T
-# echo -n xfd1y > $T
+# echo -n xfd0y > $1
+# echo -n xfd1y > $1
 
-echo -n s0 > $T
-stty -F $T 230400
+echo -n s0 > $1
+stty -F $1 230400
 
-echo -n xu > $T
-< $T  > $T sx -t 10 $1
+echo -n xu > $1
+< $1  > $1 sx -t 10 $2
 
-echo -n s1 > $T
-stty -F $T 115200
+echo -n g > $1
+stty -F $1 115200
+
