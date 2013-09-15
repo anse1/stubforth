@@ -1,4 +1,4 @@
-# -*- compile-command: "dotty vmem.dot"   -*-
+# -*- compile-command: "dot -Tpng vmem.dot > tmp.png && xzgv tmp.png ; rm tmp.png"   -*-
 digraph  procedures  {
 node [fontsize=10]
 graph [nodesep=0]
