@@ -79,6 +79,10 @@ const(ffffffec, CCR, Cache control register)
 
 const(b8000000, CPLD_BASE, reaches the the big CPLD)
 
+mmio4(b8000004, CPLD_UNK1, Used by loader as argument for function c3f8480)
+
+mmio4(b8000008, CPLD_UNK2, Loader writes to at c3f0636)
+
 mmio1(b800000c, SWITCHES, JP1/SW1 input via big CPLD)
 
 mmio1(b8000014, LED34, Front-Panel LEDs CHAN1/CHAN2 via big CPLD)
