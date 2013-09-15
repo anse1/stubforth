@@ -390,6 +390,7 @@ int getchar(void) {
   int data;
   led_dsl(1);
   while (ring.in == ring.out) {
+    asm(" sleep");
   }
   data = ring.buf[ring.out];
   RING_NEXT(ring.out);
