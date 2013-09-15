@@ -1,0 +1,438 @@
+# -*- compile-command: "dotty vmem.dot"   -*-
+digraph  procedures  {
+node [fontsize=10]
+graph [nodesep=0]
+
+c3f0100 -> c3f0610
+c3f0400 -> c3f0610
+c3f0600 -> c3f0610
+
+
+interrupt -> 
+{ 
+  c3f0610
+
+}
+
+c3f0610 -> {
+ indirect
+}
+
+
+
+c3f0820 -> {
+	c3f0700  [color="blue"]
+}
+
+c3f0900 -> {
+
+c3f07f0 [color=blue]
+c3f0ab0 [color=blue]
+c3f0b50 [color=blue]
+c3f0b80 [color=blue]
+c3f0c60 [color=blue,label="putchar"]
+c3f2a80 [color=blue]
+c3f2ac0 [color=blue]
+c3f4240 [color=blue]
+}
+
+c3f2ac0 -> {
+  c3f0c60
+}
+
+c3f2a80 -> { 
+c3f0a20 [color=blue, label="getcharlike"]
+}
+
+
+
+c3f0ab0 -> {
+c3f95a0 [color="blue", label="divmania"]
+c3f8480 [color="blue"]
+c3f07f0
+}
+
+c4f8480 -> {
+   c3f2ac0
+}
+
+c3f0b80 -> {
+  c3f2ac0 [label="puts"]
+}
+
+c3f0c80 [label=getchar, color=blue]
+
+c3f0c9e [label="uart status1"]
+c3f0cb0 [label="uart status2"]
+
+
+c3f7640 -> {
+c3f07b0 [color=blue]
+c3f07f0 [color=blue]
+c3f0850 [color=blue, label="fee0"]
+c3f0900
+c3f0b50
+c3f0b80
+c3f0bf0 [color=blue, label="auto_baud"] 
+c3f0c60
+c3f1230 [color=blue]
+c3f2a80
+c3f30b0 [color=blue]
+c3f30e0
+c3f3140 [color=blue]
+c3f3cb0
+c3f3cb0 [color=blue, label="xmodem_download"]
+c3f41e0 [color=blue]
+c3f4240 
+c3f46a0 [color=blue, label="getopts"]
+c3f52e0
+c3f52e0 [color=blue]
+c3f5ea0
+c3f5ea0 [color=blue, label="©_printer"]
+c3f5f80 [color=blue]
+c3f6190
+c3f6730 [label="erase_menu", color=pink]
+c3f6d40 [color=pink, label="firm_menu"]
+c3f8550 [color=green, label="\N\nb800000c@"]
+c3f9300 [color=pink, label="test_menu"]
+
+}
+
+c3f9300 -> {
+c3f2ac0
+c3f2a80
+c3f41e0
+c3f4240
+c3f46a0
+c3f0c60
+c3f0bf0
+c3f6190
+c3f5f80
+c3f52e0
+c3f5360
+c3f8dc0 [color=pink, label="peekpoke_menu"]
+}
+
+c3f8dc0 -> {
+c3f0c60
+c3f2ac0
+c3f41e0
+c3f8800
+c3f2a80
+c3f41e0
+c3f0c60
+
+
+}
+
+c3f8550 -> {
+c3f07f0
+
+}
+
+c3f5f80 -> {
+c3f2b50
+c3f2ac0
+c3f2960 [color=blue]
+c3f2b50
+c3f2b00
+c3f4150
+}
+
+c3f2960 -> {
+
+c3f0c60
+}
+
+
+c3f6d40 -> {
+c3f2ac0
+c3f2a80
+c3f41e0
+c3f4240
+c3f46a0
+c3f0c60
+c3f0bf0
+indirect
+c3f0c80
+c3f0c60
+c3f1e10
+c3f0c80
+c3f0c60
+c3f41e0
+c3f2610
+c3f3140
+c3f1c20
+c3f0c60
+c3f2960
+c3f45d0
+c3f2b50
+c3f2b50
+c3f2960
+
+}
+
+
+
+
+c3f3cb0 -> {
+c3f2ac0
+c3f95a0
+c3f2a80
+c3f38f0 [color=blue]
+c3f0c60
+c3f2a80
+c3f07f0
+
+
+}
+
+
+c3f30e0 -> {
+c3f3ab0 [color=blue, label="xmodem_upload"]
+c3f3400 [color=blue]
+}
+
+c3f3400 -> c3f3420
+
+c3f3420 [ color=blue]
+
+c3f3ab0 -> {
+c3f2ac0
+c3f0c60
+c3f3620 [color=blue]
+c3f2b50
+c3f07f0
+c3f3230 [color=blue]
+}
+
+
+c3f8030 -> c3f2ac0
+c3f1230->c3f4a70
+
+c3f4a70 [color=blue]
+c3f4a70 -> {
+c3f8030 [color=blue]
+c3f5400 [color=blue]
+c3f95a0
+c3f5280 [color=blue]
+
+}
+
+
+
+c3f0bf0 -> {
+c3f2ac0
+c3f0b50
+c3f0ab0
+c3f2a80
+c3f0b80
+}
+
+c3f3620 -> {
+c3f8610 [color=green]
+c3f2a80
+c3f0c60
+c3f0c60
+}
+
+c3f3140 -> {
+c3f1c20 [color=blue]
+c3f25a0
+}
+
+c3f1c20 -> {
+c3f1f90
+c3f52c0
+}
+
+c3f0da0 [label="loader"]
+
+c3f0da0 -> {
+
+c3f0750
+c3f07b0
+c3f0820
+c3f0ab0
+c3f0b50
+c3f0b80 [label="read_baud2"]
+c3f0c60
+c3f1570
+c3f1e10 [color=blue]
+c3f1f90
+c3f1f90 [color=blue]
+c3f2360 [color=blue]
+c3f2ac0
+c3f3140
+c3f4dd0
+c3f4ee0 [color=blue, label=flashindirect]
+c3f5e50 [color=blue, label=tiny]
+c3f7640
+c3f8090
+c3f8370 [color=blue]
+c3f85c0
+c3f85d0 [label=empty, color=blue]
+c3f85e0 [color=blue, label="\N\nb8000000@"]
+
+}
+
+c3f85e0 -> c3f4350
+
+c3f8090 [color=red, label=portupdate]
+
+c3f8090 -> {
+
+c3f2ac0
+}
+c3f5a10 [label=detect_m29lv]
+
+c3f5a10 -> {
+	c3f5a10
+}
+c3f5560 [label=detect_m5m29f]
+c3f5490 [label="\N\nflashrelate"]
+
+c3f5490 -> {
+c3f8030
+}
+
+c3f5560 -> {
+	c3f8030 [label="printf"]
+}
+
+
+
+
+
+c3f0750 [ label="init\nfe94\nfe9c\nfe92\nfe90\nfea0", color=blue]
+
+c3f4dd0 [color=blue, label="dense"]
+
+
+c3f8370 -> {
+c3f5310 [color="blue"]
+
+}
+
+c3f5080 [label="flash_test"]
+
+c3f0900 [label="read_baud"]
+
+
+
+c3f1280 [label="talks_about_mode"]
+
+c3f1280 -> {
+c3f0b80
+c3f0bc0 [color=blue]
+c3f1280
+c3f1c20
+c3f1e10
+c3f1e10
+c3f1f90
+c3f2360
+c3f25a0
+c3f1280
+c3f2b50 [color=blue]
+c3f7640
+c3f7640
+c3f7d60
+c3f7e80
+c3f7f10
+c3f85c0 [color=blue, label="\N\nb800000c@"]
+c3f0b50
+c3f07b0
+c3f0850
+c3f1560
+c3f85d0
+c3f1f90
+c3f2360
+c3f7d60
+c3f1c20
+}
+
+
+c3f1e10 -> {
+c3f1c20
+indirect
+c3f16a0
+c3f4a70
+c3f17a0 [color=blue]
+c3f16a0
+c3f4a70
+}
+
+c3f17a0 -> {
+c3f9630
+c3f9630
+c3f9730
+c3f52c0 [color=blue]
+c3f4a70
+c3f4a70
+
+}
+c3f52c0 -> c3f4350
+
+c3f4350 [color=blue, label=smallish]
+
+
+c3f8610 -> c3f8300
+
+c3f8300[color=green, label="\N\nb8000010@"]
+
+c3f0bc0 -> {
+c3f0ab0 [color=blue, label="\N\nfe84!fe80!\n"]
+}
+
+c3f0ab0 ->  c3f8480  [label="b8000004", color=red]
+
+c3f0ab0 -> {
+c3f95a0
+c3f07f0
+}
+
+c3f2b50 -> {
+c3f2a00  [color=blue]
+}
+c3f2a00 -> c3f0c60
+
+c3f3230 -> {
+c3f3230
+c3f95a0
+}
+
+
+c3f38f0 -> {
+c3f0c60
+c3f4070
+c3f2a80
+c3f2a80
+c3f2a80
+}
+
+c3f6730 -> {
+c3f52c0
+c3f2ac0
+c3f2a80
+c3f41e0
+c3f4240
+c3f46a0
+c3f0c60
+c3f0bf0
+c3f1230
+c3f43e0
+c3f4c80
+c3f4c80
+c3f4a70
+c3f4c80
+c3f1230
+c3f4c80
+}
+
+
+ c3f5ea0 -> {
+c3f2ac0
+}
+
+}
+
