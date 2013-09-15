@@ -40,4 +40,3 @@ hex
 
 : putchar 0 c3f0c60 call ;
 : puts 1 c3f2ac0 call ;
-	
