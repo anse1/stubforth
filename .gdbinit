@@ -1,5 +1,4 @@
 source symbols.gdb
+# source openocd.gdb
+source blackmagic.gdb
 
-tar ext /dev/ttyACM0
-mon swdp_scan
-att 1
