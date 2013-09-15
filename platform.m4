@@ -22,4 +22,8 @@ asm("wfi");
 primary(wfe)
 asm("wfe");
 
+primary(emitq, key?)
+  sp[0].i = (ring.in != ring.out);
+  sp++;
+
 constant(f_tick,tick,.a=(int *)&tick)

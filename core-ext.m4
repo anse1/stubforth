@@ -115,3 +115,10 @@ secondary(marker,,, l(
  BUILDS COMMA COMMA
  DOES DUP LOAD DP STORE CELL ADD
  LOAD CONTEXT STORE))
+
+static void *pad;
+primary(pad)
+if (!pad)
+   pad = __builtin_alloca(PAD_SIZE);
+sp[0].a = pad;
+sp++;

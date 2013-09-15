@@ -6,7 +6,7 @@ bare metal.
 file:stubforth.jpg
 
 * Goals
-- Portability :: trivially portable to anything GCC targets
+- Portability :: readily portable to anything GCC targets
 - Maintainability :: testsuite included
 - C integration :: zero-terminated forth strings, reentrant VM, FFI
 - Size :: about 10kB for a 32-bit build
@@ -86,13 +86,12 @@ te28f160 flash.  Uses builtin UART for I/O.  Interrupt handlers can be
 written in Forth.  Also includes some forth code to zoom the
 mandelbrot set.
 
-
 *** =arm/cortexm=
 This branch is used to collect vendor independent code to support
 Cortex M chips, such as NVIC setup or startup code that is merged down
 into the following silicon vendor branches.
 
-***** =arm/lm4f120=
+***** =arm/launchpad=
 Targets TI's Stellaris Launchpad.  Uses the Launchpad's USB-CDC-UART
 bridge for I/O.  Note that an ascii 3 is interpreted as a line break
 on this port, as the bridge doesn't pass out-of-band line breaks.
@@ -104,7 +103,7 @@ Targets the STM32F4-Discovery board.  Uses USART2 for I/O.
 Targets the Linux kernel by using syscalls instead of libc for I/O.  A
 =syscall= primary is provided.
 
-*** =sh/lancom=
+*** =sh3/lancom=
 Runs on a "ELSA LANCOM DSL/I-10 Office" router with Hitachi's SH3.
 
 Uses the original bootloader on the Platform which can be activated by
