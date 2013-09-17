@@ -18,3 +18,30 @@ dnl
 dnl other constants
 dnl     const(address, name, comment)
 dnl
+
+
+dnl                                Table 5-1. Basic Clock Module+ Registers
+mmio1(056, DCOCTL, DCO control register)
+mmio1(057, BCSCTL1, Basic clock system control 1)
+mmio1(058, BCSCTL2, Basic clock system control 2)
+mmio1(053, BCSCTL3, Basic clock system control 3)
+mmio1(000, IE1, SFR interrupt enable register 1)
+mmio1(002, IFG1, SFR interrupt flag register 1)
+
+mmio1(060, UCA0CTL0, USCI_A0 control register 0)
+mmio1(061, UCA0CTL1, USCI_A0 control register 1)
+mmio1(062, UCA0BR0, USCI_A0 Baud rate control register 0)
+mmio1(063, UCA0BR1, USCI_A0 baud rate control register 1)
+mmio1(064, UCA0MCTL, USCI_A0 modulation control register)
+mmio1(065, UCA0STAT, USCI_A0 status register)
+mmio1(066, UCA0RXBUF, USCI_A0 receive buffer register)
+mmio1(067, UCA0TXBUF, USCI_A0 transmit buffer register)
+mmio1(05D, UCA0ABCTL, USCI_A0 Auto baud control register)
+mmio1(05E, UCA0IRTCTL, USCI_A0 IrDA transmit control register)
+mmio1(05F, UCA0IRRCTL, USCI_A0 IrDA receive control register)
+mmio1(001, IE2, SFR interrupt enable register 2)
+mmio1(003, IFG2, SFR interrupt flag register 2)
+
+mmio2(0120, WDTCTL, Watchdog timer+ control register)
+mmio1(0000, IE1, SFR interrupt enable register 1)
+mmio1(0002, IFG1, SFR interrupt flag register 1)
