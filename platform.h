@@ -12,6 +12,12 @@
 
 static void initio()
 {
+  /* Disable WDT */
+  *WDTCTL = 0x5a10;
+
+  /* Setup UART */
+
+
 }
 
 #endif
