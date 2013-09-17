@@ -1,6 +1,6 @@
 
-GCC = gcc
-CFLAGS = -O2  -g -Wall -Wcast-align
+GCC = msp430-gcc
+CFLAGS = -O2  -g -Wall -Wcast-align -Os -mmcu=msp430g2553
 SYNC = -s
 
 all: stubforth
