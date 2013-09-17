@@ -38,7 +38,7 @@ undivert(div_word)
 $1:
 divert(div_word)
   goto next;
-  static word w_$1 = {
+  static word const w_$1 = {
     .name = "ifelse(`$2',`',`translit(`$1',_,-)',`$2')",
     .link = (word *) dict_head,
     .code = &&$1
@@ -67,7 +67,7 @@ define(secondary, `
 undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
-static struct { staticword(eval($#-2)) } w_$1 = {
+static struct { staticword(eval($#-2)) } const w_$1 = {
   .name = "ifelse($2,`',`translit($1,_,-)',$2)",
   .link = (word *)dict_head,
   .code = &&enter,
@@ -850,9 +850,9 @@ include(core.m4)
 include(core-ext.m4)
 include(tools.m4)
 include(string.m4)
-include(ffi.m4)
-include(floating.m4)
-include(double.m4)
+dnl include(ffi.m4)
+dnl include(floating.m4)
+dnl include(double.m4)
 
 dnl platform
 
