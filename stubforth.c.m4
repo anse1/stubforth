@@ -81,7 +81,7 @@ static struct { staticword(eval($#-2)) } const w_$1 = {
 dnl Cons a constant
 define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
-static struct { staticword(1) } w_$1 = {
+static const struct { staticword(1) } w_$1 = {
   .name = "ifelse($2,`',`translit($1,_,-)',$2)",
   .link = (word *)dict_head,
   .code = &&docon,
