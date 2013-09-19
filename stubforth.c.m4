@@ -98,7 +98,7 @@ dnl $2... - cell data
 define(thread, `
 define(`self', `&t_$1')
 define(translit($1,a-z,A-Z), t_$1)
-static cell t_$1[eval($#-1)] = { init_union(shift($@)) };
+static const cell t_$1[eval($#-1)] = { init_union(shift($@)) };
 undefine(`self')
 ')
 
