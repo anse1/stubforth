@@ -9,6 +9,6 @@ primary(keyq, key?)
    sp++;
 
 
-define(mmio1, `constant($2,, .a=0x$1)')
-define(mmio2, `constant($2,, .a=0x$1)')
+define(mmio1, `constant(translit($2,A-Z,a-z),, .i=0x$1)')
+define(mmio2, `constant(translit($2,A-Z,a-z),, .i=0x$1)')
 include(symbols.m4)
