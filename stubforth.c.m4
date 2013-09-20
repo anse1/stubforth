@@ -774,7 +774,7 @@ constant(redirect,, &redirect);
 
 dnl ( -- a )
 secondary(if,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
+ LIT, ZBRANCH, COMMA, HERE, NEUTRAL, COMMA
 )
 
 dnl ( a -- )
@@ -784,7 +784,7 @@ secondary(then,, .immediate=1,
 
 dnl -- pad
 secondary(ahead,, .immediate=1, l(
- LIT BRANCH COMMA HERE ZERO COMMA
+ LIT BRANCH COMMA HERE NEUTRAL COMMA
 ))
 
 dnl ( a -- a )
