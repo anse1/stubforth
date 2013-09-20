@@ -43,8 +43,6 @@ mmio1(001, IE2, SFR interrupt enable register 2)
 mmio1(003, IFG2, SFR interrupt flag register 2)
 
 mmio2(0120, WDTCTL, Watchdog timer+ control register)
-mmio1(0000, IE1, SFR interrupt enable register 1)
-mmio1(0002, IFG1, SFR interrupt flag register 1)
 
 mmio1(020, P1IN, Input)
 mmio1(021, P1OUT, Output)
