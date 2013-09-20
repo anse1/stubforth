@@ -12,8 +12,4 @@
 #define PARAM_STACK_SIZE 1024
 #define DICTIONARY_SIZE 1024
 
-#define NEUTRAL ZERO /* The NEUTRAL word is used to get a value on the
-			stack used as placeholder, e.g., when
-			compiling a forward jump. */
-
 #endif

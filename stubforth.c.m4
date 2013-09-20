@@ -15,6 +15,11 @@ struct terminal terminal;
 
 dnl m4 definitions
 
+dnl The NEUTRAL word is used to get a value on the
+dnl stack used as placeholder, e.g., when
+dnl compiling a forward jump.
+define(NEUTRAL, ZERO)
+
 define(dict_head, 0)
 define(div_word, 1)
 define(div_init, 2)
