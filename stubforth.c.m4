@@ -10,7 +10,6 @@ cell dictionary_stack[DICTIONARY_SIZE];
 struct vmstate vmstate;
 
 word *forth;
-unsigned char *redirect;
 struct terminal terminal;
 
 dnl m4 definitions
