@@ -507,7 +507,7 @@ primary(key)
 dnl n --
 dnl : p base c@ /mod dup if recurse else drop then hexchars + c@ emit  ;
 
-constant(hexchars,, .s="0123456789abcdefghijklmnopqrstuvwxyz")
+constant(hexchars,, .s="0123456789abcdefgh")
 
 thread(dot1,
  &&enter, BASE, CLOAD, DIVMOD,
