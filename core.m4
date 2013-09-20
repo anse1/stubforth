@@ -62,16 +62,6 @@ primary(abs)
   if (sp[-1].i < 0)
      sp[-1].i = -sp[-1].i;
 
-secondary(evaluate,,, l(
- REDIRECT LOAD RTO
- REDIRECT STORE
- LIT QUIT CATCH
- QDUP
- ZBRANCH self[12]
- THROW
- RFROM REDIRECT STORE
-))
-
 dnl dividend divisor -- remainder quotient
 primary(umdivmod, um/mod)
 {
