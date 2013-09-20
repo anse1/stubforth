@@ -7,3 +7,8 @@
 primary(keyq, key?)
    sp[0].i = (UCA0RXIFG & IFG2);
    sp++;
+
+
+define(mmio1, `constant($2,, .a=0x$1)')
+define(mmio2, `constant($2,, .a=0x$1)')
+include(symbols.m4)
