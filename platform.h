@@ -77,8 +77,8 @@ static void initio()
   UCA0BR1 = 0x6;
 
 /* 3. Configure ports. */
-  P1SEL = BIT1 | BIT2;
-  P1SEL2 = BIT1 | BIT2;
+  P1SEL |= BIT1 | BIT2;
+  P1SEL2 |= BIT1 | BIT2;
 
 
 /* 4. Clear UCSWRST via software (BIC.B #UCSWRST,&UCAxCTL1) */
