@@ -112,6 +112,12 @@ firmware updater.
 
 Except the memory-mapped LEDs, no hardware support besides the UART.
 
+*** =msp430/g25=
+Compiles for a msp430g2553 shipped with the later TI Launchpads.  Due
+to RAM constraints, compiling new words is very limited though, and
+the "put source into flash" method of creating persistent words is not
+applicable here.
+
 * Bugs
 ** TODO Make use of GCC's Named Address Spaces to support Harvard architectures.
 An ATMega8 ought to be a feasible target.
