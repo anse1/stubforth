@@ -14,7 +14,10 @@ config.h: .rev.h
 .rev.h: .git/* .
 	echo -n \#define REVISION \"  > $@
 	echo -n $$(git describe --always --dirty) >> $@
-	echo -n '"' >> $@
+	echo  '"' >> $@
+	echo -n \#define COMPILER \"  >> $@
+	echo -n "$$($(GCC) --version|sed q)" >> $@
+	echo  '"' >> $@
 
 stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -c $<
