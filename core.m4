@@ -1,6 +1,6 @@
 dnl start consing a dodoes word
 secondary(builds, <builds,,
-  WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
+  WORD, CONS, LIT, &&dodoes, COMMA, NEUTRAL, COMMA, SMUDGE, SUSPEND)
 
 dnl set the dodoes address to the thread following does>
 secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
