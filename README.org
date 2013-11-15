@@ -91,7 +91,7 @@ This branch is used to collect vendor independent code to support
 Cortex M chips, such as NVIC setup or startup code that is merged down
 into the following silicon vendor branches.
 
-***** =arm/lm4f120=
+***** =arm/launchpad=
 Targets TI's Stellaris Launchpad.  Uses the Launchpad's USB-CDC-UART
 bridge for I/O.  Note that an ascii 3 is interpreted as a line break
 on this port, as the bridge doesn't pass out-of-band line breaks.
@@ -111,6 +111,12 @@ bridging J1.  Builds an UPX file that can be uploaded w/ the original
 firmware updater.
 
 Except the memory-mapped LEDs, no hardware support besides the UART.
+
+*** =msp430/g25=
+Compiles for a msp430g2553 shipped with the later TI Launchpads.  Due
+to RAM constraints, compiling new words is very limited though, and
+the "put source into flash" method of creating persistent words is not
+applicable here.
 
 * Bugs
 ** TODO Make use of GCC's Named Address Spaces to support Harvard architectures.

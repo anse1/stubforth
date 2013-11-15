@@ -30,7 +30,8 @@ repeat drop ;
 begin dup while
 dumpaddr dump8
 dup 0= if exit then
-bl dump8 lf repeat lf ;
+bl dump8 lf repeat lf
+2drop ;
 
 : dumpraw ( addr n -- )
 over + swap
@@ -55,6 +56,9 @@ variable somevar
 ?word somevar @
 forget somevar
 constant &&dovar
+
+666 42 2constant 2con ?word 2con @ forget 2con
+constant &&do2con
 
 \ xt &word -- \ throws 1 if found
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
@@ -83,6 +87,7 @@ or 0= and ;
       &&docon of ." &&docon" endof
       &&dodoes of ." &&dodoes" endof
       &&dovar of ." &&dovar" endof
+      &&do2con of ." &&do2con" endof
       ." .i = " r@ .
     endcase
   then
