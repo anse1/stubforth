@@ -199,7 +199,7 @@ static void initio()
 
 
 /*   *RCC=0x24e0540; */
-  *GPIOHBCTL=0x7e00;
+/*   *GPIOHBCTL=0x7e00; */
 /*   *RCC2=0x2404000; /\* not used *\/ */
   *MOSCCTL=0x0;
   *DSLPCLKCFG=0x7800000;
