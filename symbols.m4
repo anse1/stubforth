@@ -216,6 +216,10 @@ mmio4(sysctrl(0xA58),  PREEPROM, ` R/W 0x0000.0000 EEPROM Peripheral Ready      
 mmio4(sysctrl(0xA5C),  PRWTIMER, ` R/W 0x0000.0000 32/64-Bit Wide General-Purpose Timer Peripheral Ready 385')
 
 
+dnl AHB: new
+dnl APB: legacy
+
+dnl mutually exclusive, controlled by GPIOHBCTL
 
 indirect(40004000, GPIOA_APB)
 indirect(40058000, GPIOA_AHB)
