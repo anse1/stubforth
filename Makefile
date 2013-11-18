@@ -1,7 +1,8 @@
+-include config.mak
 
-GCC = gcc
-CFLAGS = -O2  -g -Wall -Wcast-align
-SYNC = -s
+GCC ?= gcc
+CFLAGS ?= -O2  -g -Wall -Wcast-align
+SYNC ?= -s
 
 all: stubforth
 
