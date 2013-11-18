@@ -25,12 +25,6 @@ decimal
 
 hex
 
-\ pf0 - sw2
-\ pf1 - red led
-\ pf2 - blue led
-\ pf3 - green led
-\ pf4 - sw1
-
 : pa gpioa_apb ;
 : pb gpiob_apb ;
 : pc gpioc_apb ;
@@ -84,12 +78,16 @@ e gpioden pf !
 \ JTAG/SWD pins on the GPIO port pins, by setting the LOCK bits in the
 \ GPIOLOCK register.
 
-
-gpiodata ff 2 << + constant gpiod
+\ pf0 - sw2
+\ pf1 - red led
+\ pf2 - blue led
+\ pf3 - green led
+\ pf4 - sw1
 
 11 gpiopur pf !
 e gpiodir pf !
-2 gpiod pf !
 
+
+	
 e gpiodata pf ff 2 << !
 
