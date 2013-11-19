@@ -1,3 +1,5 @@
+.( Loading user.4th...) lf
+
 \ bit flipping
 
 : flip ( c a -- ) 
