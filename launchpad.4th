@@ -84,10 +84,5 @@ e gpioden pf !
 \ pf3 - green led
 \ pf4 - sw1
 
-11 gpiopur pf !
-e gpiodir pf !
-
-
-	
-e gpiodata pf ff 2 << !
-
+: led 1 << gpiodata pf e 2 << + ! ;
+1 led
