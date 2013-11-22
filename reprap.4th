@@ -101,7 +101,7 @@ variable epos
 : emove ( pos -- )
 	begin
 		dup epos @
-		= 0= while
+		<> while
 		dup epos @ > if
 			1 epos +!
 		else
