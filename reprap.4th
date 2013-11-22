@@ -69,7 +69,7 @@ variable epos
 			-1 xpos +!
 		then
 		xc
-		8 ms
+		9 ms
     repeat drop ;
 
 : ymove ( pos -- )
@@ -82,7 +82,7 @@ variable epos
 			-1 ypos +!
 		then
 		yc
-		8 ms
+		9 ms
     repeat drop ;
 
 : zmove ( pos -- )
@@ -121,4 +121,64 @@ variable epos
 			10 ms
 	repeat
     0 epos ! ;
+
+: x+ 1 xpos +! xc ;
+: y+ 1 ypos +! yc ;
+: z+ 1 zpos +! zc ;
+
+: 2rel 
+	ypos @ - swap xpos @ - swap ;
+
+: 2abs 
+	abs swap abs swap ;
+
+: mkslave ( cpos spos dc ds -- b dc ds )
+	2dup 2>r
+	3 pick * swap / - swap drop
+	2r>
+;
+
+: fx ( b dc ds x -- b dc ds y )
 	
+	
+: 2move ( c-addr s-addr c-target b dc ds -- )
+	>r >r >r
+	\  c-addr s-addr c-target -- \ r: ds dc b
+	2 pick @ over > if 1 else -1 then
+	\  c-addr s-addr c-target increment -- \ r: ds dc b
+	begin
+		3 pick @ over 2 pick
+		\  c-addr s-addr c-target increment c-pos c-target -- \ r: ds dc b
+		<> while
+			\  c-addr s-addr c-target increment -- \ r: ds dc b
+			\  c-addr s-addr c-target increment increment -- \ r: ds dc b
+			4 pick +!
+			\  c-addr s-addr c-target increment -- \ r: ds dc b
+			r> r> r> 2 pick 2 pick 2 pick >r >r >r
+			\  c-addr s-addr c-target increment b dc ds -- \ r: ds dc b
+			6 pick @ * / + 
+			\  c-addr s-addr c-target increment new-s -- \ r: ds dc b
+			
+			\ c-addr s-addr c-target c-pos c-target
+			> if 1 else -1 then
+			\ c-addr s-addr c-target c-pos c-target incr
+			
+			
+	repeat
+	\ c-addr s-addr c-target c-pos c-target
+	2drop 2drop drop
+	r> r> r>
+	2drop drop
+;
+
+: 2d ( x y -- two-dimensional tool move )
+	2dup 2rel > if
+		." x-constrained move" lf
+		xpos @ ypos @ 2swap mkslave
+		( x y b dc ds )
+	else
+		." y-constrained move" lf
+		2rel swap ypos xpos 2swap
+	then
+	cmove
+;
