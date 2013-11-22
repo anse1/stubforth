@@ -204,7 +204,6 @@ static void initio()
   *MOSCCTL=0x0;
   *DSLPCLKCFG=0x7800000;
   *RCGCTIMER=0x3;
-  *RCGCGPIO=0x21;
   *RCGCHIB=0x1;
   *RCGCUART=0x1;
   *SCGCHIB=0x1;
@@ -223,7 +222,7 @@ static void initio()
 
 /*      2. Enable the clock to the appropriate GPIO module via the RCGCGPIO register (see page 310). */
 /*          To find out which GPIO port to enable, refer to Table 21-5 on page 1134. */
-  *RCGCGPIO=0x21;
+  *RCGCGPIO=0x3f;
 
 /*      3. Set the GPIO AFSEL bits for the appropriate pins (see page 624). To determine which GPIOs to */
 
