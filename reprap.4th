@@ -50,25 +50,10 @@ variable epos
 	endcase
 ;
 
-: next @ 1+ dup halfstep swap ;
-: prev @ 1- dup halfstep swap ;
-
-: x+ xpos next xpos ! sx ;
-: x- xpos prev xpos ! sx ;
-
-: y+ ypos next ypos ! sy ;
-: y- ypos prev ypos ! sy ;
-
-: z+ zpos next zpos ! sz ;
-: z- zpos prev zpos ! sz ;
-
-: e+ epos next epos ! se ;
-: e- epos prev epos ! se ;
-
 : xc xpos @ halfstep sx ;
 : yc ypos @ halfstep sy ;
-: ec epos @ halfstep se ;
 
+: ec epos @ 7 swap - halfstep se ;
 : zc zpos @ 7 swap - halfstep sz ;
 
 : off 0 sx 0 sy 0 sz 0 se ;
@@ -111,4 +96,17 @@ variable epos
 		then
 		zc
 		10 ms
+    repeat drop ;
+
+: emove ( pos -- )
+	begin
+		dup epos @
+		= 0= while
+		dup epos @ > if
+			1 epos +!
+		else
+			-1 epos +!
+		then
+		ec
+		7 ms
     repeat drop ;
