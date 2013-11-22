@@ -110,3 +110,15 @@ variable epos
 		ec
 		7 ms
     repeat drop ;
+
+: home
+	begin
+	xpos @ ypos @ zpos @ + +
+	while
+			xpos @ if -1 xpos +! xc then
+			ypos @ if -1 ypos +! yc then
+			zpos @ if -1 zpos +! zc then
+			10 ms
+	repeat
+    0 epos ! ;
+	
