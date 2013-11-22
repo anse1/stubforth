@@ -204,6 +204,7 @@ static void initio()
   *MOSCCTL=0x0;
   *DSLPCLKCFG=0x7800000;
   *RCGCTIMER=0x3;
+  *RCGCGPIO=0x3f;
   *RCGCHIB=0x1;
   *RCGCUART=0x1;
   *SCGCHIB=0x1;
