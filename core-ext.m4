@@ -72,7 +72,7 @@ primary(zne, 0<>)
 sp[-1].i = sp[-1].i != 0 ;
 
 primary(ne, <>)
-sp[-1].i = sp[-1].i != sp[-2].i ;
+sp[-2].i = sp[-1].i != sp[-2].i ;
 sp--;
 
 primary(zgt, 0>)

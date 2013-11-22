@@ -207,6 +207,8 @@ expect {
 
 test { 5 7 2constant twocon twocon twocon . . . . } {7 5 7 5 $}
 
+test {  1 1 <> . } {0 $}
+
 send "forget testsuite-marker bye\n"
 
 interact
