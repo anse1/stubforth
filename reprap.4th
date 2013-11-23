@@ -155,8 +155,8 @@ variable eline 3 cells allot
 	dup @ swap cell+ dup @ swap cell+ @ swap 2 roll ;
 
 \ evaluate linear function
-: leval ( b dx dy x -- y )
-	* swap / + ;
+: leval ( a x -- y )
+	>r line@ r> * swap / + ;
 
 \ print a linear function
 : line. ( a -- )
@@ -176,10 +176,10 @@ variable eline 3 cells allot
 \		." domove loop: " .s lf
 		2dup <> while
 			2 pick + \ increment+1 x2 x1 -- 
-			dup >r xline line@ r> leval xpos !
-			dup >r yline line@ r> leval ypos !
-			dup >r zline line@ r> leval zpos !
-			dup >r eline line@ r> leval epos !
+			xline over leval xpos !
+			yline over leval ypos !
+			zline over leval zpos !
+			eline over leval epos !
 \			pos.
 			xc yc zc ec
 			10 ms
