@@ -129,39 +129,95 @@ variable epos
 : 2abs abs swap abs swap ;
 
 : mkline ( x1 y1 x2 y2 -- b dx dy )
-	2dup 2>r
-	3 pick * swap / - swap drop
+	2 pick	\ x1 y1 x2 y2 y1
+	- \ x1 y1 x2 y2-y1
+	swap \ x1 y1 y2-y1 x2
+	3 pick \ x1 y1 y2-y1 x2 x1
+	- \ x1 y1 y2-y1 x2-x1
+	swap \ x1 y1 x2-x1 y2-y1
+	2dup 2>r \ x1 y1 x2-x1 y2-y1 r: x2-x1 y2-y1
+	3 roll \ y1 x2-x1 y2-y1 x1 r: x2-x1 y2-y1
+	* \ y1 x2-x1 (y2-y1)*x1 r: x2-x1 y2-y1
+	swap \ y1 (y2-y1)*x1 x2-x1 r: x2-x1 y2-y1
+	/ \ y1 (y2-y1)*x1/(x2-x1) r: x2-x1 y2-y1
+	- \ y1-(y2-y1)*x1/(x2-x1) r: x2-x1 y2-y1
 	2r>
 ;
 
+\ functions for multidim. linear movement
 variable xline 3 cells allot
 variable yline 3 cells allot
 variable zline 3 cells allot
 variable eline 3 cells allot
 
+: pos.
+	." current position: "
+	." x=" xpos @ .
+	." y=" ypos @ .
+	." z=" zpos @ .
+	." e=" epos @ . lf ;
+
+\ store linear function
 : line! ( b dx dy a -- )
 	tuck ! cell+ tuck ! cell+ ! ;
 	
+\ load linear function
 : line@ ( a -- b dx dy )
 	dup @ swap cell+ dup @ swap cell+ @ swap 2 roll ;
 
+\ evaluate linear function
 : leval ( b dx dy x -- y )
 	* swap / + ;
 
+\ print a linear function
 : line. ( a -- )
 	line@ ." line: dy=" . ." dx=" . ." b=" . lf ;
 
-: move ( x y -- )
-	2dup 2rel > if
+: lines. lf
+	xline line.
+	yline line.
+	zline line.
+	eline line. ;
+
+\ multidimensional linear movement from x1 to x2 according to {x,y,z,e}line
+: domove ( x2 x1 -- )
+	2dup < if -1 else 1 then rot rot
+	\ increment x2 x1 --
+	begin
+\		." domove loop: " .s lf
+		2dup <> while
+			2 pick + \ increment+1 x2 x1 -- 
+			dup >r xline line@ r> leval xpos !
+			dup >r yline line@ r> leval ypos !
+			dup >r zline line@ r> leval zpos !
+			dup >r eline line@ r> leval epos !
+\			pos.
+			xc yc zc ec
+			9 ms
+	repeat
+;
+
+\ move tool to pos (x,y)
+: m ( x y -- )
+	2dup 2rel 2abs > if
 		." constraining axis: X" lf
 		0 1 1 xline line!
-		xpos @ ypos @ 2swap mkline
-		yline line! \ y=f(x)
+		2dup xpos @ ypos @ 2swap mkline
+		yline line!
+		\ x y --
+		drop xpos @ \ x2 x1 --
 	else
 		." constraining axis: Y" lf
 		0 1 1 yline line!
-		swap ypos @ xpos @ 2swap mkline
-		\ x=f(y)
+		2dup swap ypos @ xpos @ 2swap mkline
 		xline line!
+		\ x y --
+		swap drop ypos @ \ y2 y1 --
 	then
+	\ other dimensions constant
+	epos @ 1 0 eline line!
+	zpos @ 1 0 zline line!
+	lines.
+	domove
 ;
+
