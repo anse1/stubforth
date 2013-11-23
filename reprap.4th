@@ -128,9 +128,19 @@ variable epos
 : 2rel ypos @ - swap xpos @ - swap ;
 : 2abs abs swap abs swap ;
 
-: mkline ( x1 y1 x2 y2 -- b dc ds )
+: mkline ( x1 y1 x2 y2 -- b dx dy )
 	2dup 2>r
 	3 pick * swap / - swap drop
 	2r>
 ;
 
+variable xline 3 cells allot
+variable yline 3 cells allot
+variable zline 3 cells allot
+variable eline 3 cells allot
+
+: line! ( b dx dy a -- )
+	tuck ! cell+ tuck ! cell+ ! ;
+	
+: line@ ( a -- b dx dy )
+	dup @ swap cell+ dup @ swap cell+ @ swap 2 roll ;
