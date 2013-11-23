@@ -144,3 +144,24 @@ variable eline 3 cells allot
 	
 : line@ ( a -- b dx dy )
 	dup @ swap cell+ dup @ swap cell+ @ swap 2 roll ;
+
+: leval ( b dx dy x -- y )
+	* swap / + ;
+
+: line. ( a -- )
+	line@ ." line: dy=" . ." dx=" . ." b=" . lf ;
+
+: move ( x y -- )
+	2dup 2rel > if
+		." constraining axis: X" lf
+		0 1 1 xline line!
+		xpos @ ypos @ 2swap mkline
+		yline line! \ y=f(x)
+	else
+		." constraining axis: Y" lf
+		0 1 1 yline line!
+		swap ypos @ xpos @ 2swap mkline
+		\ x=f(y)
+		xline line!
+	then
+;
