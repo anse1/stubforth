@@ -52,9 +52,8 @@ variable epos
 
 : xc xpos @ halfstep sx ;
 : yc ypos @ halfstep sy ;
-
-: ec epos @ 7 swap - halfstep se ;
 : zc zpos @ 7 swap - halfstep sz ;
+: ec epos @ 7 swap - halfstep se ;
 
 : off 0 sx 0 sy 0 sz 0 se ;
 : on xc yc zc ec ;
@@ -126,13 +125,10 @@ variable epos
 : y+ 1 ypos +! yc ;
 : z+ 1 zpos +! zc ;
 
-: 2rel 
-	ypos @ - swap xpos @ - swap ;
+: 2rel ypos @ - swap xpos @ - swap ;
+: 2abs abs swap abs swap ;
 
-: 2abs 
-	abs swap abs swap ;
-
-: mkslave ( cpos spos dc ds -- b dc ds )
+: mkline ( x1 y1 x2 y2 -- b dc ds )
 	2dup 2>r
 	3 pick * swap / - swap drop
 	2r>
