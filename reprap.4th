@@ -197,30 +197,6 @@ variable eline 3 cells allot
 	repeat
 ;
 
-\ move tool to pos (x,y)
-: move-xy ( x y -- )
-	2dup 2rel 2abs > if
-		." constraining axis: X" lf
-		0 1 1 xline line!
-		2dup xpos @ ypos @ 2swap mkline
-		yline line!
-		\ x y --
-		drop xpos @ \ x2 x1 --
-	else
-		." constraining axis: Y" lf
-		0 1 1 yline line!
-		2dup swap ypos @ xpos @ 2swap mkline
-		xline line!
-		\ x y --
-		swap drop ypos @ \ y2 y1 --
-	then
-	\ other dimensions constant
-	epos @ 1 0 eline line!
-	zpos @ 1 0 zline line!
-	lines.
-	domove
-;
-
 \ move tool to pos (x,y,z,e)
 : move-xyze ( x y z e -- )
 	2over 2over
