@@ -179,7 +179,7 @@ variable eline 3 cells allot
 	zline line.
 	eline line. ;
 
-\ multidimensional linear movement from x1 to x2 according to {x,y,z,e}line
+\ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
 	\ increment x2 x1 --
@@ -193,12 +193,12 @@ variable eline 3 cells allot
 			dup >r eline line@ r> leval epos !
 \			pos.
 			xc yc zc ec
-			9 ms
+			10 ms
 	repeat
 ;
 
 \ move tool to pos (x,y)
-: m ( x y -- )
+: move-xy ( x y -- )
 	2dup 2rel 2abs > if
 		." constraining axis: X" lf
 		0 1 1 xline line!
@@ -219,5 +219,33 @@ variable eline 3 cells allot
 	zpos @ 1 0 zline line!
 	lines.
 	domove
+;
+
+\ move tool to pos (x,y,z,e)
+: move-xyze ( x y z e -- )
+	2over 2over
+	epos @ - abs
+	swap
+	zpos @ - abs
+	max
+	swap
+	ypos @ - abs
+	max
+	swap
+	xpos @ - abs
+	max
+	tuck swap
+	0 epos @ 2swap
+	mkline eline line!
+	tuck swap
+	0 zpos @ 2swap
+	mkline zline line!
+	tuck swap
+	0 ypos @ 2swap
+	mkline yline line!
+	tuck swap
+	0 xpos @ 2swap
+	mkline xline line!
+	0 domove
 ;
 
