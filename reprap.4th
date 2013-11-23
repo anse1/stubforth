@@ -110,17 +110,6 @@ variable epos
 		7 ms
     repeat drop ;
 
-: home
-	begin
-	xpos @ ypos @ zpos @ + +
-	while
-			xpos @ if -1 xpos +! xc then
-			ypos @ if -1 ypos +! yc then
-			zpos @ if -1 zpos +! zc then
-			10 ms
-	repeat
-    0 epos ! ;
-
 : x+ 1 xpos +! xc ;
 : y+ 1 ypos +! yc ;
 : z+ 1 zpos +! zc ;
@@ -198,7 +187,7 @@ variable eline 3 cells allot
 ;
 
 \ move tool to pos (x,y,z,e)
-: move-xyze ( x y z e -- )
+: move ( x y z e -- )
 	2over 2over
 	epos @ - abs
 	swap
@@ -225,3 +214,6 @@ variable eline 3 cells allot
 	0 domove
 ;
 
+: home
+	0 epos ! \ just reset the extruder
+	0 0 0 0 move ;
