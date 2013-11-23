@@ -158,6 +158,10 @@ variable eline 3 cells allot
 : leval ( a x -- y )
 	>r line@ r> * swap / + ;
 
+\ determine whether a linear function is constant
+: lconst? ( a -- bool )
+	line@ swap drop swap drop 0= ;
+
 \ print a linear function
 : line. ( a -- )
 	line@ ." line: dy=" . ." dx=" . ." b=" . lf ;
@@ -182,7 +186,11 @@ variable eline 3 cells allot
 			eline over leval epos !
 \			pos.
 			xc yc zc ec
-			10 ms
+			zline lconst? if
+				9 ms
+			else
+				10 ms
+			then
 	repeat
 ;
 
