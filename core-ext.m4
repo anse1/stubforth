@@ -122,3 +122,15 @@ if (!pad)
    pad = __builtin_alloca(PAD_SIZE);
 sp[0].a = pad;
 sp++;
+
+dnl ( xu xu-1 ... x0 u -- xu-1 ... x0 xu )
+primary(roll)
+{
+  int u = -sp[-1].u - 1;
+  sp--;
+  t = sp[u];
+  int i;
+  for(i = u; i < -1; i++)
+    sp[i] = sp[i+1];
+  sp[-1] = t;
+}
