@@ -264,6 +264,7 @@ variable g-fpos  \ feedrate
 
 " eol" constant eol
 " syntax error" constant syntax
+" unimplemented" constant unimplemented
 " nan" constant nan
 
 variable lastkey
@@ -296,8 +297,8 @@ variable lastkey
 	repeat
 ;
 
-: gkey
-	key dup lastkey !
+: skipline ( -- )
+	begin gkey 10 = until
 ;
 
 decimal
@@ -350,36 +351,61 @@ decimal
 	endcase
 ;
 			
-: gcode-g-1 \ controlled move
+: gcode-g1 \ controlled move
 	begin
 		gcode-collect-pos
 	eol? until
-	g-pos.
 	gmove
 ;
 
-: gcode-g-92 \ set position
-	gcode-collect-pos
+: gcode-g92 \ set position
+	begin
+		gcode-collect-pos
+	eol? until
+	g-xpos @ um2xpos xpos !
+	g-ypos @ um2ypos ypos !
+	g-zpos @ um2zpos zpos !
+	g-epos @ um2epos epos !
 ;
+
+: ok ." ok" lf ;
 
 : gcode-g
 	word number
 	case
-		1 of gcode-g-1 endof
-		92 of gcode-g-92 endof
-		." g-code"
+		1 of gcode-g1 ok endof
+		92 of gcode-g92 ok endof
+		90 of ok endof
+		21 of ok endof
+		unimplemented throw
 	endcase
-    ;
+;
 
 : gcode-m
-	." m-code"
-	;
+	word number
+	case
+		82 of ok endof
+		113 of skipline ok endof
+		108 of skipline ok endof
+		101 of ok endof \ filament retract undo
+		103 of ok endof \ filament retract
+		84 of off ok endof \ filament retract
+		unimplemented throw
+	endcase
+;
 
 : gcode
+	decimal
 	gkey case
 		[char] G of gcode-g endof
 		[char] M of gcode-m endof
-		," unsupported g-code :-( " throw
+		unimplemented throw
 	endcase
+;
+
+: ginterp
+	begin
+		gcode
+	again
 ;
 
