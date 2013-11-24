@@ -192,6 +192,7 @@ variable eline 3 cells allot
 				10 ms
 			then
 	repeat
+	2drop drop
 ;
 
 \ move tool to pos (x,y,z,e)
@@ -409,3 +410,7 @@ decimal
 	again
 ;
 
+: home
+	0 epos ! \ just reset the extruder
+	0 0 0 0 move
+    0 0 0 0 0 g-xpos ! g-ypos ! g-zpos ! g-epos ! g-fpos ! ; 
