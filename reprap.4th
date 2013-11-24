@@ -302,7 +302,8 @@ variable lastkey
 		gkey word? while
 			c,
 	repeat
-	0 c,
+	drop
+	0 c, align
 ;
 
 : digit? ( -- bool )
@@ -390,6 +391,11 @@ decimal
 	gmove
 ;
 
+: gcode-g28 \ controlled move
+	eol? if home exit then
+	gcode-g1 \ TODO: standard says ignore actual values
+;
+
 : gcode-g92 \ set position
 	begin
 		gcode-collect-pos
@@ -403,19 +409,19 @@ decimal
 : ok ." ok" lf ;
 
 : gcode-g
-	word number
+	gword number
 	case
 		1 of gcode-g1 ok endof
 		92 of gcode-g92 ok endof
 		90 of ok endof
 		21 of ok endof
-		28 of gcode-g1 ok endof
+		28 of gcode-g28 ok endof
 		unimplemented throw
 	endcase
 ;
 
 : gcode-m
-	word number
+	gword number
 	case
 		82 of ok endof
 		113 of skipline ok endof
@@ -423,7 +429,7 @@ decimal
 		101 of ok endof \ filament retract undo
 		103 of ok endof \ filament retract
 		107 of ok endof \ fan off
-		106 of ok endof \ fan on
+		106 of skipline ok endof \ fan on
 		104 of skipline ok endof \ set temperature
 		109 of skipline ok endof \ wait for temperature
 		84 of off ok endof \ filament retract
