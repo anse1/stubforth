@@ -225,3 +225,161 @@ variable eline 3 cells allot
 : home
 	0 epos ! \ just reset the extruder
 	0 0 0 0 move ;
+
+\ gcode parser
+
+decimal
+
+: xpos2um ( halfsteps -- um ) 164000 * 2048 / ;
+: ypos2um ( halfsteps -- um ) 164000 * 2048 / ;
+: zpos2um ( halfsteps -- um ) 1250 * 200 / ;
+: epos2um ( halfsteps -- um ) 48 * ;
+
+: um2xpos ( um -- halfsteps ) 2048 * 164000 / ;
+: um2ypos ( um -- halfsteps ) 2048 * 164000 / ;
+: um2zpos ( um -- halfsteps ) 200 * 1250 / ;
+: um2epos ( um -- halfsteps ) 48 / ;
+
+variable g-xpos
+variable g-ypos
+variable g-zpos
+variable g-epos
+variable g-fpos  \ feedrate
+
+: g-pos.
+	." g-code position: "
+	." x=" g-xpos @ . 
+	." y=" g-ypos @ .
+	." z=" g-zpos @ .
+	." e=" g-epos @ .
+	." f=" g-fpos @ . lf ;
+
+: gmove
+	g-xpos @ um2xpos
+	g-ypos @ um2ypos
+	g-zpos @ um2zpos
+	g-epos @ um2epos
+	move
+;
+
+" eol" constant eol
+" syntax error" constant syntax
+" nan" constant nan
+
+variable lastkey
+
+: gkey
+	key dup lastkey !
+;
+
+: eol? ( -- bool )
+	lastkey @
+	case
+		10 of 1 endof
+		13 of 1 endof
+		0
+	endcase
+;
+
+: space? ( -- bool )
+	lastkey @ 32 =
+;
+
+: digit? ( -- bool )
+	lastkey @
+	[char] 0 dup 10 + within
+;
+	
+: skipdigits ( -- )
+	begin
+		gkey drop digit? while
+	repeat
+;
+
+: gkey
+	key dup lastkey !
+;
+
+decimal
+\ parse mm w/ point as um
+: gcode-num
+	\ parse mm part
+	0
+	begin
+		gkey digit? while
+			[char] 0 -
+			swap 10 * swap +
+	repeat
+	swap
+	1000 *
+	swap
+	case
+		[char] . of
+			\ parse um part
+			gkey digit? if
+				[char] 0 - 100 * +
+				gkey digit? if
+					[char] 0 - 10 * +
+					gkey digit? if
+						[char] 0 - +
+					else drop then
+				else drop then
+			else drop then
+		endof
+	endcase
+	digit? if skipdigits then
+;
+
+: gcode-default-pos
+	xpos @ xpos2um g-xpos !
+	ypos @ ypos2um g-ypos !
+	zpos @ zpos2um g-zpos !
+	epos @ epos2um g-epos !
+;	
+
+: gcode-collect-pos
+	gkey
+	eol? if exit then
+	case
+		[char] X of gcode-num g-xpos ! endof
+		[char] Y of gcode-num g-ypos ! endof
+		[char] Z of gcode-num g-zpos ! endof
+		[char] E of gcode-num g-epos ! endof
+		[char] F of gcode-num g-fpos ! endof
+		syntax throw
+	endcase
+;
+			
+: gcode-g-1 \ controlled move
+	begin
+		gcode-collect-pos
+	eol? until
+	g-pos.
+	gmove
+;
+
+: gcode-g-92 \ set position
+	gcode-collect-pos
+;
+
+: gcode-g
+	word number
+	case
+		1 of gcode-g-1 endof
+		92 of gcode-g-92 endof
+		." g-code"
+	endcase
+    ;
+
+: gcode-m
+	." m-code"
+	;
+
+: gcode
+	gkey case
+		[char] G of gcode-g endof
+		[char] M of gcode-m endof
+		," unsupported g-code :-( " throw
+	endcase
+;
+
