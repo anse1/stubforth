@@ -247,6 +247,11 @@ variable g-zpos
 variable g-epos
 variable g-fpos  \ feedrate
 
+: home
+	0 epos ! \ just reset the extruder
+	0 0 0 0 move
+    0 0 0 0 0 g-xpos ! g-ypos ! g-zpos ! g-epos ! g-fpos ! ; 
+
 : g-pos.
 	." g-code position: "
 	." x=" g-xpos @ . 
@@ -306,11 +311,22 @@ decimal
 \ parse mm w/ point as um
 : gcode-num
 	\ parse mm part
-	0
+	gkey digit? if
+		1 swap \ sign
+	else
+		[char] - = if
+			-1 \ sign
+			gkey
+		else
+			syntax throw
+		then
+	then
+	0 swap \ accu
 	begin
-		gkey digit? while
+		digit? while
 			[char] 0 -
 			swap 10 * swap +
+			gkey
 	repeat
 	swap
 	1000 *
@@ -330,6 +346,7 @@ decimal
 		endof
 	endcase
 	digit? if skipdigits then
+	* \ sign
 ;
 
 : gcode-default-pos
@@ -379,6 +396,7 @@ decimal
 		92 of gcode-g92 ok endof
 		90 of ok endof
 		21 of ok endof
+		28 of gcode-g1 ok endof
 		unimplemented throw
 	endcase
 ;
@@ -391,6 +409,10 @@ decimal
 		108 of skipline ok endof
 		101 of ok endof \ filament retract undo
 		103 of ok endof \ filament retract
+		107 of ok endof \ fan off
+		106 of ok endof \ fan on
+		104 of skipline ok endof \ set temperature
+		109 of skipline ok endof \ wait for temperature
 		84 of off ok endof \ filament retract
 		unimplemented throw
 	endcase
@@ -421,8 +443,3 @@ decimal
 \ end of parser
 
 hex
-
-: home
-	0 epos ! \ just reset the extruder
-	0 0 0 0 move
-    0 0 0 0 0 g-xpos ! g-ypos ! g-zpos ! g-epos ! g-fpos ! ; 
