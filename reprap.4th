@@ -202,7 +202,7 @@ variable eline 3 cells allot
 	epos @ - abs
 	swap
 	zpos @ - abs
-	max
+ 	max
 	swap
 	ypos @ - abs
 	max
@@ -235,12 +235,12 @@ decimal
 : xpos2um ( halfsteps -- um ) 164000 * 2048 / ;
 : ypos2um ( halfsteps -- um ) 164000 * 2048 / ;
 : zpos2um ( halfsteps -- um ) 1250 * 200 / ;
-: epos2um ( halfsteps -- um ) 48 * ;
+: epos2um ( halfsteps -- um ) 160000 * 14336 / ;
 
 : um2xpos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2ypos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2zpos ( um -- halfsteps ) 200 * 1250 / ;
-: um2epos ( um -- halfsteps ) 48 / ;
+: um2epos ( um -- halfsteps ) 14336 * 160000 / ;
 
 variable g-xpos
 variable g-ypos
