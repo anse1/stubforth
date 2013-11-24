@@ -30,12 +30,13 @@ f gpioden pe !
 f gpiodir pe !
 : se gpiodata pe f 2 << + ! ;
 
-\ current half-step (0..7)
+\ current stepper positions in half-steps
 variable xpos
 variable ypos
 variable zpos
 variable epos
 
+\ compute active coils of unipolar stepper for halfstep
 : halfstep ( 0..7 -- 0..16 )
 	7 and
 	case
