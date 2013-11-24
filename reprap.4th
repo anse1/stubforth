@@ -187,9 +187,9 @@ variable eline 3 cells allot
 \			pos.
 			xc yc zc ec
 			zline lconst? if
-				9 ms
+				11 ms
 			else
-				10 ms
+				11 ms
 			then
 	repeat
 	2drop drop
