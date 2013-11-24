@@ -691,7 +691,7 @@ primary(dostr)
   ip = aligned(s);
 }
 
-secondary(ccomma, `c,',,
+secondary(ccomma, ``c,'',,
   HERE, CSTORE, HERE, PLUS1, DP, STORE)
 
 secondary(quote, `\"',,
