@@ -292,6 +292,19 @@ variable lastkey
 	lastkey @ 32 =
 ;
 
+: word? ( -- bool )
+	lastkey @ 32 >
+;
+
+: gword ( -- char* ) \ like word, use gkey instead
+	here
+	begin
+		gkey word? while
+			c,
+	repeat
+	0 c,
+;
+
 : digit? ( -- bool )
 	lastkey @
 	[char] 0 dup 10 + within
