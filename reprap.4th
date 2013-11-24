@@ -348,6 +348,7 @@ decimal
 		[char] Z of gcode-num g-zpos ! endof
 		[char] E of gcode-num g-epos ! endof
 		[char] F of gcode-num g-fpos ! endof
+		[char] ; of skipline endof
 		syntax throw
 	endcase
 ;
@@ -397,9 +398,16 @@ decimal
 
 : gcode
 	decimal
-	gkey case
+	gkey
+	begin
+		eol? if exit then
+		space? while
+			gkey
+	repeat
+	case
 		[char] G of gcode-g endof
 		[char] M of gcode-m endof
+		[char] ; of skipline endof
 		unimplemented throw
 	endcase
 ;
@@ -409,6 +417,10 @@ decimal
 		gcode
 	again
 ;
+
+\ end of parser
+
+hex
 
 : home
 	0 epos ! \ just reset the extruder
