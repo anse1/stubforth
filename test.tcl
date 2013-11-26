@@ -177,7 +177,7 @@ test { " 668 1 + . " evaluate } {669 $}
 test { : x ?dup if 65 emit 1- restart then ; 666 4 64 emit x 85 emit . } {@AAAAU666 $}
 
 test { " /etc/passwd" r/w open-file } {Permission denied}
-test { " /etc/passwd" r/o open-file constant fd 64 emit } {@$}
+test { " /etc/passwd" r/o open-file constant fd 40 emit } {@$}
 
 test {
     variable buf 6 allot
@@ -189,7 +189,7 @@ test {
 
 test { 0 fd reposition-file buf 5 fd read-file buf type } {root:$}
 
-test { " the quick" 9 1 write-file 64 emit } {the quick@$}
+test { " the quick" 9 1 write-file 40 emit } {the quick@$}
 
 test { -2 666 u< . } {0 $}
 test { -2 666 < . } {1 $}
