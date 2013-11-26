@@ -117,6 +117,16 @@ variable eline 3 cells allot
 	zline line.
 	eline line. ;
 
+: ramp ( x2 x1 x -- y )
+	>r
+	2dup - abs 1 >> \ x2 x1 abs(x2-x1)/2  r: x
+	>r \ x2 x1  r: x abs(x2-x1)/2
+	+ 1 >> \ µ  r: x dx/2
+	r> swap \ dx µ r: x
+	r> - abs \ dx/2 abs(µ-x)
+	-
+;
+
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
