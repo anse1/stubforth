@@ -28,5 +28,3 @@ foreach line $lines {
 	-re "abort" { error abort } \
 	-re {ok}
 }
-
- 
