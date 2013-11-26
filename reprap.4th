@@ -59,62 +59,6 @@ variable epos
 : off 0 sx 0 sy 0 sz 0 se ;
 : on xc yc zc ec ;
 
-: xmove ( pos -- )
-	begin
-		dup xpos @
-		= 0= while
-		dup xpos @ > if
-			1 xpos +!
-		else
-			-1 xpos +!
-		then
-		xc
-		9 ms
-    repeat drop ;
-
-: ymove ( pos -- )
-	begin
-		dup ypos @
-		= 0= while
-		dup ypos @ > if
-			1 ypos +!
-		else
-			-1 ypos +!
-		then
-		yc
-		9 ms
-    repeat drop ;
-
-: zmove ( pos -- )
-	begin
-		dup zpos @
-		= 0= while
-		dup zpos @ > if
-			1 zpos +!
-		else
-			-1 zpos +!
-		then
-		zc
-		10 ms
-    repeat drop ;
-
-: emove ( pos -- )
-	begin
-		dup epos @
-		<> while
-		dup epos @ > if
-			1 epos +!
-		else
-			-1 epos +!
-		then
-		ec
-		7 ms
-    repeat drop ;
-
-: x+ 1 xpos +! xc ;
-: y+ 1 ypos +! yc ;
-: z+ 1 zpos +! zc ;
-
 : 2rel ypos @ - swap xpos @ - swap ;
 : 2abs abs swap abs swap ;
 
