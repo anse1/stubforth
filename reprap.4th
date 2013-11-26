@@ -37,7 +37,7 @@ variable zpos
 variable epos
 
 \ compute active coils of unipolar stepper for halfstep
-: halfstep ( 0..7 -- 0..16 )
+: halfstep ( 0..7 -- 0..15 )
 	7 and
 	case
 		0 of 1 endof
