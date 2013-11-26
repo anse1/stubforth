@@ -5,8 +5,9 @@ changecom(/*,*/)
 #include <sys/mman.h>
 #include <fcntl.h>
 
-cell return_stack[1000];
-cell param_stack[1000];
+cell return_stack[RETURN_STACK_SIZE];
+cell param_stack[PARAM_STACK_SIZE];
+
 struct vmstate vmstate;
 
 word *forth;
@@ -18,6 +19,11 @@ unsigned char *redirect;
 struct terminal terminal;
 
 dnl m4 definitions
+
+dnl The NEUTRAL word is used to get a value on the
+dnl stack used as placeholder, e.g., when
+dnl compiling a forward jump.
+define(NEUTRAL, ZERO)
 
 define(dict_head, 0)
 define(div_word, 1)
@@ -247,7 +253,7 @@ int main(int argc, char *argv[])
 
   while(1) {
     vmstate.compiling = 0;
-    vmstate.base = 10;
+    vmstate.base = 16;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
@@ -553,6 +559,7 @@ primary(plusstore, +!)
  *(vmint *)sp[-1].a += sp[-2].i;
  sp -= 2;
 
+dnl ( src dst u -- )
 primary(move)
 {
  char *s = sp[-3].s;
@@ -761,7 +768,7 @@ primary(dostr)
   ip = aligned(s);
 }
 
-secondary(ccomma, `c,',,
+secondary(ccomma, ``c,'',,
   HERE, CSTORE, HERE, PLUS1, DP, STORE)
 
 secondary(quote, `\"',,
@@ -852,7 +859,7 @@ constant(redirect,, &redirect);
 
 dnl ( -- a )
 secondary(if,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
+ LIT, ZBRANCH, COMMA, HERE, NEUTRAL, COMMA
 )
 
 dnl ( a -- )
@@ -862,7 +869,7 @@ secondary(then,, .immediate=1,
 
 dnl -- pad
 secondary(ahead,, .immediate=1, l(
- LIT BRANCH COMMA HERE ZERO COMMA
+ LIT BRANCH COMMA HERE NEUTRAL COMMA
 ))
 
 dnl ( a -- a )
@@ -931,6 +938,7 @@ include(string.m4)
 include(ffi.m4)
 include(file.m4)
 include(floating.m4)
+include(double.m4)
 
 dnl platform
 

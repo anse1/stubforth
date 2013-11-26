@@ -135,7 +135,7 @@ test "here word w2345678 find drop drop here = ." {1 $}
 test {" fox" " quick brown " type type} {quick brown fox$}
 test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy dog$}
 
-test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
+test {decimal : t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
 test {: t 1 if ." moo" else ." bar" then ; t} {moo$}
 
@@ -219,6 +219,13 @@ expect {
     timeout { error }
     -re abort:.*$
 }
+
+test { 5 7 2constant twocon twocon twocon . . . . } {7 5 7 5 $}
+
+test {  1 1 <> . } {0 $}
+
+test {  1 2 3 4 3 roll . . . . } {1 4 3 2 $}
+test {  1 2 3 4 0 roll . . . . } {4 3 2 1 $}
 
 send "forget testsuite-marker bye\n"
 

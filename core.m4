@@ -1,6 +1,6 @@
 dnl start consing a dodoes word
 secondary(builds, <builds,,
-  WORD, CONS, LIT, &&dodoes, COMMA, ZERO, COMMA, SMUDGE, SUSPEND)
+  WORD, CONS, LIT, &&dodoes, COMMA, NEUTRAL, COMMA, SMUDGE, SUSPEND)
 
 dnl set the dodoes address to the thread following does>
 secondary(does, does>,, RFROM, CONTEXT, LOAD, TOCODE, TOBODY, STORE)
@@ -72,6 +72,24 @@ secondary(evaluate,,, l(
  RFROM REDIRECT STORE
 ))
 
+dnl dividend divisor -- remainder quotient
+primary(umdivmod, um/mod)
+{
+  vmint quot, rem;
+  quot = sp[-2].u / sp[-1].u;
+  rem = sp[-2].u % sp[-1].u;
+  sp[-2].u = rem;
+  sp[-1].u = quot;
+}
+
 secondary(ichar, [char], .immediate=1, l(
  KEY LITERAL
 ))
+
+thread(udot1,
+ &&enter, BASE, CLOAD, UMDIVMOD,
+ QDUP, ZBRANCH, self[8], self,
+ HEXCHARS, ADD, CLOAD, EMIT, EXIT)
+
+secondary(udot, u.,, UDOT1, BL)
+
