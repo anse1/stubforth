@@ -120,11 +120,11 @@ variable eline 3 cells allot
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
-	\ increment x2 x1 --
+	\ inc x2 x1 --
 	begin
 \		." domove loop: " .s lf
 		2dup <> while
-			2 pick + \ increment+1 x2 x1 -- 
+			2 pick + \ increment x2 x1+inc -- 
 			xline over leval xpos !
 			yline over leval ypos !
 			zline over leval zpos !
