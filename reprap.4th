@@ -126,30 +126,33 @@ variable eline 3 cells allot
 	r> - abs \ dx/2 abs(µ-x)
 	-
 ;
-
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
 	\ inc x2 x1 --
+	dup >r
+	\ inc x2 i=x1 -- x1
 	begin
-\		." domove loop: " .s lf
 		2dup <> while
 			2 pick + \ increment x2 x1+inc -- 
 			xline over leval xpos !
 			yline over leval ypos !
 			zline over leval zpos !
 			eline over leval epos !
-\			pos.
 			xc yc zc ec
 			zline lconst? if
-				11 ms
+				2dup r@ swap
+				ramp
+				2 /
+				11 swap -
+				5 max ms
 			else
 				11 ms
 			then
 	repeat
-	2drop drop
+	r>
+	2drop 2drop
 ;
-
 \ move tool to pos (x,y,z,e)
 : move ( x y z e -- )
 	2over 2over
