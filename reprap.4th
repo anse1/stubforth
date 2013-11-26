@@ -126,6 +126,7 @@ variable eline 3 cells allot
 	r> - abs \ dx/2 abs(µ-x)
 	-
 ;
+
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
@@ -153,6 +154,7 @@ variable eline 3 cells allot
 	r>
 	2drop 2drop
 ;
+
 \ move tool to pos (x,y,z,e)
 : move ( x y z e -- )
 	2over 2over
