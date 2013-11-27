@@ -148,7 +148,7 @@ variable eline 3 cells allot
 				11 swap -
 				5 max ms
 			else
-				11 ms
+				a ms
 			then
 	repeat
 	r>
