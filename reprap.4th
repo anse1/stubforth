@@ -127,6 +127,8 @@ variable eline 3 cells allot
 	-
 ;
 
+hex
+variable mmax 20 mmax !
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
@@ -146,7 +148,12 @@ variable eline 3 cells allot
 				ramp
 				2 /
 				11 swap -
-				5 max ms
+				zline lconst? if
+					5
+				else
+					mmax @
+				then
+				max ms
 			else
 				a ms
 			then
@@ -422,3 +429,8 @@ decimal
 \ end of parser
 
 hex
+
+: e >r xpos @ ypos @ zpos @ r> move ;
+: x ypos @ zpos @ epos @ move ;
+: y >r xpos @ r> zpos @ epos @  move ;
+: z >r xpos @ ypos @ r> epos @  move ;
