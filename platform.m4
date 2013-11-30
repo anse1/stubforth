@@ -27,3 +27,4 @@ primary(emitq, key?)
   sp++;
 
 constant(f_tick,tick,.a=(int *)&tick)
+constant(forth_vectors,, &forth_vectors)

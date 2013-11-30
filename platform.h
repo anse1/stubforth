@@ -30,6 +30,8 @@ void sys_tick(void)
   tick++;
 }
 
+cell forth_vectors[60];
+
 __attribute__((naked))
 void default_handler(void)
 {
@@ -40,10 +42,25 @@ void default_handler(void)
 void default_handler_1(struct exception_frame *frame)
 {
   int xpsr;
-  my_puts("\nx_x default handler x_x\n");
-
-  my_puts("  xpsr: ");
   asm ("mrs %0, xpsr": "=r" (xpsr)) ;
+  cell forth_vector = forth_vectors[xpsr&0xff];
+  if (forth_vector.aa) {
+    cell sp[20];
+    cell rp[10];
+    struct vmstate istate = {
+      .sp = sp,
+      .rp = rp,
+      .dp = 0,
+      .dictionary = vmstate.dictionary,
+      .base = 16,
+      .compiling = 0,
+    };
+    vm(&istate, forth_vector.aa);
+    return;
+  }
+ 
+  my_puts("\nx_x default handler x_x\n");
+  my_puts("  xpsr: ");
   dumphex(xpsr);
   my_puts("\n    pc: ");
   dumphex((int)frame->ra);
@@ -152,7 +169,7 @@ __attribute__((section(".vectors")))
 static void initio()
 {
   ring.in = ring.out;
-  *VTOR=vectors;
+  *VTOR=(unsigned)vectors;
 
 
   /* interrupt on break and data ready */
