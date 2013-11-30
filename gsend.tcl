@@ -6,7 +6,7 @@ set fh [open $gcodefile]
 set data [read $fh]
 set lines [split $data \n]
 
-set timeout 10
+set timeout 30
 spawn -open [set port [open $tty "r+"]]
 
 send "\nhi\n"
