@@ -434,3 +434,126 @@ hex
 : x ypos @ zpos @ epos @ move ;
 : y >r xpos @ r> zpos @ epos @  move ;
 : z >r xpos @ ypos @ r> epos @  move ;
+
+
+\ ADC
+
+\ 12 channels, 2 converters @ 12 bit, 1 MS/s
+
+\ Pin Name Pin Number Pin Mux /
+\                     Assignment
+\   AIN0        6         PE3
+\   AIN1        7         PE2
+\   AIN2        8         PE1
+\   AIN3        9         PE0
+\   AIN4        64        PD3
+\   AIN5        63        PD2
+\   AIN6        62        PD1
+\   AIN7        61        PD0
+\   AIN8        60        PE5
+\   AIN9        59        PE4
+\  AIN10        58        PB4
+\  AIN11        57        PB5
+
+\ Table 13-2. Samples and FIFO Depth of Sequencers
+\             Sequencer                  Number of Samples Depth of FIFO
+\                SS3                             1               1
+\                SS2                             4               4
+\                SS1                             4               4
+\                SS0                             8               8
+
+\ => use SS3
+
+\ 13.4.1 Module Initialization
+\        Initialization of the ADC module is a simple process with very few steps: enabling the clock to the
+\        ADC, disabling the analog isolation circuit associated with all inputs that are to be used, and
+\        reconfiguring the sample sequencer priorities (if needed).
+\        The initialization sequence for the ADC is as follows:
+\        1. Enable the ADC clock using the RCGCADC register (see page 322).
+
+1 rcgcadc !
+
+\        2. Enable the clock to the appropriate GPIO modules via the RCGCGPIO register (see page 310).
+\             To find out which GPIO ports to enable, refer to "Signal Description" on page 754.
+\ All up already
+
+\        3. Set the GPIO AFSEL bits for the ADC input pins (see page 624). To determine which GPIOs to
+\             configure, see Table 21-4 on page 1130.
+
+\ PE4: Bed sensor - AIN9
+\ PE5: Hotend sensor - AIN8
+
+gpioafsel pe dup @ 30 or swap !
+
+\        4. Configure the AINx signals to be analog inputs by clearing the corresponding DEN bit in the
+\             GPIO Digital Enable (GPIODEN) register (see page 635).
+
+gpioden pe dup @ 30 ~ and swap !
+
+\        5. Disable the analog isolation circuit for all ADC input pins that are to be used by writing a 1 to
+\             the appropriate bits of the GPIOAMSEL register (see page 640) in the associated GPIO block.
+
+gpioamsel pe dup @ 30 or swap !
+
+\        6. If required by the application, reconfigure the sample sequencer priorities in the ADCSSPRI
+\           register. The default configuration has Sample Sequencer 0 with the highest priority and Sample
+\           Sequencer 3 as the lowest priority.
+
+
+\ oversampling 64x
+
+adcsac adc0 6 ! 
+
+\ 13.4.2 Sample Sequencer Configuration
+\        Configuration of the sample sequencers is slightly more complex than the module initialization
+\        because each sample sequencer is completely programmable.
+\        The configuration for each sample sequencer should be as follows:
+\        1. Ensure that the sample sequencer is disabled by clearing the corresponding ASENn bit in the
+\           ADCACTSS register. Programming of the sample sequencers is allowed without having them
+\           enabled. Disabling the sequencer during programming prevents erroneous execution if a trigger
+\           event were to occur during the configuration process.
+
+adcactss adc0 ?
+
+\        2. Configure the trigger event for the sample sequencer in the ADCEMUX register.
+\        3. For each sample in the sample sequence, configure the corresponding input source in the
+\           ADCSSMUXn register.
+
+f000 adcemux adc0 !
+
+\        4. For each sample in the sample sequence, configure the sample control bits in the corresponding
+\           nibble in the ADCSSCTLn register. When programming the last nibble, ensure that the END bit
+\           is set. Failure to set the END bit causes unpredictable behavior.
+
+2 adcssctl3 adc0 !
+
+\        5. If interrupts are to be used, set the corresponding MASK bit in the ADCIM register.
+
+
+\        6. Enable the sample sequencer logic by setting the corresponding ASENn bit in the ADCACTSS
+\           register.
+
+8 adcactss adc0 !
+
+adcssfifo3 adc0 ?
+
+: adc. begin
+	adcssfifo3 adc0 ?
+	500 ms again
+;
+
+8 adcssmux3 adc0 !
+
+\ vnr bitnr voffs
+\ 30 14 0x0000.0078 ADC0 Sequence 0
+\ 31 15 0x0000.007C ADC0 Sequence 1
+\ 32 16 0x0000.0080 ADC0 Sequence 2
+\ 33 17 0x0000.0084 ADC0 Sequence 3
+\ 64 48 0x0000.0100 ADC1 Sequence 0
+\ 65 49 0x0000.0104 ADC1 Sequence 1
+\ 66 50 0x0000.0108 ADC1 Sequence 2
+\ 67 51 0x0000.010C ADC1 Sequence 3
+
+8 adcim adc0 !
+
+adcris adc0 ?
