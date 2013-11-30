@@ -214,7 +214,6 @@ static void initio()
 /* 5. Enable use of the PLL by clearing the BYPASS bit in RCC/RCC2. */
   *RCC &= ~(1<<11);
 
-
 /*   *RCC=0x24e0540; */
 /*   *GPIOHBCTL=0x7e00; */
 /*   *RCC2=0x2404000; /\* not used *\/ */
