@@ -148,14 +148,14 @@ variable mmax 20 mmax !
 				ramp
 				2 /
 				11 swap -
-				zline lconst? if
+				eline lconst? if
 					5
 				else
 					mmax @
 				then
 				max ms
 			else
-				a ms
+				b ms
 			then
 	repeat
 	r>
@@ -201,12 +201,15 @@ decimal
 : xpos2um ( halfsteps -- um ) 164000 * 2048 / ;
 : ypos2um ( halfsteps -- um ) 164000 * 2048 / ;
 : zpos2um ( halfsteps -- um ) 1250 * 200 / ;
-: epos2um ( halfsteps -- um ) 160000 * 14336 / ;
+\ : epos2um ( halfsteps -- um ) 160000 * 14336 / ;
+: epos2um ( halfsteps -- um ) 43400 * 4096 / ;
 
 : um2xpos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2ypos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2zpos ( um -- halfsteps ) 200 * 1250 / ;
-: um2epos ( um -- halfsteps ) 14336 * 160000 / ;
+\ : um2epos ( um -- halfsteps ) 14336 * 160000 / ;
+: um2epos ( um -- halfsteps ) 4096 * 43400 / ;
+
 
 variable g-xpos
 variable g-ypos
@@ -435,6 +438,7 @@ hex
 : y >r xpos @ r> zpos @ epos @  move ;
 : z >r xpos @ ypos @ r> epos @  move ;
 
+\ temperature regulation
 
 \ ADC
 
@@ -502,7 +506,7 @@ gpioamsel pe dup @ 30 or swap !
 
 \ oversampling 64x
 
-adcsac adc0 6 ! 
+6 adcsac adc0 ! 
 
 \ 13.4.2 Sample Sequencer Configuration
 \        Configuration of the sample sequencers is slightly more complex than the module initialization
@@ -513,7 +517,7 @@ adcsac adc0 6 !
 \           enabled. Disabling the sequencer during programming prevents erroneous execution if a trigger
 \           event were to occur during the configuration process.
 
-adcactss adc0 ?
+0 adcactss adc0 !
 
 \        2. Configure the trigger event for the sample sequencer in the ADCEMUX register.
 \        3. For each sample in the sample sequence, configure the corresponding input source in the
@@ -525,10 +529,11 @@ f000 adcemux adc0 !
 \           nibble in the ADCSSCTLn register. When programming the last nibble, ensure that the END bit
 \           is set. Failure to set the END bit causes unpredictable behavior.
 
-2 adcssctl3 adc0 !
+6 adcssctl3 adc0 !
 
 \        5. If interrupts are to be used, set the corresponding MASK bit in the ADCIM register.
 
+8 adcim adc0 !
 
 \        6. Enable the sample sequencer logic by setting the corresponding ASENn bit in the ADCACTSS
 \           register.
@@ -554,6 +559,72 @@ adcssfifo3 adc0 ?
 \ 66 50 0x0000.0108 ADC1 Sequence 2
 \ 67 51 0x0000.010C ADC1 Sequence 3
 
-8 adcim adc0 !
+\ Value     Description
+\ 0x0       Reserved
+\ 0x1       125 ksps
+\ 0x2       Reserved
+\ 0x3       250 ksps
+\ 0x4       Reserved
+\ 0x5       500 ksps
+\ 0x6       Reserved
+\ 0x7       1 Msps
+\ 0x8 - 0xF Reserved
+1 adcpc adc0 !
 
 adcris adc0 ?
+
+6 adcsac adc0 !
+hex
+
+4c4f434b gpiolock pd !
+ff gpiocr pd !
+80 gpiodr8r pd +!
+80 gpiodir pd +!
+80 gpioden pd +!
+
+\ turn hotend heater on/off
+: hotend ( bool -- )
+	dup 1+ led
+	7 << gpiodata pd 80 2 << + ! ;
+
+variable adcount 0 adcount !
+variable adcaccu 0 adcaccu !
+
+: t_hotend
+	adcaccu @ adcount @ / [ hex ] 319 -
+	negate
+	[ decimal ] 806 * 1000 / \ mV
+	10 * 17 / \ dK
+	20 + \ °C
+;
+
+hex
+variable t_soll 5a t_soll !
+
+: t_loop
+	t_soll @ t_hotend > hotend
+;
+
+hex
+: adcint
+	1 adcount +!
+	8 adcisc adc0 !
+	adcssfifo3 adc0 @ adcaccu +!
+	100 adcount @ < if
+		t_loop
+		0 adcount !
+		0 adcaccu !
+	then
+;
+
+' adcint forth-vectors 21 cells + !
+
+11 ise!
+
+: demo
+	begin
+	." hotend: " decimal t_hotend . ." °C "
+		1000 ms
+	again
+;
+
