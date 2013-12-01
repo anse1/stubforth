@@ -203,14 +203,18 @@ decimal
 : zpos2um ( halfsteps -- um ) 1250 * 200 / ;
 \ : epos2um ( halfsteps -- um ) 160000 * 14336 / ;
 \ : epos2um ( halfsteps -- um ) 43400 * 4096 / ;
-: epos2um ( halfsteps -- um ) 44521 * 4096 / ;
+\ : epos2um ( halfsteps -- um ) 44521 * 4096 / ;
+
+: epos2um ( halfsteps -- um ) 1000 * 92 / ;
 
 : um2xpos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2ypos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2zpos ( um -- halfsteps ) 200 * 1250 / ;
 \ : um2epos ( um -- halfsteps ) 14336 * 160000 / ;
 \ : um2epos ( um -- halfsteps ) 4096 * 43400 / ;
-: um2epos ( um -- halfsteps ) 4096 * 44521 / ;
+\ : um2epos ( um -- halfsteps ) 4096 * 44521 / ;
+
+: um2epos ( um -- halfsteps ) 92 * 1000 / ;
 
 
 variable g-xpos
@@ -633,4 +637,10 @@ hex
 		1000 ms
 	again
 ;
+
+
+
+\ G1 X55.198 Y101.768 E524.16628
+
+\ G92 E524.16628
 
