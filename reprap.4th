@@ -202,13 +202,15 @@ decimal
 : ypos2um ( halfsteps -- um ) 164000 * 2048 / ;
 : zpos2um ( halfsteps -- um ) 1250 * 200 / ;
 \ : epos2um ( halfsteps -- um ) 160000 * 14336 / ;
-: epos2um ( halfsteps -- um ) 43400 * 4096 / ;
+\ : epos2um ( halfsteps -- um ) 43400 * 4096 / ;
+: epos2um ( halfsteps -- um ) 44521 * 4096 / ;
 
 : um2xpos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2ypos ( um -- halfsteps ) 2048 * 164000 / ;
 : um2zpos ( um -- halfsteps ) 200 * 1250 / ;
 \ : um2epos ( um -- halfsteps ) 14336 * 160000 / ;
-: um2epos ( um -- halfsteps ) 4096 * 43400 / ;
+\ : um2epos ( um -- halfsteps ) 4096 * 43400 / ;
+: um2epos ( um -- halfsteps ) 4096 * 44521 / ;
 
 
 variable g-xpos
@@ -602,6 +604,10 @@ hex
 variable t_soll 5a t_soll !
 
 : t_loop
+	t_hotend 0 < if
+		." hotend sensor fault!" lf
+		0 hotend
+	then
 	t_soll @ t_hotend > hotend
 ;
 
