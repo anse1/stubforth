@@ -128,7 +128,10 @@ variable eline 3 cells allot
 ;
 
 hex
-variable mmax 20 mmax !
+variable e-max 40 e-max ! \ extruder maximum speed (ms/step)
+variable xy-max 5 xy-max ! \ xy maximum speed (ms/step)
+variable xy-jerk 11 xy-jerk
+variable z-jerk b z-jerk ! \ z maximum speed (ms/step)
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
@@ -147,15 +150,15 @@ variable mmax 20 mmax !
 				2dup r@ swap
 				ramp
 				2 /
-				11 swap -
+				xy-jerk @ swap -
 				eline lconst? if
-					5
+					xy-max @
 				else
-					mmax @
+					e-max @
 				then
 				max ms
 			else
-				b ms
+				z-jerk @ ms
 			then
 	repeat
 	r>
