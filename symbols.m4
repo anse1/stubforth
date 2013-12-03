@@ -22,10 +22,10 @@ dnl
 dnl Cortex-M system control block
 
 mmio4(E000E008, ACTLR, Auxiliary Control Register, ACTLR on page 4-5, , 00000000)
-mmio4(E000E010, STCSR, SysTick Control and Status Register, , 00000000)
-mmio4(E000E014, STRVR, SysTick Reload Value Register)
-mmio4(E000E018, STCVR, SysTick Current Value Register)
-mmio4(E000E01C, STCR, SysTick Calibration Value Register)
+mmio4(E000E010, SYST_CSR, SysTick Control and Status Register, , 00000000)
+mmio4(E000E014, SYST_RVR, SysTick Reload Value Register)
+mmio4(E000E018, SYST_CVR, SysTick Current Value Register)
+mmio4(E000E01C, SYST_CALIB, SysTick Calibration Value Register)
 mmio4(E000ED00, CPUID, CPUID Base Register, CPUID on page 4-5, , 412FC231)
 mmio4(E000ED04, ICSR, Interrupt Control and State Register, , 00000000)
 mmio4(E000ED08, VTOR, Vector Table Offset Register, , 00000000)
