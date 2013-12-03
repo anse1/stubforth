@@ -5,6 +5,9 @@
 #include "stubforth.h"
 #include "cortexm.h"
 
+/* gah, who built libgcc with exception handling?! */
+char __aeabi_unwind_cpp_pr0[0];
+
 /* The platform needs to provide my_getchar() and putchar() */
 
 /* flags.break_condition can be set in an ISR to interrupt the
