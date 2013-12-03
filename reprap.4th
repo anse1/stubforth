@@ -230,17 +230,24 @@ variable g-fpos  \ feedrate
 : sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
 
 : axis-speed ( dx dy toolspeed -- axis_speed )
-	>r 2dup max >r dup * swap dup * + sqrt  \ r: toolspeed d_axis
-	r> r> */ ;
+	>r 2dup max >r  \ dx dy -- r: toolspeed max(dx,dy)
+	dup * swap dup * + sqrt  \ sqrt(dx²+dy²) r: toolspeed d_axis
+	r> r> \ sqrt(dx²+dy²) d_axis toolspeed
+	rot rot swap */
+;
 
 : gspeed
+	\ compute step-delay
 	g-xpos @ xcal 2@ */
 	g-ypos @ ycal 2@ */
 	xpos @
 	ypos @
 	diffabs
-	g-fpos @ xcal 2@ */
+	\ dx dy --
+	g-fpos @ \ dx dy um/s --
+	xcal 2@ */ \ dx dy steps/s --
 	axis-speed
+	.s
 	1000 swap / g-speed !
 ;
 
@@ -384,10 +391,10 @@ decimal
 	begin
 		gcode-collect-pos
 	eol? until
-	g-xpos @ um2xpos xpos !
-	g-ypos @ um2ypos ypos !
-	g-zpos @ um2zpos zpos !
-	g-epos @ um2epos epos !
+	g-xpos @ xcal 2@ */ xpos !
+	g-ypos @ ycal 2@ */ ypos !
+	g-zpos @ zcal 2@ */ zpos !
+	g-epos @ ecal 2@ */ epos !
 ;
 
 : ok ." ok" lf ;
