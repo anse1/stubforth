@@ -128,7 +128,7 @@ variable eline 3 cells allot
 ;
 
 hex
-variable e-max 40 e-max ! \ extruder jerk speed (ms/step)
+variable e-jerk 40 e-jerk ! \ extruder jerk speed (ms/step)
 variable xy-max 5 xy-max ! \ xy maximum speed (ms/step)
 variable xy-jerk 11 xy-jerk
 variable z-jerk b z-jerk ! \ z jerk speed (ms/step)
@@ -154,7 +154,7 @@ variable z-jerk b z-jerk ! \ z jerk speed (ms/step)
 				eline lconst? if
 					xy-max @
 				else
-					e-max @
+					e-jerk @
 				then
 				max ms
 			else
