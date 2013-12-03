@@ -22,6 +22,7 @@ sp[-1].i <<= 1;
 primary(twodiv, 2/)
 sp[-1].i >>= 1;
 
+dnl ( x1 x2 a-addr -- )
 primary(twostore, 2!)
 {
   cell *p = sp[-1].a;
@@ -30,11 +31,13 @@ primary(twostore, 2!)
   sp -= 3;
 }
 
+dnl ( a-addr -- x1 x2 )
 primary(twoload, 2@)
 {
   cell *p = sp[-1].a;
+  sp[0] = *p++;
   sp[-1] = *p++;
-  *sp++ = *p++;
+  sp++;
 }
 
 primary(twodup, 2dup)
