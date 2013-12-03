@@ -6,7 +6,7 @@ GCC ?= arm-none-eabi-gcc
 OBJCOPY ?= arm-none-eabi-objcopy
 CFLAGS ?= -O2 -g -Wall -mcpu=cortex-m4 -mthumb 
 SYNC ?= -s
-LIBGCC ?= $(shell $(GCC) -print-libgcc-file-name)
+LIBGCC ?= $(shell $(GCC) $(CFLAGS) -print-libgcc-file-name)
 LDFLAGS ?= -Wl,-Tcortexm.ld -nostdlib $(LIBGCC)
 
 GCC ?= gcc
