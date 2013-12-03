@@ -128,11 +128,17 @@ variable eline 3 cells allot
 	-
 ;
 
-hex
-variable g-speed 5 \ user speed
-variable xy-max 5 xy-max ! \ xy maximum speed (ms/step)
-variable xy-jerk 11 xy-jerk
-variable z-jerk b z-jerk ! \ z jerk speed (ms/step)
+variable g-speed
+variable xy-max
+variable xy-jerk
+variable z-jerk
+
+decimal
+12 xy-max ! \ xy maximum speed (100us/step)
+12 \ user speed
+80 xy-jerk
+100 z-jerk ! \ z jerk speed (100us/step)
+
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
 	2dup < if -1 else 1 then rot rot
@@ -150,14 +156,14 @@ variable z-jerk b z-jerk ! \ z jerk speed (ms/step)
 			zline lconst? if
 				2dup r@ swap
 				ramp
-				2 /
+				2/
 				xy-jerk @ swap -
 				xy-max @ g-speed @ max
 				max
 			else
 				z-jerk @
 			then
-			ms
+			100us
 	repeat
 	r>
 	2drop 2drop
@@ -248,8 +254,8 @@ variable g-fpos  \ feedrate
 	g-fpos @ \ dx dy um/s --
 	xcal 2@ */ \ dx dy steps/s --
 	axis-speed
-	1000 swap / g-speed !
-	." step delay for constraining axis: " g-speed @ . ." ms" lf 
+	10000 swap / g-speed !
+	." step delay for constraining axis: " g-speed @ . ." * 100 us" lf 
 ;
 
 : gmove
@@ -413,6 +419,30 @@ decimal
 	endcase
 ;
 
+decimal
+: gcode-m104
+	key [char] S = if
+		gword number t_soll !
+	else
+		syntax throw
+	then
+;
+
+: gcode-m109
+	gcode-m104
+	begin
+		wfi
+		t_hotend t_soll @ >
+		wfi
+		t_hotend t_soll @ >
+		and
+		wfi
+		t_hotend t_soll @ >
+		and
+	until
+;
+	
+decimal
 : gcode-m
 	gword number
 	case
@@ -423,8 +453,8 @@ decimal
 		103 of ok endof \ filament retract
 		107 of ok endof \ fan off
 		106 of skipline ok endof \ fan on
-		104 of skipline ok endof \ set temperature
-		109 of skipline ok endof \ wait for temperature
+		104 of gcode-m104 ok endof
+		109 of gcode-m109 ok endof \ wait for temperature
 		84 of off ok endof \ filament retract
 		unimplemented throw
 	endcase
