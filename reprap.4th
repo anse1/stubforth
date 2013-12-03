@@ -620,7 +620,6 @@ decimal
 	endcase
 ;
 
-decimal
 : gcode-m104
 	key [char] S = if
 		gword number t_soll !
@@ -629,21 +628,20 @@ decimal
 	then
 ;
 
+decimal
 : gcode-m109
 	gcode-m104
 	begin
-		wfi
 		t_hotend t_soll @ <
-		wfi
 		t_hotend t_soll @ <
 		and
-		wfi
 		t_hotend t_soll @ <
 		and
-	while repeat
+	while
+			100 ms
+	repeat
 ;
 	
-decimal
 : gcode-m
 	gword number
 	case
