@@ -17,11 +17,6 @@ hex
 70 rcc_base + constant rcc2
 10 rcc_base + constant dc1
 
-e000e010 constant syst_csr
-e000e014 constant syst_rvr
-e000e018 constant syst_cvr
-e000e01c constant syst_calib
-
 e000ed14 constant ccr
 
 decimal
