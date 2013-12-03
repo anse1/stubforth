@@ -1,3 +1,4 @@
+
 .( Loading reprap.4th...) lf
 
 hex
@@ -247,8 +248,8 @@ variable g-fpos  \ feedrate
 	g-fpos @ \ dx dy um/s --
 	xcal 2@ */ \ dx dy steps/s --
 	axis-speed
-	.s
 	1000 swap / g-speed !
+	." step delay for constraining axis: " g-speed @ . ." ms" lf 
 ;
 
 : gmove
@@ -355,10 +356,10 @@ decimal
 ;
 
 : gcode-default-pos
-	xpos @ xpos2um g-xpos !
-	ypos @ ypos2um g-ypos !
-	zpos @ zpos2um g-zpos !
-	epos @ epos2um g-epos !
+	xpos @ xcal @ swap */ g-xpos !
+	ypos @ ycal @ swap */ g-ypos !
+	zpos @ zcal @ swap */ g-zpos !
+	epos @ ecal @ swap */ g-epos !
 ;	
 
 : gcode-collect-pos
@@ -379,6 +380,7 @@ decimal
 	begin
 		gcode-collect-pos
 	eol? until
+	gspeed
 	gmove
 ;
 
