@@ -23,9 +23,40 @@ dnl Cortex-M system control block
 
 mmio4(E000E008, ACTLR, Auxiliary Control Register, ACTLR on page 4-5, , 00000000)
 mmio4(E000E010, SYST_CSR, SysTick Control and Status Register, , 00000000)
+dnl Bits R/W Name Function
+dnl [16] RO COUNTFLAG Returns 1 if timer counted to 0 since last time this register
+dnl                  was read. COUNTFLAG is set by a count transition from 1
+dnl                 => 0. COUNTFLAG is cleared on read or by a write to the
+dnl                Current Value register.
+dnl [2] R/W CLKSOURCE 0: clock source is (optional) external reference clock
+dnl                  1: core clock used for SysTick
+dnl                 If no external clock provided, this bit will read as 1 and
+dnl                ignore writes.
+dnl [1] R/W TICKINT If 1, counting down to 0 will cause the SysTick exception to
+dnl                be pended. Clearing the SysTick Current Value register by a
+dnl               register write in software will not cause SysTick to be
+dnl              pended.
+dnl [0] R/W ENABLE 0: the counter is disabled
+dnl               1: the counter will operate in a multi-shot manner.
 mmio4(E000E014, SYST_RVR, SysTick Reload Value Register)
 mmio4(E000E018, SYST_CVR, SysTick Current Value Register)
 mmio4(E000E01C, SYST_CALIB, SysTick Calibration Value Register)
+dnl Bits R/W Name Function
+dnl [31] RO NOREF If reads as 1, the Reference clock is not provided – the
+dnl                CLKSOURCE bit of the SysTick Control and Status register will
+dnl               be forced to 1 and cannot be cleared to 0.
+dnl [30] RO SKEW If reads as 1, the calibration value for 10ms is inexact (due to clock
+dnl             frequency).
+dnl [29:24]
+dnl [23:0]
+dnl ARM DDI 0403C
+dnl Restricted Access
+dnl Reserved
+dnl RO
+dnl TENMS
+dnl An optional Reload value to be used for 10ms (100Hz) timing,
+dnl subject to system clock skew errors. If the value reads as 0, the
+dnl calibration value is not known.
 mmio4(E000ED00, CPUID, CPUID Base Register, CPUID on page 4-5, , 412FC231)
 mmio4(E000ED04, ICSR, Interrupt Control and State Register, , 00000000)
 mmio4(E000ED08, VTOR, Vector Table Offset Register, , 00000000)
