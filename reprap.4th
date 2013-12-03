@@ -134,10 +134,10 @@ variable xy-jerk
 variable z-jerk
 
 decimal
-12 xy-max ! \ xy maximum speed (100us/step)
-12 \ user speed
-80 xy-jerk
-100 z-jerk ! \ z jerk speed (100us/step)
+10 xy-max ! \ xy maximum speed (100us/step)
+10 g-speed ! \ user speed
+20 xy-jerk !
+40 z-jerk ! \ z jerk speed (100us/step)
 
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
@@ -200,6 +200,206 @@ decimal
 : home
 	0 epos ! \ just reset the extruder
 	0 0 0 0 move ;
+
+\ temperature regulation
+
+\ ADC
+hex
+\ 12 channels, 2 converters @ 12 bit, 1 MS/s
+
+\ Pin Name Pin Number Pin Mux /
+\                     Assignment
+\   AIN0        6         PE3
+\   AIN1        7         PE2
+\   AIN2        8         PE1
+\   AIN3        9         PE0
+\   AIN4        64        PD3
+\   AIN5        63        PD2
+\   AIN6        62        PD1
+\   AIN7        61        PD0
+\   AIN8        60        PE5
+\   AIN9        59        PE4
+\  AIN10        58        PB4
+\  AIN11        57        PB5
+
+\ Table 13-2. Samples and FIFO Depth of Sequencers
+\             Sequencer                  Number of Samples Depth of FIFO
+\                SS3                             1               1
+\                SS2                             4               4
+\                SS1                             4               4
+\                SS0                             8               8
+
+\ => use SS3
+
+\ 13.4.1 Module Initialization
+\        Initialization of the ADC module is a simple process with very few steps: enabling the clock to the
+\        ADC, disabling the analog isolation circuit associated with all inputs that are to be used, and
+\        reconfiguring the sample sequencer priorities (if needed).
+\        The initialization sequence for the ADC is as follows:
+\        1. Enable the ADC clock using the RCGCADC register (see page 322).
+
+1 rcgcadc !
+
+\        2. Enable the clock to the appropriate GPIO modules via the RCGCGPIO register (see page 310).
+\             To find out which GPIO ports to enable, refer to "Signal Description" on page 754.
+\ All up already
+
+\        3. Set the GPIO AFSEL bits for the ADC input pins (see page 624). To determine which GPIOs to
+\             configure, see Table 21-4 on page 1130.
+
+\ PE4: Bed sensor - AIN9
+\ PE5: Hotend sensor - AIN8
+
+gpioafsel pe dup @ 30 or swap !
+
+\        4. Configure the AINx signals to be analog inputs by clearing the corresponding DEN bit in the
+\             GPIO Digital Enable (GPIODEN) register (see page 635).
+
+gpioden pe dup @ 30 ~ and swap !
+
+\        5. Disable the analog isolation circuit for all ADC input pins that are to be used by writing a 1 to
+\             the appropriate bits of the GPIOAMSEL register (see page 640) in the associated GPIO block.
+
+gpioamsel pe dup @ 30 or swap !
+
+\        6. If required by the application, reconfigure the sample sequencer priorities in the ADCSSPRI
+\           register. The default configuration has Sample Sequencer 0 with the highest priority and Sample
+\           Sequencer 3 as the lowest priority.
+
+
+\ oversampling 64x
+
+6 adcsac adc0 ! 
+
+\ 13.4.2 Sample Sequencer Configuration
+\        Configuration of the sample sequencers is slightly more complex than the module initialization
+\        because each sample sequencer is completely programmable.
+\        The configuration for each sample sequencer should be as follows:
+\        1. Ensure that the sample sequencer is disabled by clearing the corresponding ASENn bit in the
+\           ADCACTSS register. Programming of the sample sequencers is allowed without having them
+\           enabled. Disabling the sequencer during programming prevents erroneous execution if a trigger
+\           event were to occur during the configuration process.
+
+0 adcactss adc0 !
+
+\        2. Configure the trigger event for the sample sequencer in the ADCEMUX register.
+\        3. For each sample in the sample sequence, configure the corresponding input source in the
+\           ADCSSMUXn register.
+
+f000 adcemux adc0 !
+
+\        4. For each sample in the sample sequence, configure the sample control bits in the corresponding
+\           nibble in the ADCSSCTLn register. When programming the last nibble, ensure that the END bit
+\           is set. Failure to set the END bit causes unpredictable behavior.
+
+6 adcssctl3 adc0 !
+
+\        5. If interrupts are to be used, set the corresponding MASK bit in the ADCIM register.
+
+8 adcim adc0 !
+
+\        6. Enable the sample sequencer logic by setting the corresponding ASENn bit in the ADCACTSS
+\           register.
+
+8 adcactss adc0 !
+
+adcssfifo3 adc0 ?
+
+: adc. begin
+	adcssfifo3 adc0 ?
+	500 ms again
+;
+
+8 adcssmux3 adc0 !
+
+\ vnr bitnr voffs
+\ 30 14 0x0000.0078 ADC0 Sequence 0
+\ 31 15 0x0000.007C ADC0 Sequence 1
+\ 32 16 0x0000.0080 ADC0 Sequence 2
+\ 33 17 0x0000.0084 ADC0 Sequence 3
+\ 64 48 0x0000.0100 ADC1 Sequence 0
+\ 65 49 0x0000.0104 ADC1 Sequence 1
+\ 66 50 0x0000.0108 ADC1 Sequence 2
+\ 67 51 0x0000.010C ADC1 Sequence 3
+
+\ Value     Description
+\ 0x0       Reserved
+\ 0x1       125 ksps
+\ 0x2       Reserved
+\ 0x3       250 ksps
+\ 0x4       Reserved
+\ 0x5       500 ksps
+\ 0x6       Reserved
+\ 0x7       1 Msps
+\ 0x8 - 0xF Reserved
+1 adcpc adc0 !
+
+adcris adc0 ?
+
+6 adcsac adc0 !
+hex
+
+4c4f434b gpiolock pd !
+ff gpiocr pd !
+80 gpiodr8r pd +!
+80 gpiodir pd +!
+80 gpioden pd +!
+
+\ turn hotend heater on/off
+: hotend ( bool -- )
+	dup 1+ led
+	7 << gpiodata pd 80 2 << + ! ;
+
+variable adcount 0 adcount !
+variable adcaccu 0 adcaccu !
+
+: t_hotend
+	adcaccu @ adcount @ / [ hex ] 319 -
+	negate
+	[ decimal ] 806 1000 */ \ mV
+	10 17 */ \ dK
+	20 + \ °C
+;
+
+hex
+variable t_soll 5a t_soll !
+
+: t_loop
+	t_hotend 0 < if
+		." hotend sensor fault!" lf
+		0 hotend
+	then
+	t_soll @ t_hotend > hotend
+;
+
+hex
+: adcint
+	1 adcount +!
+	8 adcisc adc0 !
+	adcssfifo3 adc0 @ adcaccu +!
+	100 adcount @ < if
+		t_loop
+		0 adcount !
+		0 adcaccu !
+	then
+;
+
+' adcint forth-vectors 21 cells + !
+
+11 ise!
+
+: demo
+	begin
+	." hotend: " decimal t_hotend . ." °C "
+		1000 ms
+	again
+;
+
+
+
+\ G1 X55.198 Y101.768 E524.16628
+
+\ G92 E524.16628
 
 \ gcode parser
 
@@ -490,204 +690,4 @@ hex
 : x ypos @ zpos @ epos @ move ;
 : y >r xpos @ r> zpos @ epos @  move ;
 : z >r xpos @ ypos @ r> epos @  move ;
-
-\ temperature regulation
-
-\ ADC
-
-\ 12 channels, 2 converters @ 12 bit, 1 MS/s
-
-\ Pin Name Pin Number Pin Mux /
-\                     Assignment
-\   AIN0        6         PE3
-\   AIN1        7         PE2
-\   AIN2        8         PE1
-\   AIN3        9         PE0
-\   AIN4        64        PD3
-\   AIN5        63        PD2
-\   AIN6        62        PD1
-\   AIN7        61        PD0
-\   AIN8        60        PE5
-\   AIN9        59        PE4
-\  AIN10        58        PB4
-\  AIN11        57        PB5
-
-\ Table 13-2. Samples and FIFO Depth of Sequencers
-\             Sequencer                  Number of Samples Depth of FIFO
-\                SS3                             1               1
-\                SS2                             4               4
-\                SS1                             4               4
-\                SS0                             8               8
-
-\ => use SS3
-
-\ 13.4.1 Module Initialization
-\        Initialization of the ADC module is a simple process with very few steps: enabling the clock to the
-\        ADC, disabling the analog isolation circuit associated with all inputs that are to be used, and
-\        reconfiguring the sample sequencer priorities (if needed).
-\        The initialization sequence for the ADC is as follows:
-\        1. Enable the ADC clock using the RCGCADC register (see page 322).
-
-1 rcgcadc !
-
-\        2. Enable the clock to the appropriate GPIO modules via the RCGCGPIO register (see page 310).
-\             To find out which GPIO ports to enable, refer to "Signal Description" on page 754.
-\ All up already
-
-\        3. Set the GPIO AFSEL bits for the ADC input pins (see page 624). To determine which GPIOs to
-\             configure, see Table 21-4 on page 1130.
-
-\ PE4: Bed sensor - AIN9
-\ PE5: Hotend sensor - AIN8
-
-gpioafsel pe dup @ 30 or swap !
-
-\        4. Configure the AINx signals to be analog inputs by clearing the corresponding DEN bit in the
-\             GPIO Digital Enable (GPIODEN) register (see page 635).
-
-gpioden pe dup @ 30 ~ and swap !
-
-\        5. Disable the analog isolation circuit for all ADC input pins that are to be used by writing a 1 to
-\             the appropriate bits of the GPIOAMSEL register (see page 640) in the associated GPIO block.
-
-gpioamsel pe dup @ 30 or swap !
-
-\        6. If required by the application, reconfigure the sample sequencer priorities in the ADCSSPRI
-\           register. The default configuration has Sample Sequencer 0 with the highest priority and Sample
-\           Sequencer 3 as the lowest priority.
-
-
-\ oversampling 64x
-
-6 adcsac adc0 ! 
-
-\ 13.4.2 Sample Sequencer Configuration
-\        Configuration of the sample sequencers is slightly more complex than the module initialization
-\        because each sample sequencer is completely programmable.
-\        The configuration for each sample sequencer should be as follows:
-\        1. Ensure that the sample sequencer is disabled by clearing the corresponding ASENn bit in the
-\           ADCACTSS register. Programming of the sample sequencers is allowed without having them
-\           enabled. Disabling the sequencer during programming prevents erroneous execution if a trigger
-\           event were to occur during the configuration process.
-
-0 adcactss adc0 !
-
-\        2. Configure the trigger event for the sample sequencer in the ADCEMUX register.
-\        3. For each sample in the sample sequence, configure the corresponding input source in the
-\           ADCSSMUXn register.
-
-f000 adcemux adc0 !
-
-\        4. For each sample in the sample sequence, configure the sample control bits in the corresponding
-\           nibble in the ADCSSCTLn register. When programming the last nibble, ensure that the END bit
-\           is set. Failure to set the END bit causes unpredictable behavior.
-
-6 adcssctl3 adc0 !
-
-\        5. If interrupts are to be used, set the corresponding MASK bit in the ADCIM register.
-
-8 adcim adc0 !
-
-\        6. Enable the sample sequencer logic by setting the corresponding ASENn bit in the ADCACTSS
-\           register.
-
-8 adcactss adc0 !
-
-adcssfifo3 adc0 ?
-
-: adc. begin
-	adcssfifo3 adc0 ?
-	500 ms again
-;
-
-8 adcssmux3 adc0 !
-
-\ vnr bitnr voffs
-\ 30 14 0x0000.0078 ADC0 Sequence 0
-\ 31 15 0x0000.007C ADC0 Sequence 1
-\ 32 16 0x0000.0080 ADC0 Sequence 2
-\ 33 17 0x0000.0084 ADC0 Sequence 3
-\ 64 48 0x0000.0100 ADC1 Sequence 0
-\ 65 49 0x0000.0104 ADC1 Sequence 1
-\ 66 50 0x0000.0108 ADC1 Sequence 2
-\ 67 51 0x0000.010C ADC1 Sequence 3
-
-\ Value     Description
-\ 0x0       Reserved
-\ 0x1       125 ksps
-\ 0x2       Reserved
-\ 0x3       250 ksps
-\ 0x4       Reserved
-\ 0x5       500 ksps
-\ 0x6       Reserved
-\ 0x7       1 Msps
-\ 0x8 - 0xF Reserved
-1 adcpc adc0 !
-
-adcris adc0 ?
-
-6 adcsac adc0 !
-hex
-
-4c4f434b gpiolock pd !
-ff gpiocr pd !
-80 gpiodr8r pd +!
-80 gpiodir pd +!
-80 gpioden pd +!
-
-\ turn hotend heater on/off
-: hotend ( bool -- )
-	dup 1+ led
-	7 << gpiodata pd 80 2 << + ! ;
-
-variable adcount 0 adcount !
-variable adcaccu 0 adcaccu !
-
-: t_hotend
-	adcaccu @ adcount @ / [ hex ] 319 -
-	negate
-	[ decimal ] 806 1000 */ \ mV
-	10 17 */ \ dK
-	20 + \ °C
-;
-
-hex
-variable t_soll 5a t_soll !
-
-: t_loop
-	t_hotend 0 < if
-		." hotend sensor fault!" lf
-		0 hotend
-	then
-	t_soll @ t_hotend > hotend
-;
-
-hex
-: adcint
-	1 adcount +!
-	8 adcisc adc0 !
-	adcssfifo3 adc0 @ adcaccu +!
-	100 adcount @ < if
-		t_loop
-		0 adcount !
-		0 adcaccu !
-	then
-;
-
-' adcint forth-vectors 21 cells + !
-
-11 ise!
-
-: demo
-	begin
-	." hotend: " decimal t_hotend . ." °C "
-		1000 ms
-	again
-;
-
-
-
-\ G1 X55.198 Y101.768 E524.16628
-
-\ G92 E524.16628
 
