@@ -128,7 +128,7 @@ variable eline 3 cells allot
 ;
 
 hex
-variable e-jerk 40 e-jerk ! \ extruder jerk speed (ms/step)
+variable g-speed 5 \ user speed
 variable xy-max 5 xy-max ! \ xy maximum speed (ms/step)
 variable xy-jerk 11 xy-jerk
 variable z-jerk b z-jerk ! \ z jerk speed (ms/step)
@@ -151,15 +151,12 @@ variable z-jerk b z-jerk ! \ z jerk speed (ms/step)
 				ramp
 				2 /
 				xy-jerk @ swap -
-				eline lconst? if
-					xy-max @
-				else
-					e-jerk @
-				then
-				max ms
+				xy-max @ g-speed @ max
+				max
 			else
-				z-jerk @ ms
+				z-jerk @
 			then
+			ms
 	repeat
 	r>
 	2drop 2drop
@@ -225,6 +222,27 @@ variable g-fpos  \ feedrate
 	." z=" g-zpos @ .
 	." e=" g-epos @ .
 	." f=" g-fpos @ . lf ;
+
+: diffabs ( x1 y1 x2 y2 -- dx_abs dy_abs )
+	swap >r - abs swap r> - abs ;
+
+: sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
+: sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
+
+: axis-speed ( dx dy toolspeed -- axis_speed )
+	>r 2dup max >r dup * swap dup * + sqrt  \ r: toolspeed d_axis
+	r> r> */ ;
+
+: gspeed
+	g-xpos @ xcal 2@ */
+	g-ypos @ ycal 2@ */
+	xpos @
+	ypos @
+	diffabs
+	g-fpos @ xcal 2@ */
+	axis-speed
+	1000 swap / g-speed !
+;
 
 : gmove
 	g-xpos @ xcal 2@ */
