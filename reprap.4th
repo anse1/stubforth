@@ -455,7 +455,6 @@ variable g-fpos  \ feedrate
 	xcal 2@ */ \ dx dy steps/s --
 	axis-speed
 	10000 swap / g-speed !
-	." step delay for constraining axis: " g-speed @ . ." * 100 us" lf 
 ;
 
 : gmove
@@ -576,7 +575,9 @@ decimal
 		[char] Y of gcode-num g-ypos ! endof
 		[char] Z of gcode-num g-zpos ! endof
 		[char] E of gcode-num g-epos ! endof
-		[char] F of gcode-num g-fpos ! endof
+		[char] F of gcode-num
+			\ unit is mm/minute, using mm/s internally
+			60 / g-fpos ! endof
 		[char] ; of skipline endof
 		syntax throw
 	endcase
@@ -632,14 +633,14 @@ decimal
 	gcode-m104
 	begin
 		wfi
-		t_hotend t_soll @ >
+		t_hotend t_soll @ <
 		wfi
-		t_hotend t_soll @ >
+		t_hotend t_soll @ <
 		and
 		wfi
-		t_hotend t_soll @ >
+		t_hotend t_soll @ <
 		and
-	until
+	while repeat
 ;
 	
 decimal
