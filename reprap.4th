@@ -198,24 +198,11 @@ variable mmax 20 mmax !
 
 decimal
 
-: xpos2um ( halfsteps -- um ) 164000 * 2048 / ;
-: ypos2um ( halfsteps -- um ) 164000 * 2048 / ;
-: zpos2um ( halfsteps -- um ) 1250 * 200 / ;
-\ : epos2um ( halfsteps -- um ) 160000 * 14336 / ;
-\ : epos2um ( halfsteps -- um ) 43400 * 4096 / ;
-\ : epos2um ( halfsteps -- um ) 44521 * 4096 / ;
-
-: epos2um ( halfsteps -- um ) 1000 * 92 / ;
-
-: um2xpos ( um -- halfsteps ) 2048 * 164000 / ;
-: um2ypos ( um -- halfsteps ) 2048 * 164000 / ;
-: um2zpos ( um -- halfsteps ) 200 * 1250 / ;
-\ : um2epos ( um -- halfsteps ) 14336 * 160000 / ;
-\ : um2epos ( um -- halfsteps ) 4096 * 43400 / ;
-\ : um2epos ( um -- halfsteps ) 4096 * 44521 / ;
-
-: um2epos ( um -- halfsteps ) 92 * 1000 / ;
-
+\               steps       µm
+2variable xcal  2048    164000  xcal 2!
+2variable ycal  2048    164000  ycal 2!
+2variable zcal   200      1250  zcal 2!
+2variable ecal  4096     44521  ecal 2!
 
 variable g-xpos
 variable g-ypos
@@ -237,10 +224,10 @@ variable g-fpos  \ feedrate
 	." f=" g-fpos @ . lf ;
 
 : gmove
-	g-xpos @ um2xpos
-	g-ypos @ um2ypos
-	g-zpos @ um2zpos
-	g-epos @ um2epos
+	g-xpos @ xcal 2@ */
+	g-ypos @ ycal 2@ */
+	g-zpos @ zcal 2@ */
+	g-epos @ ecal 2@ */
 	move
 ;
 
@@ -599,8 +586,8 @@ variable adcaccu 0 adcaccu !
 : t_hotend
 	adcaccu @ adcount @ / [ hex ] 319 -
 	negate
-	[ decimal ] 806 * 1000 / \ mV
-	10 * 17 / \ dK
+	[ decimal ] 806 1000 */ \ mV
+	10 17 */ \ dK
 	20 + \ °C
 ;
 
