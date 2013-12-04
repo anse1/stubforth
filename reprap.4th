@@ -583,11 +583,14 @@ decimal
 		syntax throw
 	endcase
 ;
-			
+
+: ok ." ok" lf ;
+
 : gcode-g1 \ controlled move
 	begin
 		gcode-collect-pos
 	eol? until
+	ok
 	gspeed
 	gmove
 ;
@@ -607,12 +610,10 @@ decimal
 	g-epos @ ecal 2@ */ epos !
 ;
 
-: ok ." ok" lf ;
-
 : gcode-g
 	gword number
 	case
-		1 of gcode-g1 ok endof
+		1 of gcode-g1 endof
 		92 of gcode-g92 ok endof
 		90 of ok endof
 		21 of ok endof
