@@ -303,8 +303,6 @@ f000 adcemux adc0 !
 
 8 adcactss adc0 !
 
-adcssfifo3 adc0 ?
-
 : adc. begin
 	adcssfifo3 adc0 ?
 	500 ms again
@@ -333,9 +331,6 @@ adcssfifo3 adc0 ?
 \ 0x7       1 Msps
 \ 0x8 - 0xF Reserved
 1 adcpc adc0 !
-
-adcris adc0 ?
-
 6 adcsac adc0 !
 hex
 
