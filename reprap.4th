@@ -52,10 +52,10 @@ variable epos
 	endcase
 ;
 
-: xc xpos @ halfstep sx ;
-: yc ypos @ halfstep sy ;
-: zc zpos @ 7 swap - halfstep sz ;
-: ec epos @ 7 swap - halfstep se ;
+: xc 7 xpos @ - halfstep sx ;
+: yc 7 ypos @ - halfstep sy ;
+: zc 7 zpos @ - halfstep sz ;
+: ec 7 epos @ - halfstep se ;
 
 : off 0 sx 0 sy 0 sz 0 se ;
 : on xc yc zc ec ;
@@ -134,9 +134,9 @@ variable xy-jerk
 variable z-jerk
 
 decimal
-10 xy-max ! \ xy maximum speed (100us/step)
+11 xy-max ! \ xy maximum speed (100us/step)
 10 g-speed ! \ user speed
-20 xy-jerk !
+22 xy-jerk !
 40 z-jerk ! \ z jerk speed (100us/step)
 
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
@@ -409,7 +409,8 @@ decimal
 2variable xcal  2048    164000  xcal 2!
 2variable ycal  2048    164000  ycal 2!
 2variable zcal   200      1250  zcal 2!
-2variable ecal  4096     44521  ecal 2!
+\ 2variable ecal  4096     44521  ecal 2!
+2variable ecal  2000     22000  ecal 2! \ free air, 195°C
 
 variable g-xpos
 variable g-ypos
@@ -633,12 +634,14 @@ decimal
 	gcode-m104
 	begin
 		t_hotend t_soll @ <
+		200 ms
 		t_hotend t_soll @ <
+		200 ms
 		and
 		t_hotend t_soll @ <
+		200 ms
 		and
 	while
-			100 ms
 	repeat
 ;
 	
