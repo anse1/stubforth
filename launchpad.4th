@@ -13,9 +13,9 @@ hex
 ;
 
 decimal
-40000 syst_rvr !
 7 syst_csr !
-: ms 40000 syst_cvr ! 0 tick ! begin wfi dup tick @ = until drop ;
+: ms 40000 syst_cvr ! 40000 syst_rvr ! 0 tick ! begin wfi dup tick @ < until drop ;
+: 100us 4000 syst_cvr ! 4000 syst_rvr ! 0 tick ! begin wfi dup tick @ < until drop ;
 
 : heartbeat begin 900 ms [ hex ] 300000 col [ decimal ] 100 ms [ hex ] 000000 col again ;
 
