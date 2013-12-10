@@ -130,14 +130,16 @@ variable eline 3 cells allot
 
 variable g-speed
 variable xy-max
+variable xy-accel
 variable xy-jerk
 variable z-jerk
 
 decimal
 11 xy-max ! \ xy maximum speed (100us/step)
 10 g-speed ! \ user speed
-22 xy-jerk !
+20 xy-jerk !
 40 z-jerk ! \ z jerk speed (100us/step)
+24 xy-accel !
 
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
@@ -156,7 +158,7 @@ decimal
 			zline lconst? if
 				2dup r@ swap
 				ramp
-				2/
+				xy-accel @ 100 */
 				xy-jerk @ swap -
 				xy-max @ g-speed @ max
 				max
@@ -357,7 +359,7 @@ variable adcaccu 0 adcaccu !
 ;
 
 hex
-variable t_soll 5a t_soll !
+variable t_soll 96 t_soll !
 
 : t_loop
 	t_hotend 0 < if
