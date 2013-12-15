@@ -365,8 +365,9 @@ variable t_soll 96 t_soll !
 	t_hotend 0 < if
 		." hotend sensor fault!" lf
 		0 hotend
+	else
+		t_soll @ t_hotend > hotend
 	then
-	t_soll @ t_hotend > hotend
 ;
 
 hex
