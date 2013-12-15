@@ -22,7 +22,7 @@ send {
     10 g-speed ! \ user speed
     40 xy-jerk !
     40 z-jerk ! \ z jerk speed (100us/step)
-    60 xy-accel !
+    50 xy-accel !
     2048    164000  xcal 2!
     2048    164000  ycal 2!
     200      1250  zcal 2!  \ M8 threads
@@ -58,4 +58,7 @@ foreach line $lines {
 	timeout { error timeout } \
 	-re "abort" { error abort } \
 	-re {ok}
+
+    puts -nonewline "$line\r"
+    flush stdout
 }
