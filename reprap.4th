@@ -120,7 +120,7 @@ variable eline 3 cells allot
 
 : ramp ( x2 x1 x -- y )
 	>r
-	2dup - abs 1 >> \ x2 x1 abs(x2-x1)/2  r: x
+	2dup - abs 1+ 1 >> \ x2 x1 abs(x2-x1)/2  r: x
 	>r \ x2 x1  r: x abs(x2-x1)/2
 	+ 1 >> \ µ  r: x dx/2
 	r> swap \ dx µ r: x
@@ -162,7 +162,8 @@ decimal
 				2dup r@ swap
 				ramp
 				xy-accel @ 100 */
-				xy-jerk @ swap sqrt -
+				xy-jerk @ swap
+				sqrt -
 				xy-max @ g-speed @ max
 				max
 			else
@@ -207,14 +208,11 @@ decimal
 : y >r xpos @ r> zpos @ epos @  move ;
 : z >r xpos @ ypos @ r> epos @  move ;
 
-: jtest begin ?dup while
-			dup x dup negate x
-			dup x dup negate x
-			dup x dup negate x
-			dup x dup negate x
-			dup x dup negate x
-			dup x dup negate x
-			1-
+: jtest begin
+		dup x dup negate x
+		dup x dup negate x
+		dup x dup negate x 1-
+		?dup while
 	repeat ;
 
 : home
