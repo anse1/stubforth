@@ -16,13 +16,16 @@ expect \
     timeout { error timeout } \
     -re {stubforth}
 
+log_user 1
+
 send {
+    quiet
     decimal
-    11 xy-max ! \ xy maximum speed (100us/step)
-    10 g-speed ! \ user speed
-    40 xy-jerk !
+    8 xy-max ! \ xy maximum speed (100us/step)
+    8 g-speed ! \ user speed
+    44 xy-jerk !
     40 z-jerk ! \ z jerk speed (100us/step)
-    50 xy-accel !
+    8192 xy-accel !
     2048    164000  xcal 2!
     2048    164000  ycal 2!
     200      1250  zcal 2!  \ M8 threads

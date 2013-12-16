@@ -135,11 +135,14 @@ variable xy-jerk
 variable z-jerk
 
 decimal
-11 xy-max ! \ xy maximum speed (100us/step)
-10 g-speed ! \ user speed
-20 xy-jerk !
+8 xy-max ! \ xy maximum speed (100us/step)
+8 g-speed ! \ user speed
+44 xy-jerk !
 40 z-jerk ! \ z jerk speed (100us/step)
-24 xy-accel !
+8192 xy-accel !
+
+: sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
+: sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
 
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
@@ -159,7 +162,7 @@ decimal
 				2dup r@ swap
 				ramp
 				xy-accel @ 100 */
-				xy-jerk @ swap -
+				xy-jerk @ swap sqrt -
 				xy-max @ g-speed @ max
 				max
 			else
@@ -198,6 +201,21 @@ decimal
 	mkline xline line!
 	0 domove
 ;
+
+: e >r xpos @ ypos @ zpos @ r> move ;
+: x ypos @ zpos @ epos @ move ;
+: y >r xpos @ r> zpos @ epos @  move ;
+: z >r xpos @ ypos @ r> epos @  move ;
+
+: jtest begin ?dup while
+			dup x dup negate x
+			dup x dup negate x
+			dup x dup negate x
+			dup x dup negate x
+			dup x dup negate x
+			dup x dup negate x
+			1-
+	repeat ;
 
 : home
 	0 epos ! \ just reset the extruder
@@ -431,9 +449,6 @@ variable g-fpos  \ feedrate
 
 : diffabs ( x1 y1 x2 y2 -- dx_abs dy_abs )
 	swap >r - abs swap r> - abs ;
-
-: sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
-: sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
 
 : axis-speed ( dx dy toolspeed -- axis_speed )
 	>r 2dup max >r  \ dx dy -- r: toolspeed max(dx,dy)
@@ -686,9 +701,3 @@ decimal
 \ end of parser
 
 hex
-
-: e >r xpos @ ypos @ zpos @ r> move ;
-: x ypos @ zpos @ epos @ move ;
-: y >r xpos @ r> zpos @ epos @  move ;
-: z >r xpos @ ypos @ r> epos @  move ;
-
