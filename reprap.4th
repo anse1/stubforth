@@ -133,13 +133,15 @@ variable xy-max
 variable xy-accel
 variable xy-jerk
 variable z-jerk
+variable xy-delay
 
 decimal
-8 xy-max ! \ xy maximum speed (100us/step)
-8 g-speed ! \ user speed
-44 xy-jerk !
+6 xy-max ! \ xy maximum speed (100us/step)
+0 g-speed ! \ user speed
+46 xy-jerk !
 40 z-jerk ! \ z jerk speed (100us/step)
-8192 xy-accel !
+2000 xy-accel !
+6 xy-delay \ delayed acceleration
 
 : sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
 : sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
@@ -161,6 +163,10 @@ decimal
 			zline lconst? if
 				2dup r@ swap
 				ramp
+				xy-delay @ -
+				dup 0< if
+					drop 0
+				then
 				xy-accel @ 100 */
 				xy-jerk @ swap
 				sqrt -
@@ -375,7 +381,7 @@ variable adcaccu 0 adcaccu !
 ;
 
 hex
-variable t_soll 96 t_soll !
+variable t_soll 8c t_soll !
 
 : t_loop
 	t_hotend 0 < if
