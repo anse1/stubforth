@@ -19,25 +19,21 @@ expect \
 log_user 1
 
 send {
-    quiet
     decimal
-    8 xy-max ! \ xy maximum speed (100us/step)
-    8 g-speed ! \ user speed
-    44 xy-jerk !
+    6 xy-max ! \ xy maximum speed (100us/step)
+    0 g-speed ! \ user speed
+    46 xy-jerk !
     40 z-jerk ! \ z jerk speed (100us/step)
-    8192 xy-accel !
-    2048    164000  xcal 2!
-    2048    164000  ycal 2!
-    200      1250  zcal 2!  \ M8 threads
-    \ 4096  44521  ecal 2!
-    \ 14336   160000 ecal 2!
-    \ 4096 43400  ecal 2!
-    \ 4096 32000  ecal 2!
+    6 xy-delay !
+    2000 xy-accel !
+    \ 2048    164000  xcal 2! \ ruler
+    \ 2048    164000  ycal 2!
+    1000    79895 xcal 2! \ dial gauge
+    1000    79895 ycal 2!
+    \ 200  1250  zcal 2! \ M8 thread pitch
+    200    1227  zcal 2! \ measured pitch
     \ 2000 22000  ecal 2! \ measured to free air @ 195°C
-    \ 2040 22000  ecal 2! \ +2%
-    \  2080 22000  ecal 2! \ +4%
-    \ 2100 22000  ecal 2! \ +5%
-    8192 68000 ecal 2! \ measured to free air @ 180°C, 0.5mm-Nozzle
+    \ 8192 68000 ecal 2! \ measured to free air @ 180°C, 0.5mm-Nozzle
     4000 28000 ecal 2! \ same with tapped bolt
 }
 
@@ -49,6 +45,8 @@ expect \
 set timeout 300
 
 send "ginterp\n"
+
+log_user 0
 
 foreach line $lines {
 
