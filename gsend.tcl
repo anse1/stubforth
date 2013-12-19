@@ -20,12 +20,12 @@ log_user 1
 
 send {
     decimal
-    6 xy-max ! \ xy maximum speed (100us/step)
+    7 xy-max ! \ xy maximum speed (100us/step)
     0 g-speed ! \ user speed
-    46 xy-jerk !
+    50 xy-jerk !
     40 z-jerk ! \ z jerk speed (100us/step)
-    6 xy-delay !
-    2000 xy-accel !
+    7 xy-delay !
+    1800 xy-accel !
     \ 2048    164000  xcal 2! \ ruler
     \ 2048    164000  ycal 2!
     1000    79895 xcal 2! \ dial gauge
