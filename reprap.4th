@@ -744,7 +744,7 @@ variable pid_err_diff
 	t_soll @ t_ist @ -
 	dup pid_err_accu +!
 	pid_p @ * \ P
-	pid_err_last @ adcaccu @ -
+	adcaccu @ pid_err_last @ -
 	dup pid_err_diff !
 	pid_d @ * \ D
 	pid_err_accu @ pid_i @ * \ I
