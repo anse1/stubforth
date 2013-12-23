@@ -209,7 +209,7 @@ decimal
 	0 domove
 ;
 
-: e >r xpos @ ypos @ zpos @ r> move ;
+: t >r xpos @ ypos @ zpos @ r> move ;
 : x ypos @ zpos @ epos @ move ;
 : y >r xpos @ r> zpos @ epos @  move ;
 : z >r xpos @ ypos @ r> epos @  move ;
@@ -374,20 +374,163 @@ variable adcaccu 0 adcaccu !
 variable t_ist
 
 : t_hotend ( -- )
-	adcaccu @ adcount @ / [ hex ] 319 -
+	adcaccu @ [ hex ] 319 adcount @ * -
 	negate
 	[ decimal ] 806 1000 */ \ mV
 	10 17 */ \ dK
-	20 + \ °C
+	adcount @ 10 / /
+	200 + \ °C
 	t_ist !
 ;
 
 hex
 variable t_soll 8c t_soll !
 
-\ G1 X55.198 Y101.768 E524.16628
+hex
 
-\ G92 E524.16628
+1 5 << rcgcwtimer +! \ clock gate for wtimer5
+7 7 4 * << gpiopctl pd +! \ PD7 AF: wt5ccp1
+1 7 << gpioafsel pd +! \ enable AF for PD7
+
+\ 1. Ensure the timer is disabled (the TnEN bit is cleared) before
+\ making any changes.
+
+0 tmctl widetimer5 ! \ clear TBEN
+
+\ 2. Write the GPTM Configuration (GPTMCFG) register with a value of
+\ 0x0000.0004.
+
+4 tmcfg widetimer5 !
+
+\ 3. In the GPTM Timer Mode (GPTMTnMR) register, set the TnAMS bit to
+\ 0x1, the TnCMR bit to 0x0, and the TnMR field to 0x2.
+
+1 3 << ( tbams ) 1 2 << ( tbcmr ) or 2 ( tbmr ) or
+tmtbmr widetimer5 !
+
+\ 4. Configure the output state of the PWM signal (whether or not it
+\ is inverted) in the TnPWML field of the GPTM Control (GPTMCTL)
+\ register.
+
+1 0e << tmctl widetimer5 !
+
+\ 5. If a prescaler is to be used, write the prescale value to the
+\ GPTM Timer n Prescale Register (GPTMTnPR).
+
+0 tmtbpr widetimer5 !
+
+\ 6. If PWM interrupts are used, configure the interrupt condition in
+\ the TnEVENT field in the GPTMCTL register and enable the interrupts
+\ by setting the TnPWMIE bit in the GPTMTnMR register. Note that edge
+\ detect interrupt behavior is reversed when the PWM output is
+\ inverted (see page 690).
+
+\ 7. Load the timer start value into the GPTM Timer n Interval Load
+\ (GPTMTnILR) register.
+
+2000000 tmtbilr widetimer5 !
+
+\ 8. Load the GPTM Timer n Match (GPTMTnMATCHR) register with the
+\ match value.
+
+200000 tmtbmatchr widetimer5 !
+
+\ 9. Set the TnEN bit in the GPTM Control (GPTMCTL) register to enable
+\ the timer and begin generation of the output PWM signal.
+
+1 8 << tmctl widetimer5 +! \ set TBEN
+
+\ In PWM Timing mode, the timer continues running after the PWM signal
+\ has been generated. The PWM period can be adjusted at any time by
+\ writing the GPTMTnILR register, and the change takes effect at the
+\ next cycle after the write.
+
+\ tmtbr widetimer5 ?
+\ 10 tmtbv widetimer5 !
+\ tmtbv widetimer5 ?
+
+decimal 800 t_soll !
+
+hex
+
+variable pid_p
+variable pid_i
+variable pid_d
+variable pid_i_min
+variable pid_i_max
+variable pid_droop
+
+variable pid_err_accu
+variable pid_err_last
+variable pid_err_diff
+variable pid_i_decay
+
+0 pid_i !	 
+80000 pid_p !
+-100000 pid_d !
+0 pid_err_accu !
+32 pid_droop !
+64 pid_i_decay !
+
+: pid_sample ( -- )
+	t_soll @ t_ist @ -
+	dup pid_err_accu @ pid_i_decay @ * 64 / + pid_err_accu !
+	pid_p @ * \ P
+	t_ist @ pid_err_last @ -
+	dup pid_err_diff !
+	pid_d @ * \ D
+	pid_err_accu @ pid_i @ * \ I
+	+ +
+	dup	tmtbilr widetimer5 @ 1- > if
+		drop tmtbilr widetimer5 @ 1-
+	then
+	dup 0 < if
+		drop 0
+	then
+	tmtbmatchr widetimer5 !
+	t_ist @ pid_err_last !
+;
+
+: t_loop
+	t_hotend
+	t_ist @ 0 < if
+		." hotend sensor fault!" lf
+		0 tmtbmatchr widetimer5 !
+		exit
+	then
+	pid_sample
+;
+
+: adcint
+	1 adcount +!
+	8 adcisc adc0 !
+	adcssfifo3 adc0 @ adcaccu +!
+	1000 adcount @ < if
+		t_loop
+		0 adcount !
+		0 adcaccu !
+	then
+;
+
+' adcint forth-vectors 21 cells + !
+
+11 ise!
+
+: .temp
+		decimal
+		." hotend=" t_ist @ .
+		." soll=" t_soll @ .
+		." pid_err_accu=" pid_err_accu @ . 
+		." pid_err_diff=" pid_err_diff @ . 
+	hex ." matchr=" tmtbmatchr widetimer5 @ . lf
+;
+	
+: demo
+	begin
+		.temp
+		700 ms
+	again
+;
 
 \ gcode parser
 
@@ -609,7 +752,7 @@ decimal
 
 : gcode-m104
 	key [char] S = if
-		gword number t_soll !
+		gword number 10 * pid_droop @ + t_soll !
 	else
 		syntax throw
 	then
@@ -619,8 +762,9 @@ decimal
 : gcode-m109
 	gcode-m104
 	begin
-		t_ist @ t_soll @ <
-		200 ms
+		t_ist @ t_soll @ pid_droop @ - <
+		.temp
+		700 ms
 	while
 	repeat
 ;
@@ -664,136 +808,3 @@ decimal
 
 \ end of parser
 
-hex
-
-1 5 << rcgcwtimer +! \ clock gate for wtimer5
-7 7 4 * << gpiopctl pd +! \ PD7 AF: wt5ccp1
-1 7 << gpioafsel pd +! \ enable AF for PD7
-
-\ 1. Ensure the timer is disabled (the TnEN bit is cleared) before
-\ making any changes.
-
-0 tmctl widetimer5 ! \ clear TBEN
-
-\ 2. Write the GPTM Configuration (GPTMCFG) register with a value of
-\ 0x0000.0004.
-
-4 tmcfg widetimer5 !
-
-\ 3. In the GPTM Timer Mode (GPTMTnMR) register, set the TnAMS bit to
-\ 0x1, the TnCMR bit to 0x0, and the TnMR field to 0x2.
-
-1 3 << ( tbams ) 1 2 << ( tbcmr ) or 2 ( tbmr ) or
-tmtbmr widetimer5 !
-
-\ 4. Configure the output state of the PWM signal (whether or not it
-\ is inverted) in the TnPWML field of the GPTM Control (GPTMCTL)
-\ register.
-
-1 0e << tmctl widetimer5 !
-
-\ 5. If a prescaler is to be used, write the prescale value to the
-\ GPTM Timer n Prescale Register (GPTMTnPR).
-
-0 tmtbpr widetimer5 !
-
-\ 6. If PWM interrupts are used, configure the interrupt condition in
-\ the TnEVENT field in the GPTMCTL register and enable the interrupts
-\ by setting the TnPWMIE bit in the GPTMTnMR register. Note that edge
-\ detect interrupt behavior is reversed when the PWM output is
-\ inverted (see page 690).
-
-\ 7. Load the timer start value into the GPTM Timer n Interval Load
-\ (GPTMTnILR) register.
-
-2000000 tmtbilr widetimer5 !
-
-\ 8. Load the GPTM Timer n Match (GPTMTnMATCHR) register with the
-\ match value.
-
-200000 tmtbmatchr widetimer5 !
-
-\ 9. Set the TnEN bit in the GPTM Control (GPTMCTL) register to enable
-\ the timer and begin generation of the output PWM signal.
-
-1 8 << tmctl widetimer5 +! \ set TBEN
-
-\ In PWM Timing mode, the timer continues running after the PWM signal
-\ has been generated. The PWM period can be adjusted at any time by
-\ writing the GPTMTnILR register, and the change takes effect at the
-\ next cycle after the write.
-
-tmtbr widetimer5 ?
-
-10 tmtbv widetimer5 !
-
-tmtbv widetimer5 ?
-
-decimal 90 t_soll !
-hex
-
-variable pid_p 200000 pid_p !
-variable pid_i 8000 pid_i !
-variable pid_d 1000 pid_d !
-
-variable pid_err_accu
-variable pid_err_last
-variable pid_err_diff
-
-: pid_sample ( -- )
-	t_soll @ t_ist @ -
-	dup pid_err_accu +!
-	pid_p @ * \ P
-	adcaccu @ pid_err_last @ -
-	dup pid_err_diff !
-	pid_d @ * \ D
-	pid_err_accu @ pid_i @ * \ I
-	+ +
-	dup	tmtbilr widetimer5 @ 1- > if
-		drop tmtbilr widetimer5 @ 1-
-	then
-	dup 0 < if
-		drop 0
-	then
-	tmtbmatchr widetimer5 !
-	adcaccu @ pid_err_last !
-;
-
-: t_loop
-	t_hotend
-	t_ist @ 0 < if
-		." hotend sensor fault!" lf
-		0 tmtbmatchr widetimer5 !
-		exit
-	then
-	pid_sample
-;
-
-: adcint
-	1 adcount +!
-	8 adcisc adc0 !
-	adcssfifo3 adc0 @ adcaccu +!
-	400 adcount @ < if
-		t_loop
-		0 adcount !
-		0 adcaccu !
-	then
-;
-
-' adcint forth-vectors 21 cells + !
-
-11 ise!
-
-: demo
-	begin
-		decimal
-		." hotend=" t_ist @ .
-		." soll=" t_soll @ .
-		." pid_err_accu=" pid_err_accu @ . 
-		." pid_err_diff=" pid_err_diff @ . 
-		hex ." matchr=" tmtbmatchr widetimer5 @ . lf
-		500 ms
-	again
-;
-
-demo
