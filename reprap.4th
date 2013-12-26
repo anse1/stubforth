@@ -469,12 +469,12 @@ variable pid_i_decay
 80000 pid_p !
 -100000 pid_d !
 0 pid_err_accu !
-32 pid_droop !
+20 pid_droop !
 64 pid_i_decay !
 
 : pid_sample ( -- )
 	t_soll @ t_ist @ -
-	dup pid_err_accu @ pid_i_decay @ * 64 / + pid_err_accu !
+	dup pid_err_accu @ pid_i_decay @ 64 */ + pid_err_accu !
 	pid_p @ * \ P
 	t_ist @ pid_err_last @ -
 	dup pid_err_diff !
@@ -537,11 +537,12 @@ variable pid_i_decay
 decimal
 
 \               steps       µm
-2variable xcal  2048    164000  xcal 2!
-2variable ycal  2048    164000  ycal 2!
-2variable zcal   200      1250  zcal 2!
+2variable xcal  1000    79895  xcal 2!
+2variable ycal  1000    79895  ycal 2!
+2variable zcal   200      1227  zcal 2!
 \ 2variable ecal  4096     44521  ecal 2!
 2variable ecal  2000     22000  ecal 2! \ free air, 195°C
+
 
 variable g-xpos
 variable g-ypos
