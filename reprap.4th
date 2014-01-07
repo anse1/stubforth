@@ -469,7 +469,7 @@ variable pid_i_decay
 80000 pid_p !
 -100000 pid_d !
 0 pid_err_accu !
-20 pid_droop !
+10 pid_droop !
 64 pid_i_decay !
 
 : pid_sample ( -- )
