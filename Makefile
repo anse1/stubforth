@@ -1,6 +1,6 @@
 -include config.mak
 
-GCC = ?msp430-gcc
+GCC ?= msp430-gcc
 CFLAGS ?= -O2  -g -Wall -Wcast-align -Os -mmcu=msp430g2553
 SYNC ?= -s
 
