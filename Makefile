@@ -24,6 +24,12 @@ stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 stubforth:  stubforth.o
 	$(GCC) $(CFLAGS) -Wl,platform.x  -o $@ $<
 
+prog: stubforth
+	mspdebug rf2500 erase
+	mspdebug rf2500 load stubforth
+	mspdebug rf2500 "load $<"
+	touch prog
+
 %.size: % size.sh
 	. ./size.sh $<
 	strip $<
