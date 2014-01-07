@@ -26,9 +26,7 @@ stubforth:  stubforth.o
 	$(GCC) $(CFLAGS) -Wl,platform.x  -o $@ $<
 
 prog: stubforth
-	mspdebug rf2500 erase
-	mspdebug rf2500 load stubforth
-	mspdebug rf2500 "load $<"
+	mspdebug rf2500 erase "load $<"
 	touch prog
 
 %.size: % size.sh
