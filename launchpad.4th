@@ -10,7 +10,11 @@ fc00 taccr1 !
 
 ec70 taccr1 !
 
-ec70 fc20 + 2/ taccr1 !
+ec70 ec70 fc20 + + 3 / taccr1 !
+
+ec70 fc20 + 2 / taccr1 !
+
+: s 4 << ec88 + taccr1 ! ;
 
 6 4 << \ output mode 6
 tacctl1 !
