@@ -1,3 +1,4 @@
+#!/usr/bin/expect
 
 set tty [lindex $argv 1]
 set gcodefile [lindex $argv 0]
