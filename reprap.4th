@@ -1,5 +1,14 @@
-
 .( Loading reprap.4th...) lf
+
+
+\ There are two design mistakes in here:
+\
+\ - The software uses the position of the fastest (constraining) axis
+\   to compute the other axes' movements.  This made the computation
+\   needlessly complicated when adding acceleration afterwards.
+\
+\ - The g-code interpreter besides the forth interpreter needs lots of
+\   space.  Better translate g-code to forth on the host.
 
 hex
 
@@ -26,10 +35,16 @@ f gpiodir pb !
 
 \ stepper e
 	
-f gpiodr8r pe !
-f gpioden pe !
-f gpiodir pe !
-: se gpiodata pe f 2 << + ! ;
+\ f gpiodr8r pe !
+\ f gpioden pe !
+\ f gpiodir pe !
+\ : se gpiodata pe f 2 << + ! ;
+
+ff gpiodr8r pb !
+ff gpioden pb !
+ff gpiodir pb !
+
+: se 4 << gpiodata pb f0 2 << + ! ;
 
 \ current stepper positions in half-steps
 variable xpos
@@ -52,10 +67,26 @@ variable epos
 	endcase
 ;
 
+\ compute dual full bridge state for bipolar steppers
+\ TODO: Rewire middle wires so it is identical to the former word.
+: halfstepbi ( 0..7 -- 0..15 )
+	7 and
+	case
+		0 of 1 endof
+		1 of 5 endof
+		2 of 4 endof
+		3 of 6 endof
+		4 of 2 endof
+		5 of a endof
+		6 of 8 endof
+		7 of 9 endof
+	endcase
+;
+
 : xc 7 xpos @ - halfstep sx ;
 : yc 7 ypos @ - halfstep sy ;
 : zc 7 zpos @ - halfstep sz ;
-: ec 7 epos @ - halfstep se ;
+: ec 7 epos @ - halfstepbi se ;
 
 : off 0 sx 0 sy 0 sz 0 se ;
 : on xc yc zc ec ;
