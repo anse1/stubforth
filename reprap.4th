@@ -796,7 +796,8 @@ decimal
 	begin
 		t_ist @ t_soll @ pid_droop @ - <
 		.temp
-		700 ms
+		750 ms
+		sw1? 0= and
 	while
 	repeat
 ;
