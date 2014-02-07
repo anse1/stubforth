@@ -82,7 +82,7 @@ e gpioden pf !
 \ pf3 - green led
 \ pf4 - sw1
 
-: led 1 << gpiodata pf e 2 << +! ;
+: led 1 << gpiodata pf e 2 << + ! ;
 1 led
 
 4c4f434b gpiolock pf !
@@ -92,3 +92,4 @@ ff gpiocr pf !
 
 : sw1? gpiodata pf 10 2 << + @ 0= ;
 : sw2? gpiodata pf 1 2 << + @ 0= ;
+
