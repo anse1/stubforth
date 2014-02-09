@@ -40,10 +40,13 @@ send {
     0 pid_i !
 
     hex
-    -300000 pid_d !
-    c0000 pid_p !
-    10 pid_droop !
-
+    \ oscillates...
+    \ -300000 pid_d !
+    \ c0000 pid_p !
+    \ 10 pid_droop !
+    -80000 pid_d !
+    80000 pid_p !
+    14 pid_droop !
 }
 
 send "hi\n"
