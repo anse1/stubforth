@@ -86,6 +86,8 @@ static void initio()
 
 /* 5. Enable interrupts (optional) via UCAxRXIE and/or UCAxTXIE */
 
+   P1DIR &= ~(7<<3); // encoder
+   P1REN |= 7 << 3;
 }
 
 
