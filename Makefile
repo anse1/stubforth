@@ -3,6 +3,7 @@
 GCC ?= msp430-gcc
 CFLAGS ?= -O2  -g -Wall -Wcast-align -Os -mmcu=msp430g2553
 SYNC ?= -s
+OBJCOPY = msp430-objcopy
 
 all: stubforth
 
@@ -22,10 +23,10 @@ stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
-stubforth:  stubforth.o
-	$(GCC) $(CFLAGS) -Wl,platform.x  -o $@ $<
+stubforth:  stubforth.o launchpad.o
+	$(GCC) $(CFLAGS) -Wl,platform.x  -o $@ $+
 
-prog: stubforth
+prog: stubforth 
 	mspdebug rf2500 erase "load $<"
 	touch prog
 
@@ -62,6 +63,6 @@ TAGS: .
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
 %.o : %.4th
-	$(OBJCOPY) -I binary -B arm -O elf32-littlearm \
+	$(OBJCOPY) -I binary -B msp430  -O elf32-little \
 	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
 	 $< $@
