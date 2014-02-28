@@ -28,5 +28,23 @@ primary(rotq, rot?)
      state = new;
 }
 
-
 include(symbols.m4)
+
+secondary(on,,,
+	LIT, .i=0x60, T1CCTL1, STORE,
+	LIT, .i=0xe0, T1CCTL2, STORE)
+
+secondary(off,,,
+	ZERO, T1CCTL1, STORE,
+	ZERO, T1CCTL2, STORE)
+
+secondary(sq, `s?',,
+	      P1IN, CLOAD, LIT, .i=0x20, AND, NULLP)
+
+secondary(duty,,,
+	OFF, DUP, T1CCR0, LOAD, SWAP, SUB, T1CCR1, STORE,
+	T1CCR2, STORE, ON)
+
+secondary(period,,,
+	OFF, T1CCR0, STORE, ON,)
+

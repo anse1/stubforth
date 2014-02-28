@@ -22,13 +22,9 @@
 \ \ p1.6/ta0.1 out1 output
 \ 1 6 << p1sel +!
 
-2 8 <<
-3 6 << or
-
-1 4 << or
-t1ctl !
-
-8000 t1ccr0 !
+2 8 << 3 6 << or
+1 4 << or t1ctl !
+ffff t1ccr0 !
 
 \ p2.1 T1.1
 \ p2.4 T1.2
@@ -36,32 +32,41 @@ t1ctl !
 1 1 << dup p2sel +! p2dir +!
 1 4 << dup p2sel +! p2dir +!
 
-: duty dup t1ccr0 @ swap - t1ccr1 ! t1ccr2 ! ;
+\ : on 3 5 << t1cctl1 ! 7 5 << t1cctl2 ! ;
+\ : off 0 t1cctl1 ! 0 t1cctl2 ! ;
 
-1 duty
-3 5 <<
-t1cctl1 !
-7 5 <<
-t1cctl2 !
+\ : duty off
+\ 	dup t1ccr0 @ swap - t1ccr1 ! t1ccr2 ! on ;
 
-0 duty
+20 duty
+
+\ : period off
+\ 	t1ccr0 ! on ;
 	
 variable state
+variable delay
 10 state !
+ffff delay !
 
-: s? p1in c@ 1 5 << and 0= ;
+\ : s? p1in c@ 1 5 << and 0= ;
 
 : loop
-	begin
-		rot?
-		s? if
-			100 *
-			t1ccr0 +!
-		else
-			state +!
-			state @ 0 < if 0 state ! then
+	begin rot?
+		?dup if
+			10 * s? if
+				10 * minus
+				delay +!
+				delay @ -1 > if
+					-1 delay ! then
+				delay @ period
+				state @ duty
+			else
+				state +!
+				state @ 0< if
+					20 state ! then
+				state @ duty
+			then
 		then
-		state @ duty
 	again
 ;
 

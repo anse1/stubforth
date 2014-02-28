@@ -23,7 +23,7 @@ stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
-stubforth:  stubforth.o launchpad.o
+stubforth:  stubforth.o
 	$(GCC) $(CFLAGS) -Wl,platform.x  -o $@ $+
 
 prog: stubforth 
