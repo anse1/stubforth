@@ -34,18 +34,17 @@ f gpioden pb !
 f gpiodir pb !
 : sy gpiodata pb f 2 << + ! ;
 
-\ stepper e
-	
-\ f gpiodr8r pe !
-\ f gpioden pe !
-\ f gpiodir pe !
-\ : se gpiodata pe f 2 << + ! ;
-
+\ stepper e 
 ff gpiodr8r pb !
 ff gpioden pb !
 ff gpiodir pb !
-
 : se 4 << gpiodata pb f0 2 << + ! ;
+
+\ display cathodes
+f gpiodr8r pe !
+f gpioden pe !
+f gpiodir pe !
+: sl gpiodata pe f 2 << + ! ;
 
 \ current stepper positions in half-steps
 variable xpos
