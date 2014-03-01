@@ -28,3 +28,11 @@ primary(emitq, key?)
 
 constant(f_tick,tick,.a=(int *)&tick)
 constant(forth_vectors,, &forth_vectors)
+
+define(mmio4, `constant(translit($2,A-Z,a-z),, .i=0x$1)')
+
+define(indirect, `
+secondary(translit($2,A-Z,a-z),,,
+	LIT, .i=0x$1, ADD)' )
+
+include(symbols.m4)
