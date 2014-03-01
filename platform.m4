@@ -33,4 +33,294 @@ define(mmio4, `constant(translit($2,A-Z,a-z),translit($2,A-Z,a-z), .i=0x$1)')
 
 define(indirect, `secondary(translit($2,A-Z,a-z),translit($2,A-Z,a-z),, LIT, .i=0x$1, ADD)' )
 
+constant(display,, .s=dpybuf)
+constant(dpystate,, .a=&dpystate)
+
 include(symbols.m4)
+
+#define SEGA 0
+#define SEGB 3
+#define SEGC 1
+#define SEGD 6
+#define SEGE 4
+#define SEGF 2
+#define SEGG 5
+
+static const unsigned char num2seg[] = {
+       1<<SEGA
+| 1<<SEGF |  1<<SEGB
+|      0<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       0<<SEGA
+| 0<<SEGF |  1<<SEGB
+|      0<<SEGG
+| 0<<SEGE |  1<<SEGC
+|      0<<SEGD
+       ,
+       1<<SEGA
+| 0<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  0<<SEGC
+|      1<<SEGD
+       ,
+       1<<SEGA
+| 0<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 0<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       0<<SEGA
+| 1<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 0<<SEGE |  1<<SEGC
+|      0<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 0<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  1<<SEGB
+|      0<<SEGG
+| 0<<SEGE |  1<<SEGC
+|      0<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 0<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      0<<SEGD
+       ,
+       0<<SEGA
+| 1<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       0<<SEGA
+| 0<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  0<<SEGC
+|      1<<SEGD
+       ,
+       0<<SEGA
+| 0<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      1<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  0<<SEGC
+|      1<<SEGD
+       ,
+       1<<SEGA
+| 1<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  0<<SEGC
+|      0<<SEGD
+} ;
+
+constant(num2seg,, .s=num2seg)
+
+static const unsigned char alpha2seg[30] = {
+       1<<SEGA
+| 1<<SEGF |  1<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      0<<SEGD
+      ,
+       0<<SEGA
+| 1<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  1<<SEGC
+|      1<<SEGD
+      ,
+       0<<SEGA
+| 0<<SEGF |  0<<SEGB
+|      1<<SEGG
+| 1<<SEGE |  0<<SEGC
+|      1<<SEGD
+      ,
+        0<<SEGA
+| 0<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       1<<SEGD
+      ,
+        1<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       1<<SEGD
+      ,
+        1<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       0<<SEGD
+      ,
+        1<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       0<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       1<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       0<<SEGD
+      ,
+        1<<SEGA
+| 0<<SEGF  |  0<<SEGB
+|       0<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       1<<SEGD
+      ,
+        1<<SEGA
+| 0<<SEGF  |  0<<SEGB
+|       0<<SEGG
+| 0<<SEGE  |  1<<SEGC
+|       1<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       0<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       0<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       1<<SEGD
+      ,
+        1<<SEGA
+| 0<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       0<<SEGD
+      ,
+        0<<SEGA
+| 0<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       0<<SEGD
+      ,
+        0<<SEGA
+| 0<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       1<<SEGD
+      ,
+        1<<SEGA
+| 1<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       0<<SEGD
+      ,
+        1<<SEGA
+| 1<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 0<<SEGE  |  1<<SEGC
+|       0<<SEGD
+      ,
+        0<<SEGA
+| 0<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       0<<SEGD
+      ,
+        1<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 0<<SEGE  |  1<<SEGC
+|       1<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       1<<SEGD
+      ,
+        0<<SEGA
+| 0<<SEGF  |  0<<SEGB
+|       0<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       1<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       0<<SEGD
+      ,
+        0<<SEGA
+| 0<<SEGF  |  1<<SEGB
+|       0<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       0<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 1<<SEGE  |  1<<SEGC
+|       0<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  1<<SEGB
+|       1<<SEGG
+| 0<<SEGE  |  1<<SEGC
+|       1<<SEGD
+      ,
+        1<<SEGA
+| 0<<SEGF  |  1<<SEGB
+|       0<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       1<<SEGD
+      ,
+        1<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       0<<SEGG
+| 1<<SEGE  |  0<<SEGC
+|       1<<SEGD
+      ,
+        0<<SEGA
+| 1<<SEGF  |  0<<SEGB
+|       1<<SEGG
+| 0<<SEGE  |  1<<SEGC
+|       0<<SEGD
+      ,
+        1<<SEGA
+| 0<<SEGF  |  1<<SEGB
+|       0<<SEGG
+| 0<<SEGE  |  1<<SEGC
+|       1<<SEGD
+};
+
+constant(alpha2seg,, .s=alpha2seg)
+

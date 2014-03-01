@@ -26,6 +26,17 @@ static void dumphex(int c) {
   }
 }
 
+#define CATHODES 4
+char dpybuf[4] = {0xAA, 0x55, 0xAA, 0x55};
+static int dpystate;
+
+void ssi0_handler(void)
+{
+  *(GPIOE_APB(GPIODATA)+0xf) = 1 << dpystate;;
+  dpystate = (dpystate + 1) % CATHODES;
+  *SSI0(SSIDR) = dpybuf[dpystate];
+}
+
 volatile int tick;
 
 void sys_tick(void)
@@ -136,7 +147,7 @@ __attribute__((section(".vectors")))
    [20] = default_handler,
    [21] = uart_handler, /* lm4f120 uart0 */
    [22] = default_handler,
-   [23] = default_handler,
+   [23] = ssi0_handler,
    [24] = default_handler,
    [25] = default_handler,
    [26] = default_handler,
@@ -259,6 +270,22 @@ static void initio()
 
  *GPIOA_APB(GPIODEN) = 0x3;
 
+ /* LED segment display cathodes */
+ *GPIOD_APB(GPIODR2R) = 0xf;
+ *GPIOD_APB(GPIODEN) = 0xf;
+ *GPIOD_APB(GPIODIR) = 0xf;
+
+ /* LED segment display anodes via HC595 on SPI */
+ *RCGCSSI |= 1;
+
+ *GPIOA_APB(GPIOAFSEL) |= 0xf << 2;
+ *GPIOA_APB(GPIODIR) |= 0xf << 2;
+ *GPIOA_APB(GPIODEN) |= 0xf << 2;
+
+ *SSI0(SSICR1) = 0;
+ *SSI0(SSICPSR) = 0xff;
+ *SSI0(SSICR0) = 0x4007;
+ *SSI0(SSICR1) = 0x12;
 
  *UART0(UARTIBRD) = 0x15;
  *UART0(UARTFBRD) = 0x2d;
@@ -274,6 +301,10 @@ static void initio()
   *(volatile int *)0xE000E104 = 0x40;
 
   *NVIC_ISER |= (1<<5);
+
+  *NVIC_ISER |= (1<<7); /* SSI0 */
+
+  *SSI0(SSIIM) |= 0x8; /* TXIM */
 
   asm volatile ("cpsie i");
 }
