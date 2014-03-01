@@ -841,3 +841,34 @@ decimal
 
 \ end of parser
 
+
+hex
+
+f sl
+
+1 rcgcssi !
+prssi ?
+
+gpioafsel gpioa_apb @ f 2 << or
+gpioafsel gpioa_apb !
+
+gpiodir gpioa_apb @ f 2 << or
+gpiodir gpioa_apb !
+
+gpioden gpioa_apb @ f 2 << or
+gpioden gpioa_apb !
+	
+\ gpiopctl default ok
+0 ssicr1 ssi0 !
+
+\ ssicc ssi0 ? \ set clock source
+ff ssicpsr ssi0 ! \ set clock prescaler
+
+10 ssicr0 ssi0 !  \ set rate/phase/polarity/protocol/datasize
+2 ssicr1 ssi0 !  \ enable ssi
+
+: test
+	begin
+		50a0 ssidr ssi0 !
+		10 ms
+	again ;
