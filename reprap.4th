@@ -13,6 +13,44 @@
 
 hex
 
+\ display
+
+0 led
+
+\ the txcomplete interrupt handler does the multiplexing, we need to
+\ send "something" to get it started.
+
+0 ssidr ssi0 ! ;
+
+: dpynum ( n -- )
+	0 >r
+	begin
+		?dup while
+			a /mod
+			swap
+			num2seg + c@
+			r> 100 * + >r
+	repeat
+	r> display !
+;
+
+: dpystr ( str -- )
+	dup
+	begin
+		dup c@ ?dup while
+			[char] a - alpha2seg + c@
+			18 <<
+			display @ 8 >>
+			+ display !
+			1+
+	repeat
+	drop
+	drop"
+;
+
+" helo" dpystr
+
+
 \ stepper z
 	
 f gpiodr8r pd !
@@ -526,9 +564,12 @@ variable pid_i_decay
 	t_hotend
 	t_ist @ 0 < if
 		." hotend sensor fault!" lf
+		," fail" dpystr
 		0 tmtbmatchr widetimer5 !
 		exit
 	then
+	t_ist @
+	dpynum
 	pid_sample
 ;
 
@@ -844,31 +885,33 @@ decimal
 
 hex
 
-f sl
+\ f sl
 
-1 rcgcssi !
-prssi ?
+\ 1 rcgcssi !
+\ prssi ?
 
-gpioafsel gpioa_apb @ f 2 << or
-gpioafsel gpioa_apb !
+\ gpioafsel gpioa_apb @ f 2 << or
+\ gpioafsel gpioa_apb !
 
-gpiodir gpioa_apb @ f 2 << or
-gpiodir gpioa_apb !
+\ gpiodir gpioa_apb @ f 2 << or
+\ gpiodir gpioa_apb !
 
-gpioden gpioa_apb @ f 2 << or
-gpioden gpioa_apb !
+\ gpioden gpioa_apb @ f 2 << or
+\ gpioden gpioa_apb !
 	
-\ gpiopctl default ok
-0 ssicr1 ssi0 !
+\ \ gpiopctl default ok
+\ 0 ssicr1 ssi0 !
 
-\ ssicc ssi0 ? \ set clock source
-ff ssicpsr ssi0 ! \ set clock prescaler
+\ \ ssicc ssi0 ? \ set clock source
+\ ff ssicpsr ssi0 ! \ set clock prescaler
 
-10 ssicr0 ssi0 !  \ set rate/phase/polarity/protocol/datasize
-2 ssicr1 ssi0 !  \ enable ssi
+\ 4007 ssicr0 ssi0 !  \ set rate/phase/polarity/protocol/datasize
 
-: test
-	begin
-		50a0 ssidr ssi0 !
-		10 ms
-	again ;
+\ 12 ssicr1 ssi0 !  \ enable ssi
+
+
+\ 8 ssiim ssi0 !
+\ ssiris ssi0 ?
+\ ssimis ssi0 ?
+
+\ 7 ise!
