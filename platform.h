@@ -268,12 +268,12 @@ static void initio()
 
  *GPIOA_APB(GPIOPCTL) = 0x222211;
 
- *GPIOA_APB(GPIODEN) = 0x3;
+ *GPIOA_APB(GPIODEN) |= 0x3;
 
  /* LED segment display cathodes */
- *GPIOD_APB(GPIODR2R) = 0xf;
- *GPIOD_APB(GPIODEN) = 0xf;
- *GPIOD_APB(GPIODIR) = 0xf;
+ *GPIOD_APB(GPIODR2R) |= 0xf;
+ *GPIOD_APB(GPIODEN) |= 0xf;
+ *GPIOD_APB(GPIODIR) |= 0xf;
 
  /* LED segment display anodes via HC595 on SPI */
  *RCGCSSI |= 1;
