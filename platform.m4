@@ -324,3 +324,14 @@ static const unsigned char alpha2seg[30] = {
 
 constant(alpha2seg,, .s=alpha2seg)
 
+primary(dpynum)
+{
+	sp--;
+	int idx = 3;
+
+	while(idx > -1) {
+		dpybuf[idx--] = num2seg[sp->u % 10];
+		sp->u = sp->u/10;
+	}
+}
+

@@ -22,17 +22,17 @@ hex
 
 0 ssidr ssi0 ! ;
 
-: dpynum ( n -- )
-	0 >r
-	begin
-		?dup while
-			a /mod
-			swap
-			num2seg + c@
-			r> 100 * + >r
-	repeat
-	r> display !
-;
+\ : dpynum ( n -- )
+\ 	0 >r
+\ 	begin
+\ 		?dup while
+\ 			a /mod
+\ 			swap
+\ 			num2seg + c@
+\ 			r> 100 * + >r
+\ 	repeat
+\ 	r> display !
+\ ;
 
 : dpystr ( str -- )
 	dup

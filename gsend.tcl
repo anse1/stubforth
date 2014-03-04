@@ -23,7 +23,7 @@ send {
     decimal
     5 xy-max ! \ xy maximum speed (100us/step)
     0 g-speed ! \ user speed
-    46 xy-jerk !
+    47 xy-jerk !
     40 z-jerk ! \ z jerk speed (100us/step)
     6 xy-delay !
     20000 xy-accel !
@@ -44,9 +44,9 @@ send {
     \ -300000 pid_d !
     \ c0000 pid_p !
     \ 10 pid_droop !
-    -80000 pid_d !
-    80000 pid_p !
-    14 pid_droop !
+    -c0000 pid_d !
+    68000 pid_p !
+    18 pid_droop !
 }
 
 send "hi\n"
