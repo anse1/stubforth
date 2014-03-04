@@ -23,7 +23,7 @@ send {
     decimal
     5 xy-max ! \ xy maximum speed (100us/step)
     0 g-speed ! \ user speed
-    47 xy-jerk !
+    46 xy-jerk !
     40 z-jerk ! \ z jerk speed (100us/step)
     6 xy-delay !
     20000 xy-accel !
