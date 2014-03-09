@@ -15,13 +15,15 @@ include(symbols.m4)
 
 primary(us)
 {
+    TA0R = 0;
     sp--;
     sp->u *= 2;
-    TA0R = 0;
-    while ((uvmint)TA0R < sp->u) {
-
-    }
+    while ((uvmint)TA0R < sp->u)
+        ;
 }
+
+secondary(ms,,,
+	QDUP, ZBRANCH, self[9], MINUS1, LIT, .u=800, US, BRANCH, self[0])
 
 dnl static unsigned char gray[4] = { 0, 1, 3, 2 };
 dnl static unsigned char state;
