@@ -1,8 +1,7 @@
 
-\ 2 8 << \ src
-\ 3 6 << or \ div
-\ 2 4 << or \ mode
-\ tactl !
+2 8 << 3 6 << or
+2 4 << or
+tactl !
 
 \ ffff taccr0 !
 
@@ -24,7 +23,15 @@
 
 2 8 << 3 6 << or
 1 4 << or t1ctl !
+
 ffff t1ccr0 !
+0 p2out !
+
+\ : us 2* 0 t1r ! begin dup t1r @ u< until drop ;
+
+: l begin 1 p2dir ! 1 ms 0 p2dir ! 0 t1r !
+		begin p2in @ 1 and until
+		t1r @ e00 < p1out !  again ;
 
 \ p2.1 T1.1
 \ p2.4 T1.2
@@ -32,7 +39,9 @@ ffff t1ccr0 !
 1 1 << dup p2sel +! p2dir +!
 1 4 << dup p2sel +! p2dir +!
 
-\ : on 3 5 << t1cctl1 ! 7 5 << t1cctl2 ! ;
+\ : on
+3 5 << t1cctl1 !
+7 5 << t1cctl2 !
 \ : off 0 t1cctl1 ! 0 t1cctl2 ! ;
 
 \ : duty off
