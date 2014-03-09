@@ -88,6 +88,9 @@ static void initio()
 
    P1DIR &= ~(7<<3); // encoder
    P1REN |= 7 << 3;
+
+   /* Use timerA1 to implement US */
+   TA0CTL = (2 << 8) | (3 << 6) | (2 << 4);
 }
 
 
