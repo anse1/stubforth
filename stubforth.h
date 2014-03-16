@@ -1,10 +1,7 @@
 #ifndef STUBFORTH_H
 #define STUBFORTH_H
 
-#include <stdint.h>
-
-typedef intptr_t vmint;
-typedef uintptr_t uvmint;
+#include <config.h>
 
 union cell {
   void *a;
