@@ -36,7 +36,7 @@ send {
     \ 2000 22000  ecal 2! \ measured to free air @ 195°C
     \ 8192 68000 ecal 2! \ measured to free air @ 180°C, 0.5mm-Nozzle
     \ 4000 28000 ecal 2! \ same with tapped bolt
-    4096 40900 ecal 2! \ latest tapped bolt
+    1024 10225 ecal 2! \ latest tapped bolt
     0 pid_i !
 
     hex

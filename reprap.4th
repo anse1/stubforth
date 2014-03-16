@@ -614,7 +614,7 @@ decimal
 2variable zcal   200      1227  zcal 2!
 \ 2variable ecal  4096     44521  ecal 2!
 \ 2variable ecal  2000     22000  ecal 2! \ free air, 195°C
-2variable ecal 4096 40900 ecal 2! \ new tapped bold
+2variable ecal 1024 10225 ecal 2! \ new tapped bold
 
 variable g-xpos
 variable g-ypos
