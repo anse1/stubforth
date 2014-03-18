@@ -1,7 +1,7 @@
 #ifndef STUBFORTH_H
 #define STUBFORTH_H
 
-#include <config.h>
+#include "config.h"
 
 union cell {
   void *a;
