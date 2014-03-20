@@ -35,10 +35,18 @@ primary(wload, w@)
 primary(stop)
 asm("stop #0x2000");
 
-constant(forth_vectors, forth_vectors)
+constant(forth_vectors,forth_vectors, .a=forth_vectors)
 
 dnl override boot
 
 secondary(boot2, boot,,
    HI, LIT, .s="booting from block 0.\n", TYPE,
    LIT, .a=(void *)0x9f0000, REDIRECT, STORE, QUIT)
+
+#include "terminus.c"
+
+constant(fontdata,, .a=fontdata)
+
+primary(gchar)
+   sp[-1].s = fontdata[sp[-1].i];
+
