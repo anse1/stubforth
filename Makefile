@@ -143,6 +143,7 @@ user:
 	make display.prog
 	make touch.prog
 	make mset.prog
+	make terminal.prog
 
 block.0.bin : flash.bin
 	cp flash.bin block.0.bin
@@ -164,9 +165,10 @@ chainload.%:
 bblock.0.bin: user.4th dragon.4th flash.4th chainload.4th chainload.1
 bblock.1.bin: vivo.4th display.4th chainload.2
 bblock.2.bin: touch.4th chainload.3
-bblock.3.bin: mset.4th # chainload.4
+bblock.3.bin: mset.4th chainload.4
+bblock.4.bin: terminal.4th # chainload.4
 
-sourceblocks: bblock.0.fprog bblock.1.fprog bblock.2.fprog bblock.3.fprog
+sourceblocks: bblock.0.fprog bblock.1.fprog bblock.2.fprog bblock.3.fprog bblock.4.fprog
 blocks: block.0.fprog sourceblocks
 
 bblock.%.fprog: bblock.%.bin flashload

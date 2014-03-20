@@ -195,4 +195,3 @@ variable iset
 	again
 ;
 
-0 redirect !
