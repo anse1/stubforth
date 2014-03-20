@@ -82,12 +82,24 @@ decimal
 	hwcursor
 ;
 
+: crel ( x y -- )
+	cursor 2@
+	swap >r + swap r> + swap
+	cursor!
+;
+
+hex
+
 : putchar ( c -- )
-	>r
-	cursor 2@ cursor2pix
-	r>
-	drawchar
-	advance
+	case
+		07 of 100 honk endof
+		d of cursor 2@ swap drop 0 swap cursor! endof
+		a of 0 1 crel endof
+		c of cls endof
+		cursor 2@ cursor2pix
+		r@ drawchar
+		advance
+	endcase
 ;
 
 : puts ( s -- )
@@ -106,21 +118,11 @@ decimal
 	cls 0 0 cursor!
 ;
 
-: crel ( x y -- )
-	cursor 2@
-	swap >r + swap r> + swap
-	cursor!
-;
-
 hex
 
 : vt100
 	begin
 		key case
-			07 of 100 honk endof
-			d of cursor 2@ swap drop 0 swap cursor! endof
-			a of 0 1 crel endof
-			c of cls endof
 			r@ putchar
 		endcase
 	again
@@ -133,4 +135,19 @@ ff lblkc c!
 
 080c lcwch w!
 
+new
+
+raw
+
+308f puts
+
+" 
+ready.
+"
+puts
+cooked
+
+.( ready.) lf
+
 0 redirect !
+
