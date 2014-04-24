@@ -207,10 +207,10 @@ variable xy-delay
 decimal
 6 xy-max ! \ xy maximum speed (100us/step)
 0 g-speed ! \ user speed
-46 xy-jerk !
-40 z-jerk ! \ z jerk speed (100us/step)
+33 xy-jerk !
+42 z-jerk ! \ z jerk speed (100us/step)
 30000 xy-accel !
-6 xy-delay \ delayed acceleration
+4 xy-delay \ delayed acceleration
 
 : sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
 : sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
@@ -518,7 +518,7 @@ tmtbmr widetimer5 !
 \ 10 tmtbv widetimer5 !
 \ tmtbv widetimer5 ?
 
-decimal 800 t_soll !
+decimal 900 t_soll !
 
 hex
 
@@ -842,6 +842,12 @@ decimal
 	while
 	repeat
 ;
+
+: gcode-m226
+	begin
+		sw1? 0= while
+	repeat
+;
 	
 : gcode-m
 	gword number
@@ -853,6 +859,7 @@ decimal
 		106 of skipline ok endof \ fan on
 		104 of gcode-m104 ok endof
 		109 of gcode-m109 ok endof \ wait for temperature
+		226 of gcode-m226 ok endof \ user pause
 		84 of off ok endof \ filament retract
 		unimplemented throw
 	endcase

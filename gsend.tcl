@@ -25,8 +25,8 @@ send {
     0 g-speed ! \ user speed
     32 xy-jerk !
     42 z-jerk ! \ z jerk speed (100us/step)
-    4 xy-delay !
-    30000 xy-accel !
+    6 xy-delay !
+    20000 xy-accel !
     \ 2048    164000  xcal 2! \ ruler
     \ 2048    164000  ycal 2!
     1000    79895 xcal 2! \ dial gauge
@@ -54,7 +54,7 @@ expect \
     timeout { error timeout } \
     -re {stubforth}
 
-set timeout 300
+set timeout 3000
 
 send "ginterp\n"
 
