@@ -248,7 +248,7 @@ static void initio()
 /* U0Tx 27 PA1 (1) O TTL UART module 0 transmit. When in IrDA mode, this */
 /*                       signal has IrDA modulation. */
 
-  *RCGC2 |= 0x1f; /* enable all gpio clocks */
+  *RCGC2 |= 0x1ff; /* enable all gpio clocks */
 
 /*      3. Set the GPIO AFSEL bits for the appropriate pins (see page 624). To determine which GPIOs to */
 
