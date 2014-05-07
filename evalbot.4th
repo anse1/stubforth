@@ -17,6 +17,34 @@ hex
 : pd gpiod_apb ;
 : pe gpioe_apb ;
 : pf gpiof_apb ;
+: pg gpiog_apb ;
+: ph gpioh_apb ;
+
+: or! ( value addr -- )
+	tuck @ or swap ! ;
+
+: setgpout ( mask base -- )
+	2dup gpiodir + or!
+	2dup gpioden + or!
+	gpiodr8r + or!
+;	
+
+f 2 << 0 pf setgpout
+
+: led1 0= if 0 else 10 then gpiodata pf 10 2 << + ! ;
+: led2 0= if 0 else 20 then gpiodata pf 20 2 << + ! ;
+
+: ledg 0= if 4 else 0 then gpiodata pf 4 2 << + ! ;
+: ledo 0= if 8 else 0 then gpiodata pf 8 2 << + ! ;
+
+3 0 ph setgpout
+: left gpiodata ph 3 2 << + ! ;
+
+3 0 pd setgpout
+: right gpiodata pd 3 2 << + ! ;
+
+1 5 << 0 pd setgpout
+: 12v 5 << dup 1 5 << 2 << gpiodata pd + ! ;
 
 \ \ 1. Enable the clock to the port by setting the appropriate bits in
 \ \ the RCGCGPIO register (see page 310). In addition, the SCGCGPIO and
