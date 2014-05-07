@@ -1,6 +1,6 @@
 MEMORY {
        flash : ORIGIN = 0x00000000, LENGTH = 256k
-       ram : ORIGIN = 0x20000000, LENGTH = 32k
+       ram : ORIGIN = 0x20000000, LENGTH = 96k
 }
 
 /* 0x00000000 flash */

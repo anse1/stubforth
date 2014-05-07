@@ -99,6 +99,7 @@ void uart_handler_1(struct exception_frame *frame)
   if (status & (1<<2) /* BE */ ) {
   force_break:
     *UART0(UARTRSR) = 0;
+    *UART0(UARTICR) = 0;
     my_puts(" <BREAK>\n");
     /* Patch ReturnAddress in exception frame to return to _cstart
        instead. */
@@ -180,7 +181,7 @@ __attribute__((section(".vectors")))
 static void initio()
 {
   ring.in = ring.out;
-  *VTOR=(unsigned)vectors;
+ *VTOR=(unsigned)vectors;
 
 /* The PLL is configured using direct register writes to the RCC/RCC2 register. If the RCC2 register */
 /* is being used, the USERCC2 bit must be set and the appropriate RCC2 bit/field is used. The steps */
@@ -220,29 +221,34 @@ static void initio()
 /*   *RCC=0x24e0540; */
 /*   *GPIOHBCTL=0x7e00; */
 /*   *RCC2=0x2404000; /\* not used *\/ */
-  *MOSCCTL=0x0;
-  *DSLPCLKCFG=0x7800000;
-  *RCGCTIMER=0x3;
-  *RCGCGPIO=0x3f;
-  *RCGCHIB=0x1;
-  *RCGCUART=0x1;
-  *SCGCHIB=0x1;
-  *DCGCHIB=0x1;
-  *PRTIMER=0x3;
-  *PRGPIO=0x21;
-  *PRHIB=0x1;
-  *PRUART=0x1;
+/*   *MOSCCTL=0x0; */
+/*   *DSLPCLKCFG=0x7800000; */
+
+
+/*   *RCGCTIMER=0x3; */
+/*   *RCGCGPIO=0x3f; */
+/*   *RCGCHIB=0x1; */
+/*   *RCGCUART=0x1; */
+/*   *SCGCHIB=0x1; */
+/*   *DCGCHIB=0x1; */
 
 
 /* 14.4 Initialization and Configuration */
 /*      To enable and initialize the UART, the following steps are necessary: */
 /*      1. Enable the UART module using the RCGCUART register (see page 314). */
+  *RCGC1 |= 1;
 
-  *RCGCUART=0x1;
+/*   *RCGCUART=0x1; */
 
 /*      2. Enable the clock to the appropriate GPIO module via the RCGCGPIO register (see page 310). */
 /*          To find out which GPIO port to enable, refer to Table 21-5 on page 1134. */
-  *RCGCGPIO=0x3f;
+
+/* U0Rx 26 PA0 (1) I TTL UART module 0 receive. When in IrDA mode, this */
+/*                       signal has IrDA modulation. */
+/* U0Tx 27 PA1 (1) O TTL UART module 0 transmit. When in IrDA mode, this */
+/*                       signal has IrDA modulation. */
+
+  *RCGC2 |= 0x1f; /* enable all gpio clocks */
 
 /*      3. Set the GPIO AFSEL bits for the appropriate pins (see page 624). To determine which GPIOs to */
 
@@ -255,7 +261,7 @@ static void initio()
 /* 5. Configure the PMCn fields in the GPIOPCTL register to assign the UART signals to the appropriate */
 /*    pins (see page 641 and Table 21-5 on page 1134). */
 
- *GPIOA_APB(GPIOPCTL) = 0x222211;
+/*  *GPIOA_APB(GPIOPCTL) = 0x222211; */
 
  *GPIOA_APB(GPIODEN) = 0x3;
 
@@ -264,14 +270,12 @@ static void initio()
  *UART0(UARTFBRD) = 0x2d;
  *UART0(UARTLCRH) = 0x70;
  *UART0(UARTCTL) = 0x301;
- *UART0(UARTIM) = 0x50;
- *UART0(UARTRIS) = 0xf;
 
   /* interrupt on break and data ready */
- *UART0(UARTIM) = (1<<4) | (1<<9);
+ *UART0(UARTIM) = (1<<4);
  *UART0(UARTLCRH) &= ~(1<<4);
 
-  *(volatile int *)0xE000E104 = 0x40;
+ *UART0(UARTICR) = 0xff;
 
   *NVIC_ISER |= (1<<5);
 
