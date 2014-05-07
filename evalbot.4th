@@ -86,3 +86,28 @@ f 2 << 0 pf setgpout
 \ : sw1? gpiodata pf 10 2 << + @ 0= ;
 \ : sw2? gpiodata pf 1 2 << + @ 0= ;
 
+
+\ i2c master
+
+\ | pg0  |      | oled_sda    | i2c1 |
+\ | pg1  |      | oled_scl    | i2c1 |
+
+1000 rcgc1 or! \ i2c0
+4000 rcgc1 or! \ i2c1
+
+3 gpioafsel pg or!
+3 gpioodr pg or!
+3 gpiopctl pg or!
+
+\ 10 i2cmcr i2c1 !
+\ 9 i2cmtpr i2c1 !
+
+\ 78 i2cmsa i2c1 !
+\ data i2cmdr i2c1 !
+\ 7 i2cmcs i2c1 !
+\ \ poll i2cmcs
+\ \ check i2cmcs for ack/error
+
+\ \        a  1    2      3     4   5 6    7        8    9 a b 
+\ \ PG0 19 - U2Rx PWM0 I2C1SCL PWM4 - - USB0EPEN EPI0S13 - - -
+\ \ PG1 18 - U2Tx PWM1 I2C1SDA PWM5 - -     -    EPI0S14 - - -
