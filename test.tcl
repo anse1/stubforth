@@ -219,5 +219,7 @@ test {  1 1 <> . } {0 $}
 test {  1 2 3 4 3 roll . . . . } {1 4 3 2 $}
 test {  1 2 3 4 0 roll . . . . } {4 3 2 1 $}
 
+test {  666 1 cell 8 * 1 - << dup */ . } {666 $}
+
 send "forget testsuite-marker bye\n"
 

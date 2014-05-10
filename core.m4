@@ -99,7 +99,7 @@ secondary(udot, u.,, UDOT1, BL)
 dnl ( n1 n2 n3 -- n4 )
 primary(star_slash, */)
 {
-   int64_t tmp = sp[-3].i * sp[-2].i;
+   dvmint tmp = (dvmint)sp[-3].i * sp[-2].i;
    tmp /= sp[-1].i;
    sp -= 2;
    sp[-1].i = tmp;
