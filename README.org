@@ -27,10 +27,10 @@ extensions are currently used:
 - +Cast to Union+ ::
 - +Static initialization of flexible arrays+ ::
 ** M4
-M4 is used to hide the boring aspects of constructing Forth words as
-static C structs.  Here are some examples of how definitions of Forth
-words look like in stubforth's source before M4 expands them to code
-and static structs in plain C:
+M4 is used to hide the redundant aspects of constructing Forth words
+as static C structs.  Here are some examples of how definitions of
+Forth words look like in stubforth's source before M4 expands them to
+code and static structs in plain C:
 
 : primary(min)
 :   sp--;
