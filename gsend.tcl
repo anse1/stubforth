@@ -23,9 +23,9 @@ send {
     decimal
     5 xy-max ! \ xy maximum speed (100us/step)
     0 g-speed ! \ user speed
-    32 xy-jerk !
+    24 xy-jerk !
     42 z-jerk ! \ z jerk speed (100us/step)
-    6 xy-delay !
+    5 xy-delay !
     20000 xy-accel !
     \ 2048    164000  xcal 2! \ ruler
     \ 2048    164000  ycal 2!
