@@ -31,8 +31,8 @@ send {
     \ 2048    164000  ycal 2!
     1000    79895 xcal 2! \ dial gauge
     1000    79895 ycal 2!
-    \ 200  1250  zcal 2! \ M8 thread pitch
-    200    1227  zcal 2! \ measured pitch
+    200  1250  zcal 2! \ M8 thread pitch
+    \ 200    1227  zcal 2! \ measured pitch
     \ 2000 22000  ecal 2! \ measured to free air @ 195°C
     \ 8192 68000 ecal 2! \ measured to free air @ 180°C, 0.5mm-Nozzle
     \ 4000 28000 ecal 2! \ same with tapped bolt
