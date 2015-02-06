@@ -1,7 +1,6 @@
 stubforth
 
-A small, C-based, indirect threaded forth system intended to run on
-bare metal.
+A small, C-based, indirect threaded forth system intended to run on bare metal.
 
 file:stubforth.jpg
 
@@ -43,7 +42,8 @@ and static structs in plain C:
 
 ** Standard conformance
 I try to follow the standards unless doing so would violate the goals
-or not make sense to me.
+or not make sense to me or I didn't find the time to coerce the code
+to conform yet.  Patches welcome.
 
 Some grave departures:
 
@@ -52,6 +52,7 @@ Some grave departures:
 - No counted strings.
 - Use of =does>= with =<builds= instead of =create=.
 - Throwing a 0 does non-local control flow without rolling back the parameter stack.
+- No automatic "OK" response
 
 * Source
 ** Repository
