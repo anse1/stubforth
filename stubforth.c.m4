@@ -214,11 +214,13 @@ int main(int argc, char *argv[])
     dataspace_fd = open(".stubforth", O_RDWR);
     if (dataspace_fd < 0) {
         perror("opening dataspace read-write");
+	fprintf(stderr, "try dd if=/dev/zero of=$HOME/.stubforth count=10k\n");
     	return -2;
     }
     fchdir(oldpwd);
   }
 
+  /* TODO: Add PIC magic */
   v = mmap((void *)0x10000000, 1<<20, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_SHARED, dataspace_fd, 0);
   if (v == MAP_FAILED) {
     perror("mmap");
