@@ -3,6 +3,7 @@
 
 #include "symbols.h"
 #include "stubforth.h"
+#include <syscall.h>
 
 /* 1. User-level applications use as integer registers for passing the sequence */
 /*    %rdi, %rsi, %rdx, %rcx, %r8 and %r9. The kernel interface uses %rdi, */
