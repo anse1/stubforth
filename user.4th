@@ -1,8 +1,3 @@
-\ non-platform-specific forth code
-
-: forget ( read a word to forget, adjusts dp )
-	?word >word dup >link @ context ! >name @ dp ! ;
-
 \ bit flipping
 
 : flip ( c a -- ) 
@@ -35,7 +30,8 @@ repeat drop ;
 begin dup while
 dumpaddr dump8
 dup 0= if exit then
-bl dump8 lf repeat lf ;
+bl dump8 lf repeat lf
+2drop ;
 
 : dumpraw ( addr n -- )
 over + swap
@@ -61,6 +57,9 @@ variable somevar
 forget somevar
 constant &&dovar
 
+666 42 2constant 2con ?word 2con @ forget 2con
+constant &&do2con
+
 \ xt &word -- \ throws 1 if found
 : xtp1 begin 2dup >code = if 1 throw then >link @ dup 0= until ;
 
@@ -68,7 +67,6 @@ constant &&dovar
 : xtp context @ ['] xtp1 catch if 2drop 1 else 2drop 0 then ;
 
 : xttype >word >name @ type bl ;
-: words context @ begin dup >code xttype lf >link @ dup 0= until ;
 
 \ addr -- \ disassemble thread
 
@@ -89,12 +87,11 @@ or 0= and ;
       &&docon of ." &&docon" endof
       &&dodoes of ." &&dodoes" endof
       &&dovar of ." &&dovar" endof
+      &&do2con of ." &&do2con" endof
       ." .i = " r@ .
     endcase
   then
 ;
-
-: [char] key postpone literal ; immediate
 
 : disas
   begin dup . dup @ .pretty lf eotp 0= while
@@ -124,75 +121,9 @@ repeat drop ;
     &&dodoes of ." does>" lf @ disas endof
     drop lf
   endcase
-  drop
+  2drop
 ; 
-
-: skip[if] ( -- )
- begin
-   word
-   dup ," [if]" compare 0= if
-     drop" recurse 1
-   else
-     dup ," [then]" compare swap drop"
-   then
-   while
- repeat
-;
-
-\ read and discard till [then] or [else] is read, skipif on [if]
-\ leaves t/f on stack when then/else was read
-: skip[block] ( -- t/f )
- begin
-   word
-   dup ," [if]" compare 0= if
-     drop" skip[if]
-   else
-     dup ," [then]" compare 0= if drop" 1 exit then
-     dup ," [else]" compare 0= if drop" 0 exit then
-     drop"
-   then
-again ;
-
-" dangling else" constant err[else]
-" dangling then" constant err[then]
-
-: [else] err[else] throw ; immediate
-: [then] err[then] throw ; immediate
-
-: [if]
-  0= if skip[block] if exit then then
-  try
-    begin
-      word
-      interpret
-    again
-  catch>
-    case
-      err[else] of skip[if] endof
-      err[then] of endof
-      r@ throw
-    endcase
-    exit
-  endtry
-; immediate
-
-: restart
-	postpone branch
-	context @ >code >body ,
-; immediate
 
 : octal 8 base c! ;
 : binary 2 base c! ;
 
-variable erreof
-: x ," " redirect ! ['] quit catch ;
-x erreof !
-forget x
-	
-: evaluate ( s -- )
-	redirect @ >r
-	redirect !
-	['] quit catch
-	dup [ erreof @ ] literal = 0= if throw then
-	r> redirect !
-;

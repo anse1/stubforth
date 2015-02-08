@@ -29,11 +29,6 @@ secondary(endcase,, .immediate=1, l(
  LIT RFROM COMMA LIT DROP COMMA
 ))
 
-dnl -- pad
-secondary(ahead,, .immediate=1, l(
- LIT BRANCH COMMA HERE ZERO COMMA
-))
-
 dnl -- pad xt
 secondary(try,, .immediate=1, l(
   AHEAD HERE
@@ -71,13 +66,13 @@ sp[-2] = sp[-1];
 sp--;
 
 primary(celladd, cell+)
-sp[-1].a++;
+sp[-1].aa++;
 
 primary(zne, 0<>)
 sp[-1].i = sp[-1].i != 0 ;
 
 primary(ne, <>)
-sp[-1].i = sp[-1].i != sp[-2].i ;
+sp[-2].i = sp[-1].i != sp[-2].i ;
 sp--;
 
 primary(zgt, 0>)
@@ -95,6 +90,47 @@ primary(tworload, 2r@)
 *sp++ = rp[-2];
 *sp++ = rp[-1];
 
-secondary(noname, :noname,, l(
-  HERE LIT &&enter COMMA RESUME
-))
+primary(within)
+{
+  uvmint u1 = sp[-3].u;
+  uvmint u2 = sp[-2].u;
+  uvmint u3 = sp[-1].u;
+
+  sp[-3].u =  (u1-u2) < (u3-u2);
+  sp-=2;
+}
+
+ubinop(ugt, >, u>)
+
+constant(true,,.i=-1)
+constant(false,,.i=0)
+
+primary(backslash, `\\', immediate)
+while((t.i = my_getchar()) != '\n') {
+  if (t.i < 0) cthrow(-39, unexpected end of file);
+}
+
+secondary(marker,,, l(
+ CONTEXT LOAD DP LOAD
+ BUILDS COMMA COMMA
+ DOES DUP LOAD DP STORE CELL ADD
+ LOAD CONTEXT STORE))
+
+static void *pad;
+primary(pad)
+if (!pad)
+   pad = __builtin_alloca(PAD_SIZE);
+sp[0].a = pad;
+sp++;
+
+dnl ( xu xu-1 ... x0 u -- xu-1 ... x0 xu )
+primary(roll)
+{
+  int u = -sp[-1].u - 1;
+  sp--;
+  t = sp[u];
+  int i;
+  for(i = u; i < -1; i++)
+    sp[i] = sp[i+1];
+  sp[-1] = t;
+}

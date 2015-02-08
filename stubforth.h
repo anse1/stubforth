@@ -1,26 +1,32 @@
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef STUBFORTH_H
+#define STUBFORTH_H
 
-#include <stdint.h>
-
-typedef intptr_t vmint;
+#include "config.h"
 
 union cell {
   void *a;
   void **aa;
   vmint i;
+  uvmint u;
   char *s;
 };
 typedef union cell cell;
 
+/* GCC supports static initialization of flexible arrays, but we work
+   around it for portability's sake and because it produces bogus
+   sizes in the ELF meta-info. */
+
+#define staticword(len)				\
+  const char *name;				\
+  int compile_only : 1;				\
+  int immediate : 1;				\
+  int smudge : 1;				\
+  struct word *link;				\
+  void *code;					\
+  cell data[len];				\
+
 struct word {
-  const char *name;
-  int compile_only : 1; /* Not verified */
-  int immediate : 1;
-  int smudge : 1;
-  struct word *link;
-  void *code;
-  cell data[];
+  staticword(0)
 };
 
 struct vmstate {
@@ -32,12 +38,15 @@ struct vmstate {
 
   int compiling : 1; /* Used by state-aware word INTERPRET */
 
-  /* I/O configuration */
+};
+
+struct terminal {
   int raw : 1;  /* Avoid translating lf to crlf, etc.  Set this if you
 		   want to process binary data. */
   int quiet : 1; /* Don't echo incoming characters as they are
 		    consumed by the VM. */
 };
+extern struct terminal terminal;
 
 #define IS_WORD(c) (c > ' ')
 
@@ -51,8 +60,9 @@ typedef struct word word;
 
 extern struct word *forth; /* points to the head of head of the static
                               dictionary.  */
-cell vm(struct vmstate *vmstate, void **xt);
+cell vm(struct vmstate *vmstate, void *const*xt);
 void stubforth_init(void);
-word *find(word *p, const char *key);
+const word *find(const word *p, const char *key);
+void my_puts(const char *s);
 
 #endif

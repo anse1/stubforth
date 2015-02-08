@@ -1,3 +1,6 @@
+symbols.h
+symbols.gdb
+symbols.4th
 TAGS
 cachegrind.*
 gmon.out
@@ -15,3 +18,4 @@ stubforth
 *.elf
 flashload
 core
+builtin.4th

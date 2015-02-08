@@ -1,18 +1,24 @@
 changecom(/*,*/)
 #include "platform.h"
-#include "types.h"
+#include "stubforth.h"
 #include "config.h"
 
-cell return_stack[1000];
-cell param_stack[1000];
-cell dictionary_stack[1000];
+cell return_stack[RETURN_STACK_SIZE];
+cell param_stack[PARAM_STACK_SIZE];
+cell dictionary_stack[DICTIONARY_SIZE];
 
 struct vmstate vmstate;
 
 word *forth;
 unsigned char *redirect;
+struct terminal terminal;
 
 dnl m4 definitions
+
+dnl The NEUTRAL word is used to get a value on the
+dnl stack used as placeholder, e.g., when
+dnl compiling a forward jump.
+define(NEUTRAL, ZERO)
 
 define(dict_head, 0)
 define(div_word, 1)
@@ -39,7 +45,7 @@ divert(div_word)
   goto next;
   static word w_$1 = {
     .name = "ifelse(`$2',`',`translit(`$1',_,-)',`$2')",
-    .link = dict_head,
+    .link = (word *) dict_head,
     .code = &&$1
     dnl optional flags
     ifelse(`$3',`',`',`, .$3=1')
@@ -66,9 +72,9 @@ define(secondary, `
 undivert(div_word)
 define(`self', `&w_$1.data')
 define(translit($1,a-z,A-Z), &w_$1.code)
-static word w_$1 = {
+static struct { staticword(eval($#-2)) } w_$1 = {
   .name = "ifelse($2,`',`translit($1,_,-)',$2)",
-  .link = dict_head,
+  .link = (word *)dict_head,
   .code = &&enter,
    ifelse(`$3',`',`',`$3,')
   .data = { init_union(shift(shift(shift($@)))) , {EXIT}}
@@ -80,9 +86,9 @@ static word w_$1 = {
 dnl Cons a constant
 define(constant, `ifelse($#,0,``$0'',`
 undivert(div_word)
-static word w_$1 = {
+static struct { staticword(1) } w_$1 = {
   .name = "ifelse($2,`',`translit($1,_,-)',$2)",
-  .link = dict_head,
+  .link = (word *)dict_head,
   .code = &&docon,
   .data = { init_union(shift(shift($@))) }
 };
@@ -97,7 +103,7 @@ dnl $2... - cell data
 define(thread, `
 define(`self', `&t_$1')
 define(translit($1,a-z,A-Z), t_$1)
-static cell t_$1[] = { init_union(shift($@)) };
+static cell t_$1[eval($#-1)] = { init_union(shift($@)) };
 undefine(`self')
 ')
 
@@ -138,12 +144,12 @@ static void try_deallocate(char *s, cell **sp) {
      *sp = (cell *)s;
 }
 
-static void my_puts(const char *s) {
+void my_puts(const char *s) {
   while (*s)
     putchar(*s++);
 }
 
-word *find(word *p, const char *key)
+const word *find(const word *p, const char *key)
 {
    while(p) {
       if(! p->smudge && (0 == strcmp(p->name, key)))
@@ -174,9 +180,7 @@ int main()
   while(1) {
     redirect = 0;
     vmstate.compiling = 0;
-    vmstate.raw = 0;
-    vmstate.quiet = 0;
-    vmstate.base = 10;
+    vmstate.base = 16;
     vmstate.sp = param_stack;
     vmstate.rp = return_stack;
 
@@ -202,7 +206,7 @@ control flow within forth.  The entire VM must be contained in a
 single function since we make use of GCC's Labels as Values
 extension. */
 
-cell vm(struct vmstate *vmstate, void **xt)
+cell vm(struct vmstate *vmstate, void *const*xt)
 {
 
   /* The VM registers */
@@ -475,6 +479,7 @@ primary(plusstore, +!)
  *(vmint *)sp[-1].a += sp[-2].i;
  sp -= 2;
 
+dnl ( src dst u -- )
 primary(move)
 {
  char *s = sp[-3].s;
@@ -535,11 +540,6 @@ while((t.i = my_getchar()) != ')') {
   if (t.i < 0) cthrow(-39, unexpected end of file);
 }
 
-primary(linecomment, `\\', immediate)
-while((t.i = my_getchar()) != '\n') {
-  if (t.i < 0) cthrow(-39, unexpected end of file);
-}
-
 secondary(q, ?,, LOAD, DOT)
 secondary(cq, c?,, CLOAD, DOT)
 
@@ -573,12 +573,12 @@ dnl s -- cfa tf (found) -- s ff (not found)
 dnl s is deallocated when found
 {
    char *key = sp[-1].s;
-   word *p = find(vmstate->dictionary, key);
+   const word *p = find(vmstate->dictionary, key);
    if (p)
    {
      sp--;
      try_deallocate(sp[0].a, &vmstate->dp);
-     (sp++)->a = &p->code;
+     (sp++)->a = (void *)&p->code;
      (sp++)->i = 1;
    }
    else (sp++)->i = 0;
@@ -619,7 +619,7 @@ dnl ( -- s ) read a word, return zstring, allocated on dictionary stack
    char *s = (char *)vmstate->dp;
    do {
       c = my_getchar();
-      if (c < 0) cthrow(-39, unexpected end of file);
+      if (c < 0) cthrow(0);
    } while (!IS_WORD(c));
    do {
       *s++ = c;
@@ -688,7 +688,7 @@ primary(dostr)
   ip = aligned(s);
 }
 
-secondary(ccomma, `c,',,
+secondary(ccomma, ``c,'',,
   HERE, CSTORE, HERE, PLUS1, DP, STORE)
 
 secondary(quote, `\"',,
@@ -779,18 +779,22 @@ constant(redirect,, &redirect);
 
 dnl ( -- a )
 secondary(if,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA
-)
-
-dnl ( a -- a )
-secondary(else,, .immediate=1,
- LIT, BRANCH, COMMA, HERE, ZERO, COMMA,
- SWAP, HERE, SWAP, STORE
+ LIT, ZBRANCH, COMMA, HERE, NEUTRAL, COMMA
 )
 
 dnl ( a -- )
 secondary(then,, .immediate=1,
  HERE, SWAP, STORE
+)
+
+dnl -- pad
+secondary(ahead,, .immediate=1, l(
+ LIT BRANCH COMMA HERE NEUTRAL COMMA
+))
+
+dnl ( a -- a )
+secondary(else,, .immediate=1,
+ AHEAD, SWAP, THEN
 )
 
 dnl ( -- a )
@@ -799,8 +803,7 @@ dnl ( a -- )
 secondary(until,, .immediate=1, LIT, ZBRANCH, COMMA, COMMA)
 
 dnl ( -- a )
-secondary(while,, .immediate=1,
- LIT, ZBRANCH, COMMA, HERE, ZERO, COMMA /* jump after repeat */)
+secondary(while,, .immediate=1, IF)
 
 dnl ( a a -- )
 secondary(repeat,, .immediate=1,
@@ -819,16 +822,16 @@ primary(cold)
   goto start;
 
 primary(raw)
- vmstate->raw = 1;
+ terminal.raw = 1;
 
 primary(cooked)
- vmstate->raw = 0;
+ terminal.raw = 0;
 
 primary(echo)
- vmstate->quiet = 0;
+ terminal.quiet = 0;
 
 primary(quiet)
- vmstate->quiet = 1;
+ terminal.quiet = 1;
 
 secondary(qword, ?word,,
   WORD, FIND, NULLP, ZBRANCH, self[8], LIT, .s="undefined word", THROW )
@@ -840,10 +843,11 @@ secondary(brackettick, ['], .immediate=1, l(
 ))
 
 secondary(postpone,, .immediate=1, l(
-   QWORD,
+   QWORD
    IMMEDIATEP ZBRANCH self[6] COMMA EXIT
    LITERAL LIT COMMA COMMA
 ))
+
 dnl convenience
 
 dnl non-core
@@ -853,6 +857,7 @@ include(tools.m4)
 include(string.m4)
 include(ffi.m4)
 include(floating.m4)
+include(double.m4)
 
 dnl platform
 
@@ -866,14 +871,14 @@ start:
 {
     thread(top, BYE)
     ip = TOP;
-    (sp++)->a = xt;
+    (sp++)->a = (void *)xt;
     undivert(div_start)
     goto execute;
 }
 
 init:
     undivert(div_init)
-    return t.a=dict_head, t;
+    return t.a=(word *)dict_head, t;
 }
 
 /*

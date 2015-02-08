@@ -135,7 +135,7 @@ test "here word w2345678 find drop drop here = ." {1 $}
 test {" fox" " quick brown " type type} {quick brown fox$}
 test {: t ," lazy dog" ," jumps over the " type type ; t} {jumps over the lazy dog$}
 
-test {: t 85 emit ." moo" 85 emit ; t} {UmooU$}
+test {decimal : t 85 emit ." moo" 85 emit ; t} {UmooU$}
 
 test {: t 1 if ." moo" else ." bar" then ; t} {moo$}
 
@@ -180,9 +180,51 @@ buf type lf } {:root:.*}
 
 test { " asdf" " moo" over 3 move type } {moof$}
 
-test { :noname 85 emit 65 emit ; execute } {UA$}
-
 test { 64 1 putchar call 85 1 putchar call } {@U$}
 
-send "bye\n"
+test { " 667 1 + 0 redirect ! " redirect ! . } {668 $}
+test { " 668 1 + . " evaluate } {669 $}
+
+test { : x ?dup if 65 emit 1- restart then ; 666 4 64 emit x 85 emit . } {@AAAAU666 $}
+
+test { -2 666 u< . } {0 $}
+test { -2 666 < . } {1 $}
+test { -2 666 u> -1 666 > <> 0<> . } {1 $}
+
+# send " : within ( n1|u1 n2|u2 n3|u3 -- flag )  over - >r - r> u< ; "
+
+test {  0  0  0  within . } {0 $}
+test {  2  6  5  within . } {1 $}
+test {  2  6  2  within . } {0 $}
+test {  2  6  6  within . } {0 $}
+test { -6 -2 -4  within . } {1 $}
+test { -2 -6 -4  within . } {0 $}
+test { -6 -2 -2  within . } {0 $}
+test { -6 -2 -6  within . } {0 $}
+test { -1  2  1  within . } {1 $}
+test { -1  2  2  within . } {0 $}
+test { -1  2 -1  within . } {0 $}
+test {  0 -1  1  within . } {1 $}
+
+
+test { marker oblivious  : oblivion 666 . ; oblivion } {666 $}
+send { oblivious oblivion
+}
+
+expect {
+    timeout { error }
+    -re abort:.*$
+}
+
+test { 5 7 2constant twocon twocon twocon . . . . } {7 5 7 5 $}
+
+test {  1 1 <> . } {0 $}
+
+test {  1 2 3 4 3 roll . . . . } {1 4 3 2 $}
+test {  1 2 3 4 0 roll . . . . } {4 3 2 1 $}
+
+test {  666 1 cell 8 * 1 - << dup */ . } {666 $}
+
+send "forget testsuite-marker bye\n"
+
 interact
