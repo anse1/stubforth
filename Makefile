@@ -24,7 +24,7 @@ stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
 stubforth:  stubforth.o
-	$(GCC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(GCC) $(CFLAGS) -o $@ $< $(LDFLAGS)
 
 %.size: % size.sh
 	. ./size.sh $<
