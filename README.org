@@ -2,6 +2,8 @@ stubforth
 
 A small, C-based, indirect threaded forth system intended to run on bare metal.
 
+[[file:stubforth.jpg]]
+
 * Goals
 - Portability :: readily portable to anything GCC targets
 - Maintainability :: testsuite included
