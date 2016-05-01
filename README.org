@@ -23,8 +23,6 @@ The following extensions are currently used:
      macros.
 - Inline assembly ::
 - =__alignof__= ::
-- +Cast to Union+ ::
-- +Static initialization of flexible arrays+ ::
 ** M4
 M4 is used to hide the boring aspects of constructing Forth words as
 static C structs.  Here are some examples of how definitions of Forth
