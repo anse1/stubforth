@@ -26,7 +26,7 @@ send {
     27 xy-jerk !
     42 z-jerk ! \ z jerk speed (100us/step)
     5 xy-delay !
-    25000 xy-accel !
+    22500 xy-accel !
     \ 2048    164000  xcal 2! \ ruler
     \ 2048    164000  ycal 2!
     1000    79895 xcal 2! \ dial gauge
