@@ -2,7 +2,7 @@ stubforth
 
 A small, C-based, indirect threaded forth system intended to run on bare metal.
 
-file:stubforth.jpg
+[[file:stubforth.jpg]]
 
 * Goals
 - Portability :: readily portable to anything GCC targets
@@ -14,8 +14,8 @@ file:stubforth.jpg
 ** C Extensions used
 Using C extensions contradicts the goal of ultimate portability, but
 some of them are too good to pass up and support for them is common in
-other compilers than GCC (such as Libfirm/cparser).  The following
-extensions are currently used:
+other compilers than GCC (such as Libfirm/cparser and LLVM/clang).
+The following extensions are currently used:
 
 - Labels as Values :: Instantly puts you inside the ballpark of the
      fastest C-Forths out there.
@@ -23,8 +23,6 @@ extensions are currently used:
      macros.
 - Inline assembly ::
 - =__alignof__= ::
-- +Cast to Union+ ::
-- +Static initialization of flexible arrays+ ::
 ** M4
 M4 is used to hide the boring aspects of constructing Forth words as
 static C structs.  Here are some examples of how definitions of Forth
@@ -56,7 +54,7 @@ Some grave departures:
 
 * Source
 ** Repository
-git://gate450.dyndns.org/git/stubforth
+https://github.com/anse1/stubforth
 
 See the file COPYING for warranty and redistribution conditions.
 
