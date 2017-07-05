@@ -19,3 +19,4 @@ stubforth
 flashload
 core
 builtin.4th
+.prog

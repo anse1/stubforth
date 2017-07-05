@@ -28,7 +28,7 @@ stubforth:  stubforth.o
 
 prog: stubforth 
 	mspdebug rf2500 erase "load $<"
-	touch prog
+	touch .prog
 
 %.size: % size.sh
 	. ./size.sh $<
