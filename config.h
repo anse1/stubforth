@@ -12,4 +12,10 @@
 #define PARAM_STACK_SIZE 32
 #define DICTIONARY_SIZE 144
 
+#include <stdint.h>
+
+typedef intptr_t vmint;
+typedef uintptr_t uvmint;
+typedef int64_t dvmint;
+
 #endif
