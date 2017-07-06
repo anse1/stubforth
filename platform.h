@@ -18,11 +18,6 @@ void putchar(int c) {
       putchar('\r');
 }
 
-void *malloc(void) {
-  static char buf[50];
-  return buf;
-}
-
 int getchar(void) {
 
   while( !(UCA0RXIFG & IFG2)) {
