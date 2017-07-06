@@ -212,6 +212,20 @@ test {  1 1 <> . } {0 $}
 test {  1 2 3 4 3 roll . . . . } {1 4 3 2 $}
 test {  1 2 3 4 0 roll . . . . } {4 3 2 1 $}
 
+test {  variable bitfiddle
+    aa bitfiddle ! bitfiddle ? }  {aa $}
+
+test {  50 bitfiddle |! bitfiddle ?
+        5a bitfiddle &! bitfiddle ?
+        a5 bitfiddle &! bitfiddle ?
+        aa bitfiddle ^! bitfiddle ?
+        a5 bitfiddle ^! bitfiddle ?
+   }  {fa 5a 0 aa f $}
+
+test {  a0 bitfiddle |! bitfiddle ?
+        55 bitfiddle ~&! bitfiddle ?
+   }  {af aa $}
+
 send "forget testsuite-marker bye\n"
 
 interact
