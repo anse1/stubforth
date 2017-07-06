@@ -845,6 +845,7 @@ include(string.m4)
 dnl include(ffi.m4)
 dnl include(floating.m4)
 dnl include(double.m4)
+include(bitfiddle.m4)
 
 dnl platform
 
