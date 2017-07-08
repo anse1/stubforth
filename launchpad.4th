@@ -83,3 +83,45 @@ ffff t1ccr0 !
 \ ;
 
 
+\ adc
+
+0 adc10ctl1 ?
+0 adc10ctl0 ?
+0 adc10ctl1 !
+0 adc10ctl0 !
+10 adc10ctl0 |! \ ADCON
+1 d << adc10ctl0 |! \ internal reference
+3 b << adc10ctl0 |! \ 64clk s&h
+\ 3 5 << adc10ctl1 |! \ clk/4
+7 5 << adc10ctl1 |! \ clk/8
+\ 3 5 << adc10ctl0 |! \ REF2_5V | REFON
+1 5 << adc10ctl0 |! \ !REF2_5V | REFON
+a c << adc10ctl1 |! \ temperature sensor
+b c << adc10ctl1 |! \ vcc/2
+\ 2 3 << adc10ctl1 |! \ smclk
+
+
+: sample
+  3 adc10ctl0 |!
+  begin
+  adc10ctl1 @ 1 and while \ adcbusy
+  [char] . emit
+  repeat
+  3 adc10ctl0 ~&!
+  adc10mem @ ;
+
+: avg
+  0 1f
+  begin
+  swap sample + swap
+  ?dup while 1-
+  repeat
+  5 >> ;
+
+: avg2
+  0 1f
+  begin
+  swap avg + swap
+  ?dup while 1-
+  repeat
+  5 >> lf ;
