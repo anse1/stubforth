@@ -31,9 +31,6 @@ prog: stubforth
 	touch .prog
 
 %.size: % size.sh
-	. ./size.sh $<
-	strip $<
-	ls -l $<
 	size $<
 
 %.c: %.c.m4 Makefile *.m4
