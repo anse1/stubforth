@@ -21,8 +21,10 @@ The following extensions are currently used:
      fastest C-Forths out there.
 - Named initializers :: Allows robust filling of static C structs with
      macros.
-- Inline assembly ::
-- =__alignof__= ::
+- Inline assembly :: We're targeting bare metal here…
+- =__alignof__= :: The compiler already knows the alignment
+                   requirements of the target.  Doing it by hand would
+                   be error-prone and redundant work
 ** M4
 M4 is used to hide the boring aspects of constructing Forth words as
 static C structs.  Here are some examples of how definitions of Forth
@@ -51,6 +53,8 @@ Some grave departures:
 - Use of =does>= with =<builds= instead of =create=.
 - Throwing a 0 does non-local control flow without rolling back the parameter stack.
 - No automatic "OK" response
+- Outlandish operator names.  E.g., =<<= instead of =lshift=.  This
+  matters when squeezing stubforth into smaller µCs.
 
 * Source
 ** Repository
