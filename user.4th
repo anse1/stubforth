@@ -129,3 +129,6 @@ repeat drop ;
 : octal 8 base c! ;
 : binary 2 base c! ;
 
+: do postpone swap postpone 2>r postpone begin postpone 2r@ postpone > postpone while ; immediate
+: loop postpone r> postpone 1+ postpone >r postpone repeat postpone 2r> postpone 2drop ; immediate
+: i postpone r@ ; immediate
