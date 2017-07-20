@@ -64,7 +64,7 @@ fbinop(fdiv, f/, /)
 
 fbinop(flt, f<, <)
 fbinop(fgt, f>, >)
-fbinop(feq, f=, =)
+fbinop(feq, f=, ==)
 
 primary(fzlt, f0<)
 sp->i = fp[-1] < 0;
