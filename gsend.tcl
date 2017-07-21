@@ -21,7 +21,7 @@ log_user 1
 
 send {
     decimal
-    5 xy-max ! \ xy maximum speed (100us/step)
+    2 xy-max ! \ xy maximum speed (100us/step)
     0 g-speed ! \ user speed
     24 xy-jerk !
     42 z-jerk ! \ z jerk speed (100us/step)

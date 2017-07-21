@@ -58,19 +58,51 @@ f gpioden pd !
 f gpiodir pd !
 : sz gpiodata pd f 2 << + ! ;
 
-\ stepper x
-	
-f0 gpiodr8r pc !
-f0 gpioden pc !
-f0 gpiodir pc !
-: sx 4 << gpiodata pc f0 2 << + ! ;
+\ drv8825 upgrade
 
-\ stepper y
-	
 f gpiodr8r pb !
 f gpioden pb !
 f gpiodir pb !
-: sy gpiodata pb f 2 << + ! ;
+
+: reset ( bool -- ) \ reset drv8825
+   3 << gpiodata pb 8 2 << + !
+;
+
+f0 gpiodr8r pc !
+f0 gpioden pc !
+f0 gpiodir pc !
+
+: ystep ( -- ) \ step drv8825 x
+   [ 10 ] literal
+   [ gpiodata pc 10 2 << + ] literal
+   !
+   0 + \ NOP, stubforth is too fast!
+   [ 0 ] literal
+   [ gpiodata pc 10 2 << + ] literal
+   !
+;
+
+: ydir ( bool -- ) \ dir drv8825 x
+   5 <<
+   [ gpiodata pc 20 2 << + ] literal
+   !
+;
+
+: xstep ( -- ) \ step drv8825 x
+   [ 40 ] literal
+   [ gpiodata pc 40 2 << + ] literal
+   !
+   0 + \ NOP, stubforth is too fast!
+   [ 0 ] literal
+   [ gpiodata pc 40 2 << + ] literal
+   !
+;
+
+: xdir ( bool -- ) \ dir drv8825 x
+   7 <<
+   [ gpiodata pc 80 2 << + ] literal
+   !
+;
 
 \ stepper e 
 ff gpiodr8r pb !
@@ -85,10 +117,10 @@ f gpiodir pe !
 : sl gpiodata pe f 2 << + ! ;
 
 \ current stepper positions in half-steps
-variable xpos
-variable ypos
-variable zpos
-variable epos
+variable xpos 0 xpos !
+variable ypos 0 ypos !
+variable zpos 0 zpos !
+variable epos 0 epos !
 
 \ compute active coils of unipolar stepper for halfstep
 : halfstep ( 0..7 -- 0..15 )
@@ -121,13 +153,40 @@ variable epos
 	endcase
 ;
 
-: xc 7 xpos @ - halfstep sx ;
-: yc 7 ypos @ - halfstep sy ;
+\ kludge to avoid touching too much code after drv8825 upgrade
+
+variable prev_xpos 0 prev_xpos !
+variable prev_ypos 0 prev_ypos !
+
+: xc
+  xpos @ prev_xpos @
+  2dup = if 2drop exit then
+  < xdir
+  xstep
+  xpos @ prev_xpos !
+;
+
+: yc
+  ypos @ prev_ypos @
+  2dup = if 2drop exit then
+  < ydir
+  ystep
+  ypos @ prev_ypos !
+;
+
+
 : zc 7 zpos @ - halfstep sz ;
 : ec 7 epos @ - halfstepbi se ;
 
-: off 0 sx 0 sy 0 sz 0 se ;
-: on xc yc zc ec ;
+: off \ motors off
+  0 reset
+  0 sz 0 se
+;
+
+: on \ motors on
+   1 reset
+   zc ec
+;
 
 : 2rel ypos @ - swap xpos @ - swap ;
 : 2abs abs swap abs swap ;
