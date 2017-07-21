@@ -1,9 +1,8 @@
 stubforth
 
-A small, C-based, indirect threaded forth system intended to run on
-bare metal.
+A small, C-based, indirect threaded forth system intended to run on bare metal.
 
-file:stubforth.jpg
+[[file:stubforth.jpg]]
 
 * Goals
 - Portability :: readily portable to anything GCC targets
@@ -15,22 +14,22 @@ file:stubforth.jpg
 ** C Extensions used
 Using C extensions contradicts the goal of ultimate portability, but
 some of them are too good to pass up and support for them is common in
-other compilers than GCC (such as Libfirm/cparser).  The following
-extensions are currently used:
+other compilers than GCC (such as Libfirm/cparser and LLVM/clang).
+The following extensions are currently used:
 
 - Labels as Values :: Instantly puts you inside the ballpark of the
      fastest C-Forths out there.
 - Named initializers :: Allows robust filling of static C structs with
      macros.
-- Inline assembly ::
-- =__alignof__= ::
-- +Cast to Union+ ::
-- +Static initialization of flexible arrays+ ::
+- Inline assembly :: We're targeting bare metal here…
+- =__alignof__= :: The compiler already knows the alignment
+                   requirements of the target.  Doing it by hand would
+                   be error-prone and redundant work
 ** M4
-M4 is used to hide the boring aspects of constructing Forth words as
-static C structs.  Here are some examples of how definitions of Forth
-words look like in stubforth's source before M4 expands them to code
-and static structs in plain C:
+M4 is used to hide the redundant aspects of constructing Forth words
+as static C structs.  Here are some examples of how definitions of
+Forth words look like in stubforth's source before M4 expands them to
+code and static structs in plain C:
 
 : primary(min)
 :   sp--;
@@ -43,7 +42,8 @@ and static structs in plain C:
 
 ** Standard conformance
 I try to follow the standards unless doing so would violate the goals
-or not make sense to me.
+or not make sense to me or I didn't find the time to coerce the code
+to conform yet.  Patches welcome.
 
 Some grave departures:
 
@@ -52,10 +52,13 @@ Some grave departures:
 - No counted strings.
 - Use of =does>= with =<builds= instead of =create=.
 - Throwing a 0 does non-local control flow without rolling back the parameter stack.
+- No automatic "OK" response
+- Outlandish operator names.  E.g., =<<= instead of =lshift=.  This
+  matters when squeezing stubforth into smaller µCs.
 
 * Source
 ** Repository
-git://gate450.dyndns.org/git/stubforth
+https://github.com/anse1/stubforth
 
 See the file COPYING for warranty and redistribution conditions.
 
