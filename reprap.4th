@@ -264,7 +264,7 @@ variable z-jerk
 variable xy-delay
 
 decimal
-3 xy-max ! \ xy maximum speed (100us/step)
+0 xy-max ! \ xy maximum speed (100us/step)
 0 g-speed ! \ user speed
 24 xy-jerk !
 42 z-jerk ! \ z jerk speed (100us/step)
@@ -667,8 +667,8 @@ variable pid_i_decay
 decimal
 
 \               steps       µm
-2variable xcal  1000    79895  xcal 2!
-2variable ycal  1000    79895  ycal 2!
+2variable xcal  2000    79895  xcal 2!
+2variable ycal  2000    79895  ycal 2!
 2variable zcal   200      1227  zcal 2!
 \ 2variable ecal  4096     44521  ecal 2!
 \ 2variable ecal  2000     22000  ecal 2! \ free air, 195°C
@@ -832,17 +832,29 @@ decimal
 	gkey
 	eol? if exit then
 	case
-		[char] X of gcode-num g-xpos endof
-		[char] Y of gcode-num g-ypos endof
-		[char] Z of gcode-num g-zpos endof
-		[char] E of gcode-num g-epos endof
+		[char] X of
+		    gcode-num g-xpos
+		    g-relative-p @ if +! else ! then
+		endof
+		[char] Y of
+		     gcode-num g-ypos
+                     g-relative-p @ if +! else ! then
+		endof
+		[char] Z of
+ 		     gcode-num g-zpos
+                     g-relative-p @ if +! else ! then
+                endof
+		[char] E of
+                     gcode-num g-epos
+                     g-relative-p @ if +! else ! then
+                endof
 		[char] F of gcode-num
 			\ unit is mm/minute, using mm/s internally
-			60 / g-fpos endof
-		[char] ; of skipline exit endof
+			60 / g-fpos !
+                endof
+		[char] ; of skipline endof
 		syntax throw
 	endcase
-	g-relative-p @ if +! else ! then
 ;
 
 : ok ." ok " .s ;
@@ -973,5 +985,4 @@ decimal
 : GCODE ginterp ; \ pronterface capitalizes everything
 
 \ end of parser
-
 
