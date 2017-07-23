@@ -514,7 +514,6 @@ variable t_ist
 hex
 variable t_soll 8c t_soll !
 
-hex
 
 1 5 << rcgcwtimer +! \ clock gate for wtimer5
 7 7 4 * << gpiopctl pd +! \ PD7 AF: wt5ccp1
@@ -680,6 +679,7 @@ variable g-ypos
 variable g-zpos
 variable g-epos
 variable g-fpos  \ feedrate
+variable g-relative-p
 
 : home
 	0 epos ! \ just reset the extruder
@@ -848,7 +848,7 @@ decimal
 
 : gcode-g1 \ controlled move
 	begin
-		gcode-collect-pos
+	   gcode-collect-pos
 	eol? until
 	ok
 	gspeed
@@ -892,6 +892,13 @@ decimal
 ;
 
 decimal
+
+: gcode-m105
+       base @ decimal
+       ." ok T:" t_ist @  10 / . lf
+       base !
+;
+
 : gcode-m109
 	gcode-m104
 	begin
@@ -917,6 +924,7 @@ decimal
 		108 of skipline ok endof
 		107 of ok endof \ fan off
 		106 of skipline ok endof \ fan on
+		105 of gcode-m105 skipline endof \ temperature reading
 		104 of gcode-m104 ok endof
 		109 of gcode-m109 ok endof \ wait for temperature
 		226 of gcode-m226 ok endof \ user pause
@@ -946,6 +954,8 @@ decimal
 		gcode
 	again
 ;
+
+: GCODE ginterp ; \ pronterface capitalizes everything
 
 \ end of parser
 
