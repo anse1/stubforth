@@ -593,10 +593,10 @@ variable pid_err_diff
 variable pid_i_decay
 
 0 pid_i !	 
-80000 pid_p !
--100000 pid_d !
+68000 pid_p !
+-c0000 pid_d !
 0 pid_err_accu !
-10 pid_droop !
+18 pid_droop !
 64 pid_i_decay !
 
 : pid_sample ( -- )
