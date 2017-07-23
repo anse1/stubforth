@@ -873,11 +873,12 @@ decimal
 : gcode-g
 	gword number
 	case
-		1 of gcode-g1 endof
-		92 of gcode-g92 ok endof
-		90 of ok endof
-		21 of ok endof
-		28 of gcode-g28 ok endof
+		0 of gcode-g1 endof \ rapid linear move
+		1 of gcode-g1 endof \ linear move
+		92 of gcode-g92 ok endof \ set position
+		90 of ok endof \ set absolute positioning
+		21 of ok endof \ set units to mm
+		28 of gcode-g28 ok endof \ move to origin
 		unimplemented throw
 	endcase
 ;
