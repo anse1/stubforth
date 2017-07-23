@@ -303,7 +303,7 @@ decimal
 			else
 				z-jerk @
 			then
-			100us
+			?dup if 100us then
 	repeat
 	r>
 	2drop 2drop
@@ -715,7 +715,7 @@ variable g-relative-p
 	g-fpos @ \ dx dy um/s --
 	xcal 2@ */ \ dx dy steps/s --
 	axis-speed
-	10000 swap / g-speed !
+	2000 swap / g-speed !
 ;
 
 : gmove
