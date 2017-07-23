@@ -832,19 +832,20 @@ decimal
 	gkey
 	eol? if exit then
 	case
-		[char] X of gcode-num g-xpos ! endof
-		[char] Y of gcode-num g-ypos ! endof
-		[char] Z of gcode-num g-zpos ! endof
-		[char] E of gcode-num g-epos ! endof
+		[char] X of gcode-num g-xpos endof
+		[char] Y of gcode-num g-ypos endof
+		[char] Z of gcode-num g-zpos endof
+		[char] E of gcode-num g-epos endof
 		[char] F of gcode-num
 			\ unit is mm/minute, using mm/s internally
-			60 / g-fpos ! endof
-		[char] ; of skipline endof
+			60 / g-fpos endof
+		[char] ; of skipline exit endof
 		syntax throw
 	endcase
+	g-relative-p @ if +! else ! then
 ;
 
-: ok ." ok" lf ;
+: ok ." ok " .s ;
 
 : gcode-g1 \ controlled move
 	begin
@@ -871,12 +872,14 @@ decimal
 ;
 
 : gcode-g
+	on
 	gword number
 	case
 		0 of gcode-g1 endof \ rapid linear move
 		1 of gcode-g1 endof \ linear move
 		92 of gcode-g92 ok endof \ set position
-		90 of ok endof \ set absolute positioning
+		90 of 0 g-relative-p ! ok endof \ set absolute positioning
+		91 of 1 g-relative-p ! ok endof \ set absolute positioning
 		21 of ok endof \ set units to mm
 		28 of gcode-g28 ok endof \ move to origin
 		unimplemented throw
@@ -885,7 +888,7 @@ decimal
 
 : gcode-m104
 	key [char] S = if
-		gword number 10 * pid_droop @ + t_soll !
+		gcode-num 100 / pid_droop @ + t_soll !
 	else
 		syntax throw
 	then
@@ -910,6 +913,16 @@ decimal
 	repeat
 ;
 
+: gcode-m114
+       base @ decimal
+       ." ok X:" g-xpos @ 1000 / .
+       ." Y:" g-ypos @ 1000 / .
+       ." Z:" g-zpos @ 1000 / .
+       ." E:" g-epos @ 1000 / .
+       base !
+       lf
+;
+
 : gcode-m226
 	begin
 		sw1? 0= while
@@ -924,9 +937,11 @@ decimal
 		108 of skipline ok endof
 		107 of ok endof \ fan off
 		106 of skipline ok endof \ fan on
-		105 of gcode-m105 skipline endof \ temperature reading
+		105 of gcode-m105 endof \ temperature reading
 		104 of gcode-m104 ok endof
 		109 of gcode-m109 ok endof \ wait for temperature
+		114 of gcode-m114 ok endof \ get current position
+		140 of skipline ok endof \ bed temperature
 		226 of gcode-m226 ok endof \ user pause
 		84 of off ok endof \ filament retract
 		unimplemented throw
@@ -959,8 +974,4 @@ decimal
 
 \ end of parser
 
-ginterp
-
-
-hex
 
