@@ -264,12 +264,12 @@ variable z-jerk
 variable xy-delay
 
 decimal
-6 xy-max ! \ xy maximum speed (100us/step)
+3 xy-max ! \ xy maximum speed (100us/step)
 0 g-speed ! \ user speed
-33 xy-jerk !
+24 xy-jerk !
 42 z-jerk ! \ z jerk speed (100us/step)
-30000 xy-accel !
-4 xy-delay \ delayed acceleration
+20000 xy-accel !
+5 xy-delay \ delayed acceleration
 
 : sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
 : sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
