@@ -1,5 +1,3 @@
--include config.mak
-
 TTY ?= /dev/ttyACM0
 
 GCC ?= arm-none-eabi-gcc
@@ -75,7 +73,7 @@ TAGS: .
 BINFMT = arm
 ELFFMT = elf32-littlearm
 
-builtin.4th: user.4th cortexm.4th launchpad.4th
+builtin.4th: user.4th cortexm.4th launchpad.4th reprap.4th
 	echo ".( Loading $@...) lf" > $@
 	cat $+ >> $@
 	echo ".( Ready.) lf" >> $@
