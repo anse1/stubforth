@@ -123,7 +123,7 @@ variable zpos 0 zpos !
 variable epos 0 epos !
 
 \ bits for microstepping XY axes over EZ axes
-2 constant xy-microstep
+3 constant xy-microstep
 
 \ compute active coils of unipolar stepper for halfstep
 : halfstep ( 0..7 -- 0..15 )
@@ -268,13 +268,16 @@ variable xy-jerk
 variable z-jerk
 variable xy-delay
 
+
 decimal
 1 xy-max ! \ xy maximum speed (100us/step)
 0 g-speed ! \ user speed
-24 xy-jerk !
-42 xy-microstep >> z-jerk ! \ z jerk speed (100us/step)
-1 xy-accel !
-8 xy-delay \ delayed acceleration
+96 xy-jerk !
+21 z-jerk ! \ z jerk speed (100us/step)
+2 xy-accel !
+16 xy-delay \ delayed acceleration (steps)
+
+: 25us 1000 syst_cvr ! 1000 syst_rvr ! 0 tick ! begin wfi dup tick @ < until drop ;
 
 : sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
 : sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
@@ -285,30 +288,36 @@ decimal
 	\ inc x2 x1 --
 	dup >r
 	\ inc x2 i=x1 -- x1
-	begin
-		2dup <> while
+        zline lconst? if
+                begin 2dup <> while
+			2 pick + \ increment x2 x1+inc -- 
+			xline over leval xpos !
+			yline over leval ypos !
+			eline over leval epos !
+			xc yc ec
+			2dup r@ swap
+			ramp
+			xy-delay @ -
+			dup 0< if
+				drop 0
+			then
+			xy-accel @ <<
+			xy-jerk @ swap -
+			xy-max @ g-speed @ max
+			max
+			?dup if 25us then
+		repeat
+	    else
+		begin 2dup <> while
 			2 pick + \ increment x2 x1+inc -- 
 			xline over leval xpos !
 			yline over leval ypos !
 			zline over leval zpos !
 			eline over leval epos !
 			xc yc zc ec
-			zline lconst? if
-				2dup r@ swap
-				ramp
-				xy-delay @ -
-				dup 0< if
-					drop 0
-				then
-\				xy-accel @ /
-				xy-jerk @ swap -
-				xy-max @ g-speed @ max
-				max
-			else
-				z-jerk @
-			then
-			?dup if 100us then
-	repeat
+			z-jerk @ 25us
+		repeat
+            then
 	r>
 	2drop 2drop
 ;
@@ -671,12 +680,12 @@ variable pid_i_decay
 decimal
 
 \               steps       µm
-2variable xcal  2000    79895  xcal 2!
-2variable ycal  2000    79895  ycal 2!
-2variable zcal   200      1227  zcal 2!
+2variable xcal  4000    79895  xcal 2!
+2variable ycal  4000    79895  ycal 2!
+2variable zcal   800      1227  zcal 2!
 \ 2variable ecal  4096     44521  ecal 2!
 \ 2variable ecal  2000     22000  ecal 2! \ free air, 195°C
-2variable ecal 1024 10225 ecal 2! \ new tapped bold
+2variable ecal 4096 10225 ecal 2! \ new tapped bold
 
 variable g-xpos
 variable g-ypos
