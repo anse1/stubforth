@@ -122,8 +122,12 @@ variable ypos 0 ypos !
 variable zpos 0 zpos !
 variable epos 0 epos !
 
+\ bits for microstepping XY axes over EZ axes
+2 constant xy-microstep
+
 \ compute active coils of unipolar stepper for halfstep
 : halfstep ( 0..7 -- 0..15 )
+  	xy-microstep >>
 	7 and
 	case
 		0 of 1 endof
@@ -140,6 +144,7 @@ variable epos 0 epos !
 \ compute dual full bridge state for bipolar steppers
 \ TODO: Rewire middle wires so it is identical to the former word.
 : halfstepbi ( 0..7 -- 0..15 )
+  	xy-microstep >>
 	7 and
 	case
 		0 of 1 endof
@@ -267,7 +272,7 @@ decimal
 1 xy-max ! \ xy maximum speed (100us/step)
 0 g-speed ! \ user speed
 24 xy-jerk !
-42 z-jerk ! \ z jerk speed (100us/step)
+42 xy-microstep >> z-jerk ! \ z jerk speed (100us/step)
 1 xy-accel !
 8 xy-delay \ delayed acceleration
 
