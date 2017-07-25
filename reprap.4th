@@ -126,36 +126,27 @@ variable epos 0 epos !
 3 constant xy-microstep
 
 \ compute active coils of unipolar stepper for halfstep
+
+variable halfstep_tab 1 cells allot
+06020301 halfstep_tab !
+09080c04 halfstep_tab 1 cells + !
+
 : halfstep ( 0..7 -- 0..15 )
   	xy-microstep >>
 	7 and
-	case
-		0 of 1 endof
-		1 of 3 endof
-		2 of 2 endof
-		3 of 6 endof
-		4 of 4 endof
-		5 of c endof
-		6 of 8 endof
-		7 of 9 endof
-	endcase
+	halfstep_tab + c@
 ;
+
+variable halfstepbi_tab 1 cells allot
+06040501 halfstepbi_tab !
+09080a02 halfstepbi_tab 1 cells + !
 
 \ compute dual full bridge state for bipolar steppers
 \ TODO: Rewire middle wires so it is identical to the former word.
 : halfstepbi ( 0..7 -- 0..15 )
   	xy-microstep >>
 	7 and
-	case
-		0 of 1 endof
-		1 of 5 endof
-		2 of 4 endof
-		3 of 6 endof
-		4 of 2 endof
-		5 of a endof
-		6 of 8 endof
-		7 of 9 endof
-	endcase
+	halfstepbi_tab + c@
 ;
 
 \ kludge to avoid touching too much code after drv8825 upgrade
@@ -197,18 +188,18 @@ variable prev_ypos 0 prev_ypos !
 : 2abs abs swap abs swap ;
 
 : mkline ( x1 y1 x2 y2 -- b dx dy )
-	2 pick	\ x1 y1 x2 y2 y1
-	- \ x1 y1 x2 y2-y1
-	swap \ x1 y1 y2-y1 x2
-	3 pick \ x1 y1 y2-y1 x2 x1
-	- \ x1 y1 y2-y1 x2-x1
-	swap \ x1 y1 x2-x1 y2-y1
-	2dup 2>r \ x1 y1 x2-x1 y2-y1 r: x2-x1 y2-y1
-	3 roll \ y1 x2-x1 y2-y1 x1 r: x2-x1 y2-y1
-	* \ y1 x2-x1 (y2-y1)*x1 r: x2-x1 y2-y1
-	swap \ y1 (y2-y1)*x1 x2-x1 r: x2-x1 y2-y1
-	/ \ y1 (y2-y1)*x1/(x2-x1) r: x2-x1 y2-y1
-	- \ y1-(y2-y1)*x1/(x2-x1) r: x2-x1 y2-y1
+	2 pick		\ x1 y1 x2 y2 y1
+	-		\ x1 y1 x2 y2-y1
+	swap		\ x1 y1 y2-y1 x2
+	3 pick		\ x1 y1 y2-y1 x2 x1
+	-		\ x1 y1 y2-y1 x2-x1
+	swap		\ x1 y1 x2-x1 y2-y1
+	2dup 2>r	\ x1 y1 x2-x1 y2-y1 r: x2-x1 y2-y1
+	3 roll		\ y1 x2-x1 y2-y1 x1 r: x2-x1 y2-y1
+	*		\ y1 x2-x1 (y2-y1)*x1 r: x2-x1 y2-y1
+	swap		\ y1 (y2-y1)*x1 x2-x1 r: x2-x1 y2-y1
+	/		\ y1 (y2-y1)*x1/(x2-x1) r: x2-x1 y2-y1
+	-		\ y1-(y2-y1)*x1/(x2-x1) r: x2-x1 y2-y1
 	2r>
 ;
 
