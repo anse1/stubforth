@@ -272,15 +272,12 @@ variable xy-delay
 decimal
 1 xy-max ! \ xy maximum speed (100us/step)
 0 g-speed ! \ user speed
-96 xy-jerk !
+48 xy-jerk !
 21 z-jerk ! \ z jerk speed (100us/step)
-2 xy-accel !
-16 xy-delay \ delayed acceleration (steps)
+6 xy-accel !
+20 xy-delay \ delayed acceleration (steps)
 
 : 25us 1000 syst_cvr ! 1000 syst_rvr ! 0 tick ! begin wfi dup tick @ < until drop ;
-
-: sqrt-closer ( square guess -- square guess adjustment) 2dup / over - 2 / ;
-: sqrt ( square -- root ) 1 begin sqrt-closer dup while + repeat drop nip ;
 
 \ multidimensional linear movement from x1 to x2  {x,y,z,e}line
 : domove ( x2 x1 -- )
@@ -301,7 +298,7 @@ decimal
 			dup 0< if
 				drop 0
 			then
-			xy-accel @ <<
+			xy-accel @ << sqrt
 			xy-jerk @ swap -
 			xy-max @ g-speed @ max
 			max

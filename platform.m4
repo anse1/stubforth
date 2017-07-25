@@ -341,3 +341,23 @@ primary(dpynum)
 	}
 }
 
+primary(sqrt)
+{
+     uvmint square = sp[-1].u;
+     uvmint guess = square;
+
+     if (square == 0)
+	  goto next;
+
+     while(1)
+     {
+	  uvmint newguess = (guess+square/guess)/2;
+	  if (newguess >= guess)
+	  {
+	       sp[-1].u = guess;
+	       goto next;
+	  }
+	  else
+	       guess = newguess;
+     }
+}
