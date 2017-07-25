@@ -22,6 +22,12 @@ asm("wfi");
 primary(wfe)
 asm("wfe");
 
+primary(cpsie)
+asm("cpsie i");
+
+primary(cpsid)
+asm("cpsid i");
+
 primary(emitq, key?)
   sp[0].i = (ring.in != ring.out);
   sp++;
