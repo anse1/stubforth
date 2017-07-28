@@ -864,7 +864,7 @@ decimal
 
 : ok 
   skipline
-  ." ok " .s 
+  ." ok" lf
 ;
 
 : gcode-g1 \ controlled move
