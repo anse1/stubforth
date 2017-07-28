@@ -743,6 +743,7 @@ variable lastkey
 	case
 		10 of 1 endof
 		13 of 1 endof
+ 		[char] * of 1 endof
 		0
 	endcase
 ;
@@ -752,7 +753,8 @@ variable lastkey
 ;
 
 : word? ( -- bool )
-	lastkey @ 32 >
+	lastkey @ dup 32 >
+	swap [char] * <> and
 ;
 
 : gword ( -- char* ) \ like word, use gkey instead
@@ -777,6 +779,7 @@ variable lastkey
 ;
 
 : skipline ( -- )
+  	lastkey @ 10 = if exit then
 	begin gkey 10 = until
 ;
 
@@ -859,7 +862,10 @@ decimal
 	endcase
 ;
 
-: ok ." ok " .s ;
+: ok 
+  skipline
+  ." ok " .s 
+;
 
 : gcode-g1 \ controlled move
 	begin
@@ -975,11 +981,10 @@ decimal
 		[char] G of gcode-g endof
 		[char] M of gcode-m endof
 		[char] ; of skipline endof
-		[char] N of
-  		     begin gkey 32 <> while repeat
-		endof
+		[char] N of gword number drop recurse endof
 		unimplemented throw
 	endcase
+	skipline
 ;
 
 : ginterp
