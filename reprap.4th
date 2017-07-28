@@ -670,10 +670,10 @@ decimal
 \               steps       µm
 2variable xcal  4000    79895  xcal 2!
 2variable ycal  4000    79895  ycal 2!
-2variable zcal   800      1227  zcal 2!
+2variable zcal   1600      1227  zcal 2!
 \ 2variable ecal  4096     44521  ecal 2!
 \ 2variable ecal  2000     22000  ecal 2! \ free air, 195°C
-2variable ecal 4096 10225 ecal 2! \ new tapped bold
+2variable ecal 8192 10225 ecal 2! \ new tapped bold
 
 variable g-xpos
 variable g-ypos
@@ -716,7 +716,7 @@ variable g-relative-p
 	g-fpos @ \ dx dy um/s --
 	xcal 2@ */ \ dx dy steps/s --
 	axis-speed
-	2000 swap / g-speed !
+	25000 swap / g-speed !
 ;
 
 : gmove
@@ -854,6 +854,7 @@ decimal
 			60 / g-fpos !
                 endof
 		[char] ; of skipline endof
+		[char] * of skipline endof
 		syntax throw
 	endcase
 ;
@@ -953,6 +954,7 @@ decimal
 		105 of gcode-m105 endof \ temperature reading
 		104 of gcode-m104 ok endof
 		109 of gcode-m109 ok endof \ wait for temperature
+		110 of skipline ok endof \ get current position
 		114 of gcode-m114 ok endof \ get current position
 		140 of skipline ok endof \ bed temperature
 		226 of gcode-m226 ok endof \ user pause
@@ -973,6 +975,9 @@ decimal
 		[char] G of gcode-g endof
 		[char] M of gcode-m endof
 		[char] ; of skipline endof
+		[char] N of
+  		     begin gkey 32 <> while repeat
+		endof
 		unimplemented throw
 	endcase
 ;
@@ -986,4 +991,9 @@ decimal
 : GCODE ginterp ; \ pronterface capitalizes everything
 
 \ end of parser
+
+\ Make the forth interpreter understand g-code directly
+
+\ comments
+: ; state if postpone ; else postpone \ then ;
 
