@@ -108,6 +108,15 @@ undefine(`self')
 
 dnl C helpers
 static int my_getchar() {
+  int c;
+
+  if (redirect) {
+    c = *redirect++;
+    if (!c)
+      return (redirect = 0), -1;
+    else
+      return c;
+  }
   return getchar();
 }
 
@@ -168,6 +177,7 @@ int main()
 
 
   while(1) {
+    redirect = 0;
     vmstate.compiling = 0;
     vmstate.base = 16;
     vmstate.sp = param_stack;
@@ -763,6 +773,8 @@ STATE, NULLP, ZBRANCH, self[19], EXIT,
 LITERAL)
 
 secondary(quit,,, WORD, INTERPRET, QSTACK, BRANCH, self[0])
+
+constant(redirect,, &redirect);
 
 dnl ( -- a )
 secondary(if,, .immediate=1,

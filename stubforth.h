@@ -29,6 +29,8 @@ struct word {
   staticword(0)
 };
 
+unsigned char *redirect;
+
 struct vmstate {
   cell *dp; /* Points above top of data stack. */
   cell *rp; /* Invalid during execution of a VM. */

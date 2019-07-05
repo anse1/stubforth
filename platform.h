@@ -20,7 +20,16 @@ void putchar(int c) {
 
 int getchar(void) {
 
+ maybe_redirect:
+   if(redirect) {
+     if (*redirect)
+       return *redirect++;
+     else
+       redirect = 0;
+    }
+
   while( !(UCA0RXIFG & IFG2)) {
+    goto maybe_redirect;
   }
 
   int data = UCA0RXBUF;
