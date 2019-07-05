@@ -13,6 +13,10 @@ define(mmio1, `constant(translit($2,A-Z,a-z),, .i=0x$1)')
 define(mmio2, `constant(translit($2,A-Z,a-z),, .i=0x$1)')
 include(symbols.m4)
 
+extern char _binary_builtin_4th_start[];
+constant(builtin,, .s=_binary_builtin_4th_start)
+secondary(boot2,boot,, BUILTIN, EVALUATE, HI, QUIT)
+
 primary(us)
 {
     TA0R = 0;

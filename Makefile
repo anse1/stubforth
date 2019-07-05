@@ -23,7 +23,7 @@ stubforth.o:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 stubforth.s:  stubforth.c  *.h Makefile *.m4 config.h symbols.h platform.h
 	$(GCC) $(CFLAGS) -o $@ -S $<
 
-stubforth:  stubforth.o
+stubforth:  stubforth.o builtin.o
 	$(GCC) $(CFLAGS) -Wl,platform.x  -o $@ $+
 
 prog: stubforth 
@@ -40,7 +40,7 @@ check: stubforth
 	expect test.tcl
 
 clean:
-	rm -f symbols.h symbols.4th symbols.gdb
+	rm -f symbols.h symbols.4th symbols.gdb builtin.4th
 	rm -f TAGS
 	rm -f *grind.out.* stubforth
 	rm -f .rev.h *.o *.s stubforth.c
@@ -59,7 +59,15 @@ TAGS: .
 	 *.4th *.c.m4 *.m4
 	shopt -s nullglob; ctags-exuberant -e -a --language-force=c *.c *.h *.m4
 
+builtin.4th: launchpad.4th
+	echo "lf .( Loading $@...) lf" > $@
+	for f in $+; do echo " .( Loading $$f...) lf "; cat $$f ; done >> $@
+	echo ".( Ready.) lf" >> $@
+	dd if=/dev/zero of=$@ bs=1 count=1 oflag=append conv=notrunc
+
+source.o : builtin.4th
+
 %.o : %.4th
-	$(OBJCOPY) -I binary -B msp430  -O elf32-little \
-	 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
+	$(OBJCOPY) -I binary -B msp430:430  -O elf32-msp430 \
+	 --rename-section .data=.rodata.4th,alloc,load,readonly,data,contents \
 	 $< $@
